@@ -9,8 +9,10 @@ export
     rgb2ansi,
     imshow,
     imshow256,
-    imshow24bit
+    imshow24bit,
 
+    @imshow256_on_show,
+    @imshow24bit_on_show
 
 abstract TermColorDepth
 immutable TermColor256   <: TermColorDepth end
@@ -38,36 +40,41 @@ julia> rgb2ansi(Gray(.5))
 244
 ```
 """
+rgb2ansi(color) = rgb2ansi(color, TermColor256())
+
 function rgb2ansi(col::AbstractRGB, ::TermColor256)
     r, g, b = red(col), green(col), blue(col)
-    r24 = round(Int, r*23)
-    g24 = round(Int, g*23)
-    b24 = round(Int, b*23)
+    r24 = round(Int, r * 23)
+    g24 = round(Int, g * 23)
+    b24 = round(Int, b * 23)
     if r24 == g24 == b24
         # Use grayscales because of higher resultion
         # This way even grayscale RGB images look good.
         232 + r24
     else
-        r6 = round(Int, r*5)
-        g6 = round(Int, g*5)
-        b6 = round(Int, b*5)
+        r6 = round(Int, r * 5)
+        g6 = round(Int, g * 5)
+        b6 = round(Int, b * 5)
         16 + 36 * r6 + 6 * g6 + b6
     end
 end
 
-rgb2ansi{T}(gr::Color{T,1}, ::TermColor256) = round(Int, 232 + real(gr) * 23)
+function rgb2ansi{T}(gr::Color{T,1}, ::TermColor256)
+    round(Int, 232 + real(gr) * 23)
+end
 
 # 24 bit colors
 function rgb2ansi(col::AbstractRGB, ::TermColor24bit)
     r, g, b = red(col), green(col), blue(col)
-    round(Int, r*255), round(Int, g*255), round(Int, b*255)
+    round(Int, r * 255), round(Int, g * 255), round(Int, b * 255)
 end
 
 function rgb2ansi{T}(gr::Color{T,1}, ::TermColor24bit)
-    r = round(Int, real(gr)*255)
+    r = round(Int, real(gr) * 255)
     r, r, r
 end
 
+# Fallback for non-rgb and transparent colors (convert to rgb)
 rgb2ansi(gr::Color, colordepth::TermColorDepth) = rgb2ansi(convert(RGB, gr), colordepth)
 rgb2ansi(gr::TransparentColor, colordepth::TermColorDepth) = rgb2ansi(color(gr), colordepth)
 
@@ -147,10 +154,11 @@ function encodeimg{C<:Colorant}(
 end
 
 """
-    imshow([stream], img)
+    imshow([stream], img, [depth::TermColorDepth])
 
 Displays the given image `img` using unicode characters and
-terminal colors. `img` has to be an array or `Colorant`.
+terminal colors (defaults to 256 colors).
+`img` has to be an array of `Colorant`.
 
 If working in the REPL, the function tries to choose the encoding
 based on the current display size. The image will also be
@@ -159,10 +167,10 @@ downsampled to fit into the display (using `restrict`).
 function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C}, colordepth::TermColorDepth)
     io_h, io_w = isinteractive() ? displaysize(io) : (100, 100)
     img_h, img_w = size(img)
-    str = if img_h <= io_h-4 && img_w*2 <= io_w-1
-        encodeimg(BigBlocks(), colordepth, img, io_h-4, io_w-1)[1]
+    str = if img_h <= io_h-4 && img_w*2 <= io_w
+        first(encodeimg(BigBlocks(), colordepth, img, io_h-4, io_w))
     else
-        encodeimg(SmallBlocks(), colordepth, img, io_h-4, io_w-1)[1]
+        first(encodeimg(SmallBlocks(), colordepth, img, io_h-4, io_w))
     end
     for (idx, line) in enumerate(str)
         print(io, line)
@@ -170,14 +178,42 @@ function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C}, colordepth::TermCol
     end
 end
 
+imshow(img) = imshow(STDOUT, img, TermColor256())
+
+"""
+    imshow256([stream], img)
+
+Displays the given image `img` using unicode characters and
+the widely supported 256 terminal colors.
+`img` has to be an array of `Colorant`.
+
+If working in the REPL, the function tries to choose the encoding
+based on the current display size. The image will also be
+downsampled to fit into the display (using `restrict`).
+"""
 imshow256(io, img) = imshow(io, img, TermColor256())
 imshow256(img) = imshow256(STDOUT, img)
 
+"""
+    imshow256([stream], img)
+
+Displays the given image `img` using unicode characters and
+the 24 terminal colors that some modern terminals support.
+`img` has to be an array of `Colorant`.
+
+If working in the REPL, the function tries to choose the encoding
+based on the current display size. The image will also be
+downsampled to fit into the display (using `restrict`).
+"""
 imshow24bit(io, img) = imshow(io, img, TermColor24bit())
 imshow24bit(img) = imshow24bit(STDOUT, img)
 
-imshow(img) = imshow(STDOUT, img, TermColor256())
+"""
+    @imshow256_on_show()
 
+Triggers `imshow256` automatically if an array of colorants is to
+be displayed in the julia REPL.
+"""
 macro imshow256_on_show()
     esc(quote
         function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
@@ -187,6 +223,12 @@ macro imshow256_on_show()
     end)
 end
 
+"""
+    @imshow24bit_on_show()
+
+Triggers `imshow24bit` automatically if an array of colorants is to
+be displayed in the julia REPL.
+"""
 macro imshow24bit_on_show()
     esc(quote
         function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
@@ -195,6 +237,8 @@ macro imshow24bit_on_show()
         end
     end)
 end
+
+@imshow256_on_show()
 
 end # module
 
