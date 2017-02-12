@@ -11,7 +11,6 @@ export
     imshow,
     imshow256,
     imshow24bit,
-
     @imshow24bit_on_show
 
 abstract TermColorDepth
@@ -153,6 +152,33 @@ function encodeimg{C<:Colorant}(
     replace.(readlines(seek(io,0)), ["\n"], [""]), h, 2*w
 end
 
+# colorant vector
+function encodeimg{C<:Colorant}(
+        enc::Union{BigBlocks,SmallBlocks},
+        colordepth::TermColorDepth,
+        img::AbstractVector{C},
+        maxwidth::Int = 100)
+    sign = typeof(enc) <: BigBlocks ? "██ " : "█"
+    mlp  = typeof(enc) <: BigBlocks ?  3    :  1
+    w  = length(img)
+    io = IOBuffer()
+    n = length(img)*mlp > maxwidth ? floor(Int, maxwidth/(mlp*2))-3 : w
+    print(io, Crayon(reset = true))
+    for i in 1:n
+        fgcol = rgb2ansi(img[i], colordepth)
+        print(io, Crayon(foreground=fgcol), sign)
+    end
+    if n < w
+        print(io, Crayon(reset = true), " … ")
+        for i in w-n:w
+            fgcol = rgb2ansi(img[i], colordepth)
+            print(io, Crayon(foreground=fgcol), sign)
+        end
+    end
+    println(io, Crayon(reset = true))
+    replace.(readlines(seek(io,0)), ["\n"], [""]), 1, w
+end
+
 """
     imshow([stream], img, [depth::TermColorDepth])
 
@@ -171,6 +197,21 @@ function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C}, colordepth::TermCol
         first(encodeimg(BigBlocks(), colordepth, img, io_h-4, io_w))
     else
         first(encodeimg(SmallBlocks(), colordepth, img, io_h-4, io_w))
+    end
+    for (idx, line) in enumerate(str)
+        print(io, line)
+        idx < length(str) && println(io)
+    end
+end
+
+# colorant vector
+function imshow{C<:Colorant}(io::IO, img::AbstractVector{C}, colordepth::TermColorDepth)
+    io_h, io_w = isinteractive() ? displaysize(io) : (1, 100)
+    img_w = length(img)
+    str = if img_w*3 <= io_w
+        first(encodeimg(BigBlocks(), colordepth, img, io_w))
+    else
+        first(encodeimg(SmallBlocks(), colordepth, img, io_w))
     end
     for (idx, line) in enumerate(str)
         print(io, line)
@@ -217,14 +258,14 @@ be displayed in the julia REPL.
 macro imshow24bit_on_show()
     esc(quote
         info("Overwriting Base.show for AbstractArray{T<:Colorant} with imshow24bit. If images now render as non-sense for you, then that means your terminal does not support 24 bit colors. To return to the default behaviour of using imshow256 you need to restart the Julia session.")
-        function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
+        function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractVecOrMat{C})
             println(summary(img), ":")
             ImageInTerminal.imshow24bit(io, img)
         end
     end)
 end
 
-function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
+function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractVecOrMat{C})
     println(summary(img), ":")
     ImageInTerminal.imshow256(io, img)
 end
