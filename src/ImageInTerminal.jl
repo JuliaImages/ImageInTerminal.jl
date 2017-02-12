@@ -11,7 +11,6 @@ export
     imshow256,
     imshow24bit,
 
-    @imshow256_on_show,
     @imshow24bit_on_show
 
 abstract TermColorDepth
@@ -209,21 +208,6 @@ imshow24bit(io, img) = imshow(io, img, TermColor24bit())
 imshow24bit(img) = imshow24bit(STDOUT, img)
 
 """
-    @imshow256_on_show()
-
-Triggers `imshow256` automatically if an array of colorants is to
-be displayed in the julia REPL.
-"""
-macro imshow256_on_show()
-    esc(quote
-        function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
-            println(summary(img), ":")
-            ImageInTerminal.imshow256(io, img)
-        end
-    end)
-end
-
-"""
     @imshow24bit_on_show()
 
 Triggers `imshow24bit` automatically if an array of colorants is to
@@ -238,7 +222,10 @@ macro imshow24bit_on_show()
     end)
 end
 
-@imshow256_on_show()
+function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
+    println(summary(img), ":")
+    ImageInTerminal.imshow256(io, img)
+end
 
 end # module
 
