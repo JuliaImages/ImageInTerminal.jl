@@ -7,7 +7,14 @@ using Crayons
 export
 
     rgb2ansi,
-    imshow
+    imshow,
+    imshow256,
+    imshow24bit
+
+
+abstract TermColorDepth
+immutable TermColor256   <: TermColorDepth end
+immutable TermColor24bit <: TermColorDepth end
 
 """
     rgb2ansii(color::Colorant) -> Int
@@ -31,7 +38,7 @@ julia> rgb2ansi(Gray(.5))
 244
 ```
 """
-function rgb2ansi{T}(col::Colorant{T,3})
+function rgb2ansi(col::AbstractRGB, ::TermColor256)
     r, g, b = red(col), green(col), blue(col)
     r24 = round(Int, r*23)
     g24 = round(Int, g*23)
@@ -48,11 +55,26 @@ function rgb2ansi{T}(col::Colorant{T,3})
     end
 end
 
-rgb2ansi{T}(gr::Colorant{T,1}) = round(Int, 232 + real(gr) * 23)
-rgb2ansi{T}(gr::Colorant{T}) = rgb2ansi(color(gr))
+rgb2ansi{T}(gr::Color{T,1}, ::TermColor256) = round(Int, 232 + real(gr) * 23)
+
+# 24 bit colors
+function rgb2ansi(col::AbstractRGB, ::TermColor24bit)
+    r, g, b = red(col), green(col), blue(col)
+    round(Int, r*255), round(Int, g*255), round(Int, b*255)
+end
+
+function rgb2ansi{T}(gr::Color{T,1}, ::TermColor24bit)
+    r = round(Int, real(gr)*255)
+    r, r, r
+end
+
+rgb2ansi(gr::Color, colordepth::TermColorDepth) = rgb2ansi(convert(RGB, gr), colordepth)
+rgb2ansi(gr::TransparentColor, colordepth::TermColorDepth) = rgb2ansi(color(gr), colordepth)
+
+# -----------------------------------------------------------
 
 abstract ImageEncoder
-immutable BigBlocks <: ImageEncoder end
+immutable BigBlocks   <: ImageEncoder end
 immutable SmallBlocks <: ImageEncoder end
 
 """
@@ -81,9 +103,10 @@ The function returns a tuple with three elements:
 """
 function encodeimg{C<:Colorant}(
         ::SmallBlocks,
+        colordepth::TermColorDepth,
         img::AbstractMatrix{C},
-        maxheight::Int = 100,
-        maxwidth::Int = 100)
+        maxheight::Int = 50,
+        maxwidth::Int = 150)
     while ceil(size(img,1)/2) > maxheight || size(img,2) > maxwidth
         img = restrict(img)
     end
@@ -92,8 +115,8 @@ function encodeimg{C<:Colorant}(
     print(io, Crayon(reset = true))
     for y in 1:2:h
         for x in 1:w
-            fgcol = rgb2ansi(img[y,x])
-            bgcol = y+1 <= h ? rgb2ansi(img[y+1,x]) : Symbol("nothing")
+            fgcol = rgb2ansi(img[y,x], colordepth)
+            bgcol = y+1 <= h ? rgb2ansi(img[y+1,x], colordepth) : Symbol("nothing")
             print(io, Crayon(foreground=fgcol, background=bgcol), "▀")
         end
         println(io, Crayon(reset = true))
@@ -103,9 +126,10 @@ end
 
 function encodeimg{C<:Colorant}(
         ::BigBlocks,
+        colordepth::TermColorDepth,
         img::AbstractMatrix{C},
         maxheight::Int = 50,
-        maxwidth::Int = 50)
+        maxwidth::Int = 150)
     while size(img,1) > maxheight || size(img,2)*2 > maxwidth
         img = restrict(img)
     end
@@ -114,7 +138,7 @@ function encodeimg{C<:Colorant}(
     print(io, Crayon(reset = true))
     for y in 1:h
         for x in 1:w
-            fgcol = rgb2ansi(img[y,x])
+            fgcol = rgb2ansi(img[y,x], colordepth)
             print(io, Crayon(foreground=fgcol), "██")
         end
         println(io, Crayon(reset = true))
@@ -132,13 +156,13 @@ If working in the REPL, the function tries to choose the encoding
 based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
-function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C})
+function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C}, colordepth::TermColorDepth)
     io_h, io_w = isinteractive() ? displaysize(io) : (100, 100)
     img_h, img_w = size(img)
     str = if img_h <= io_h-4 && img_w*2 <= io_w-1
-        encodeimg(BigBlocks(), img, io_h-4, io_w-1)[1]
+        encodeimg(BigBlocks(), colordepth, img, io_h-4, io_w-1)[1]
     else
-        encodeimg(SmallBlocks(), img, io_h-4, io_w-1)[1]
+        encodeimg(SmallBlocks(), colordepth, img, io_h-4, io_w-1)[1]
     end
     for (idx, line) in enumerate(str)
         print(io, line)
@@ -146,12 +170,30 @@ function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C})
     end
 end
 
-imshow(img) = imshow(STDOUT, img)
+imshow256(io, img) = imshow(io, img, TermColor256())
+imshow256(img) = imshow256(STDOUT, img)
 
-# Overwrite how colorant arrays are displayed
-function Base.show{C<:Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
-    println(summary(img), ":")
-    imshow(io, img)
+imshow24bit(io, img) = imshow(io, img, TermColor24bit())
+imshow24bit(img) = imshow24bit(STDOUT, img)
+
+imshow(img) = imshow(STDOUT, img, TermColor256())
+
+macro imshow256_on_show()
+    esc(quote
+        function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
+            println(summary(img), ":")
+            ImageInTerminal.imshow256(io, img)
+        end
+    end)
+end
+
+macro imshow24bit_on_show()
+    esc(quote
+        function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
+            println(summary(img), ":")
+            ImageInTerminal.imshow24bit(io, img)
+        end
+    end)
 end
 
 end # module
