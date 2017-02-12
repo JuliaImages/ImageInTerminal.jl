@@ -158,10 +158,11 @@ function encodeimg{C<:Colorant}(
         colordepth::TermColorDepth,
         img::AbstractVector{C},
         maxwidth::Int = 100)
-    while length(img) > maxwidth
-        img = restrict(img)
-    end
     w  = length(img)
+    if w > maxwidth
+        img = vec(Images.imresize(reshape(img, 1, w), (1, maxwidth)))
+        w  = length(img)
+    end
     io = IOBuffer()
     print(io, Crayon(reset = true))
     for i in 1:w
