@@ -215,6 +215,7 @@ be displayed in the julia REPL.
 """
 macro imshow24bit_on_show()
     esc(quote
+        info("Overwriting Base.show for AbstractArray{T<:Colorant} with imshow24bit. If images now render as non-sense for you, then that means your terminal does not support 24 bit colors. To return to the default behaviour of using imshow256 you need to restart the Julia session.")
         function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractMatrix{C})
             println(summary(img), ":")
             ImageInTerminal.imshow24bit(io, img)
