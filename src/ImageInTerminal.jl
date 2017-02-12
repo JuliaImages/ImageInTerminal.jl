@@ -13,6 +13,8 @@ export
     imshow24bit,
     @imshow24bit_on_show
 
+# -------------------------------------------------------------------
+
 abstract TermColorDepth
 immutable TermColor256   <: TermColorDepth end
 immutable TermColor24bit <: TermColorDepth end
@@ -20,16 +22,16 @@ immutable TermColor24bit <: TermColorDepth end
 """
     rgb2ansii(color::Colorant) -> Int
 
-Converts the given colorant into a integer index corresponding to
-the 256r-colors ANSI code that most terminals support.
+Converts the given colorant into an integer index that corresponds
+to the closest 256-colors ANSI code.
 
 ```julia
 julia> rgb2ansi(RGB(1., 1., 0.))
 226
 ```
 
-This function also tries to make good use of the extended number
-of available shades of gray (ansi codes 232 to 255).
+This function also tries to make good use of the additional number
+of available shades of gray (ANSI codes 232 to 255).
 
 ```julia
 julia> rgb2ansi(RGB(.5, .5, .5))
@@ -74,10 +76,13 @@ function rgb2ansi{T}(gr::Color{T,1}, ::TermColor24bit)
 end
 
 # Fallback for non-rgb and transparent colors (convert to rgb)
-rgb2ansi(gr::Color, colordepth::TermColorDepth) = rgb2ansi(convert(RGB, gr), colordepth)
-rgb2ansi(gr::TransparentColor, colordepth::TermColorDepth) = rgb2ansi(color(gr), colordepth)
+rgb2ansi(gr::Color, colordepth::TermColorDepth) =
+    rgb2ansi(convert(RGB, gr), colordepth)
 
-# -----------------------------------------------------------
+rgb2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
+    rgb2ansi(color(gr), colordepth)
+
+# -------------------------------------------------------------------
 
 abstract ImageEncoder
 immutable BigBlocks   <: ImageEncoder end
@@ -122,7 +127,13 @@ function encodeimg{C<:Colorant}(
     for y in 1:2:h
         for x in 1:w
             fgcol = rgb2ansi(img[y,x], colordepth)
-            bgcol = y+1 <= h ? rgb2ansi(img[y+1,x], colordepth) : Symbol("nothing")
+            bgcol = if y+1 <= h
+                rgb2ansi(img[y+1,x], colordepth)
+            else
+                # if reached it means that the last character row
+                # has only the upper pixel defined.
+                Symbol("nothing")
+            end
             print(io, Crayon(foreground=fgcol, background=bgcol), "▀")
         end
         println(io, Crayon(reset = true))
@@ -136,7 +147,7 @@ function encodeimg{C<:Colorant}(
         img::AbstractMatrix{C},
         maxheight::Int = 50,
         maxwidth::Int = 150)
-    while size(img,1) > maxheight || size(img,2)*2 > maxwidth
+    while size(img, 1) > maxheight || size(img, 2)*2 > maxwidth
         img = restrict(img)
     end
     h, w = size(img)
@@ -145,7 +156,7 @@ function encodeimg{C<:Colorant}(
     for y in 1:h
         for x in 1:w
             fgcol = rgb2ansi(img[y,x], colordepth)
-            print(io, Crayon(foreground=fgcol), "██")
+            print(io, Crayon(foreground = fgcol), "██")
         end
         println(io, Crayon(reset = true))
     end
@@ -184,13 +195,13 @@ function encodeimg{C<:Colorant}(
     print(io, Crayon(reset = true))
     for i in 1:n
         fgcol = rgb2ansi(img[i], colordepth)
-        print(io, Crayon(foreground=fgcol), "██ ")
+        print(io, Crayon(foreground = fgcol), "██ ")
     end
     if n < w
         print(io, Crayon(reset = true), " … ")
         for i in w-n:w
             fgcol = rgb2ansi(img[i], colordepth)
-            print(io, Crayon(foreground=fgcol), "██ ")
+            print(io, Crayon(foreground = fgcol), "██ ")
         end
     end
     println(io, Crayon(reset = true))
@@ -208,11 +219,14 @@ If working in the REPL, the function tries to choose the encoding
 based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
-function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C}, colordepth::TermColorDepth)
+function imshow{C<:Colorant}(
+        io::IO,
+        img::AbstractMatrix{C},
+        colordepth::TermColorDepth)
     io_h, io_w = isinteractive() ? displaysize(io) : (50, 150)
     img_h, img_w = size(img)
     str = if img_h <= io_h-4 && img_w*2 <= io_w
-        first(encodeimg(BigBlocks(), colordepth, img, io_h-4, io_w))
+        first(encodeimg(BigBlocks(),   colordepth, img, io_h-4, io_w))
     else
         first(encodeimg(SmallBlocks(), colordepth, img, io_h-4, io_w))
     end
@@ -223,11 +237,14 @@ function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C}, colordepth::TermCol
 end
 
 # colorant vector
-function imshow{C<:Colorant}(io::IO, img::AbstractVector{C}, colordepth::TermColorDepth)
+function imshow{C<:Colorant}(
+        io::IO,
+        img::AbstractVector{C},
+        colordepth::TermColorDepth)
     io_h, io_w = isinteractive() ? displaysize(io) : (1, 100)
     img_w = length(img)
     str = if img_w*3 <= io_w
-        first(encodeimg(BigBlocks(), colordepth, img, io_w))
+        first(encodeimg(BigBlocks(),   colordepth, img, io_w))
     else
         first(encodeimg(SmallBlocks(), colordepth, img, io_w))
     end
@@ -276,15 +293,19 @@ be displayed in the julia REPL.
 macro imshow24bit_on_show()
     esc(quote
         info("Overwriting Base.show for AbstractArray{T<:Colorant} with imshow24bit. If images now render as non-sense for you, then that means your terminal does not support 24 bit colors. To return to the default behaviour of using imshow256 you need to restart the Julia session.")
-        function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractVecOrMat{C})
-            println(summary(img), ":")
+        function Base.show{C<:ColorTypes.Colorant}(
+                io::IO, ::MIME"text/plain",
+                img::AbstractVecOrMat{C})
+            println(io, summary(img), ":")
             ImageInTerminal.imshow24bit(io, img)
         end
     end)
 end
 
-function Base.show{C<:ColorTypes.Colorant}(io::IO, ::MIME"text/plain", img::AbstractVecOrMat{C})
-    println(summary(img), ":")
+function Base.show{C<:ColorTypes.Colorant}(
+        io::IO, ::MIME"text/plain",
+        img::AbstractVecOrMat{C})
+    println(io, summary(img), ":")
     ImageInTerminal.imshow256(io, img)
 end
 
