@@ -154,29 +154,46 @@ end
 
 # colorant vector
 function encodeimg{C<:Colorant}(
-        enc::Union{BigBlocks,SmallBlocks},
+        enc::SmallBlocks,
         colordepth::TermColorDepth,
         img::AbstractVector{C},
         maxwidth::Int = 100)
-    sign = typeof(enc) <: BigBlocks ? "██ " : "█"
-    mlp  = typeof(enc) <: BigBlocks ?  3    :  1
+    while length(img) > maxwidth
+        img = restrict(img)
+    end
     w  = length(img)
     io = IOBuffer()
-    n = length(img)*mlp > maxwidth ? floor(Int, maxwidth/(mlp*2))-3 : w
+    print(io, Crayon(reset = true))
+    for i in 1:w
+        fgcol = rgb2ansi(img[i], colordepth)
+        print(io, Crayon(foreground = fgcol), "█")
+    end
+    println(io, Crayon(reset = true))
+    replace.(readlines(seek(io,0)), ["\n"], [""]), 1, w
+end
+
+function encodeimg{C<:Colorant}(
+        enc::BigBlocks,
+        colordepth::TermColorDepth,
+        img::AbstractVector{C},
+        maxwidth::Int = 100)
+    w  = length(img)
+    io = IOBuffer()
+    n = length(img)*3 > maxwidth ? floor(Int, maxwidth/(3*2))-2 : w
     print(io, Crayon(reset = true))
     for i in 1:n
         fgcol = rgb2ansi(img[i], colordepth)
-        print(io, Crayon(foreground=fgcol), sign)
+        print(io, Crayon(foreground=fgcol), "██ ")
     end
     if n < w
         print(io, Crayon(reset = true), " … ")
         for i in w-n:w
             fgcol = rgb2ansi(img[i], colordepth)
-            print(io, Crayon(foreground=fgcol), sign)
+            print(io, Crayon(foreground=fgcol), "██ ")
         end
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), ["\n"], [""]), 1, w
+    replace.(readlines(seek(io,0)), ["\n"], [""]), 1, 3*(length(1:n) + 1 + length(w-n:w))
 end
 
 """
