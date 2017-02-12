@@ -1,3 +1,4 @@
+__precompile__()
 module ImageInTerminal
 
 using ColorTypes
@@ -164,7 +165,7 @@ based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
 function imshow{C<:Colorant}(io::IO, img::AbstractMatrix{C}, colordepth::TermColorDepth)
-    io_h, io_w = isinteractive() ? displaysize(io) : (100, 100)
+    io_h, io_w = isinteractive() ? displaysize(io) : (50, 150)
     img_h, img_w = size(img)
     str = if img_h <= io_h-4 && img_w*2 <= io_w
         first(encodeimg(BigBlocks(), colordepth, img, io_h-4, io_w))
