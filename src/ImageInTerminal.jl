@@ -1,9 +1,10 @@
 __precompile__()
 module ImageInTerminal
 
-using ColorTypes
-using Images
 using Crayons
+using ColorTypes
+using ImageCore
+using ImageTransformations
 
 export
 
@@ -169,10 +170,10 @@ function encodeimg{C<:Colorant}(
         colordepth::TermColorDepth,
         img::AbstractVector{C},
         maxwidth::Int = 100)
-    w  = length(img)
+    w = length(img)
     if w > maxwidth
         img = vec(Images.imresize(reshape(img, 1, w), (1, maxwidth)))
-        w  = length(img)
+        w = length(img)
     end
     io = IOBuffer()
     print(io, Crayon(reset = true))
@@ -189,9 +190,9 @@ function encodeimg{C<:Colorant}(
         colordepth::TermColorDepth,
         img::AbstractVector{C},
         maxwidth::Int = 100)
-    w  = length(img)
+    w = length(img)
+    n = w*3 > maxwidth ? floor(Int, maxwidth/(3*2))-2 : w
     io = IOBuffer()
-    n = length(img)*3 > maxwidth ? floor(Int, maxwidth/(3*2))-2 : w
     print(io, Crayon(reset = true))
     for i in 1:n
         fgcol = rgb2ansi(img[i], colordepth)
