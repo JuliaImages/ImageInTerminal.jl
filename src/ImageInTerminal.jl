@@ -11,8 +11,13 @@ export
     rgb2ansi,
     imshow,
     imshow256,
-    imshow24bit,
-    @imshow24bit_on_show
+    imshow24bit
+
+const alpha_chars = ["⋅", "░", "▒", "▓", "█"]
+function _charof(alpha)
+    idx = round(Int, alpha * (length(alpha_chars)-1))
+    alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
+end
 
 # -------------------------------------------------------------------
 
@@ -156,8 +161,10 @@ function encodeimg{C<:Colorant}(
     print(io, Crayon(reset = true))
     for y in 1:h
         for x in 1:w
-            fgcol = rgb2ansi(img[y,x], colordepth)
-            print(io, Crayon(foreground = fgcol), "██")
+            color = img[y,x]
+            fgcol = rgb2ansi(color, colordepth)
+            chr = _charof(alpha(color))
+            print(io, Crayon(foreground = fgcol), chr, chr)
         end
         println(io, Crayon(reset = true))
     end
@@ -172,14 +179,16 @@ function encodeimg{C<:Colorant}(
         maxwidth::Int = 100)
     w = length(img)
     if w > maxwidth
-        img = vec(Images.imresize(reshape(img, 1, w), (1, maxwidth)))
+        img = vec(imresize(reshape(img, 1, w), (1, maxwidth)))
         w = length(img)
     end
     io = IOBuffer()
     print(io, Crayon(reset = true))
     for i in 1:w
-        fgcol = rgb2ansi(img[i], colordepth)
-        print(io, Crayon(foreground = fgcol), "█")
+        color = img[i]
+        fgcol = rgb2ansi(color, colordepth)
+        chr = _charof(alpha(color))
+        print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
     replace.(readlines(seek(io,0)), ["\n"], [""]), 1, w
@@ -195,14 +204,18 @@ function encodeimg{C<:Colorant}(
     io = IOBuffer()
     print(io, Crayon(reset = true))
     for i in 1:n
-        fgcol = rgb2ansi(img[i], colordepth)
-        print(io, Crayon(foreground = fgcol), "██ ")
+        color = img[i]
+        fgcol = rgb2ansi(color, colordepth)
+        chr = _charof(alpha(color))
+        print(io, Crayon(foreground = fgcol), chr, chr, " ")
     end
     if n < w
         print(io, Crayon(reset = true), " … ")
         for i in w-n:w
-            fgcol = rgb2ansi(img[i], colordepth)
-            print(io, Crayon(foreground = fgcol), "██ ")
+            color = img[i]
+            fgcol = rgb2ansi(color, colordepth)
+            chr = _charof(alpha(color))
+            print(io, Crayon(foreground = fgcol), chr, chr, " ")
         end
     end
     println(io, Crayon(reset = true))
@@ -286,21 +299,30 @@ imshow24bit(io, img) = imshow(io, img, TermColor24bit())
 imshow24bit(img) = imshow24bit(STDOUT, img)
 
 """
-    @imshow24bit_on_show()
+    @use_24bit()
 
 Triggers `imshow24bit` automatically if an array of colorants is to
 be displayed in the julia REPL.
 """
-macro imshow24bit_on_show()
-    esc(quote
+macro use_24bit()
+    quote
         info("Overwriting Base.show for AbstractArray{T<:Colorant} with imshow24bit. If images now render as non-sense for you, then that means your terminal does not support 24 bit colors. To return to the default behaviour of using imshow256 you need to restart the Julia session.")
         function Base.show{C<:ColorTypes.Colorant}(
                 io::IO, ::MIME"text/plain",
                 img::AbstractVecOrMat{C})
             println(io, summary(img), ":")
-            ImageInTerminal.imshow24bit(io, img)
+            imshow24bit(io, img)
         end
-    end)
+        function Base.show(
+                io::IO, ::MIME"text/plain",
+                color::ColorTypes.Colorant)
+            fgcol = rgb2ansi(color, TermColor256())
+            chr = _charof(alpha(color))
+            print(io, Crayon(foreground = fgcol), "$(chr)$(chr) ")
+            print(io, Crayon(foreground = :white), color)
+            print(io, Crayon(reset = true))
+        end
+    end
 end
 
 function Base.show{C<:ColorTypes.Colorant}(
@@ -308,6 +330,16 @@ function Base.show{C<:ColorTypes.Colorant}(
         img::AbstractVecOrMat{C})
     println(io, summary(img), ":")
     ImageInTerminal.imshow256(io, img)
+end
+
+function Base.show(
+        io::IO, ::MIME"text/plain",
+        color::ColorTypes.Colorant)
+    fgcol = rgb2ansi(color, TermColor256())
+    chr = _charof(alpha(color))
+    print(io, Crayon(foreground = fgcol), "$(chr)$(chr) ")
+    print(io, Crayon(foreground = :white), color)
+    print(io, Crayon(reset = true))
 end
 
 end # module
