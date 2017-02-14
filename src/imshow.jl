@@ -13,9 +13,9 @@ function imshow{C<:Colorant}(
         io::IO,
         img::AbstractMatrix{C},
         colordepth::TermColorDepth)
-    io_h, io_w = isinteractive() ? displaysize(io) : (50, 150)
+    io_h, io_w = isinteractive() ? displaysize(io) : (50, 80)
     img_h, img_w = size(img)
-    str = if img_h <= io_h-4 && img_w*2 <= io_w
+    str = if img_h <= io_h-4 && 2img_w <= io_w
         first(encodeimg(BigBlocks(),   colordepth, img, io_h-4, io_w))
     else
         first(encodeimg(SmallBlocks(), colordepth, img, io_h-4, io_w))
@@ -31,9 +31,9 @@ function imshow{C<:Colorant}(
         io::IO,
         img::AbstractVector{C},
         colordepth::TermColorDepth)
-    io_h, io_w = isinteractive() ? displaysize(io) : (1, 100)
+    io_h, io_w = isinteractive() ? displaysize(io) : (1, 80)
     img_w = length(img)
-    str = if img_w*3 <= io_w
+    str = if 3img_w <= io_w
         first(encodeimg(BigBlocks(),   colordepth, img, io_w))
     else
         first(encodeimg(SmallBlocks(), colordepth, img, io_w))

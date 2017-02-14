@@ -19,6 +19,9 @@ ansi terminal colors.
 - The encoder `enc` specifies which kind of unicode represenation
   should be used.
 
+- The `colordepth` can either be `TermColor256()` or `TermColor24bit()`
+  and specifies which terminal color codes should be used.
+
 - `maxheight` and `maxwidth` specify the maximum numbers of
   string characters that should be used for the resulting image.
   Larger images are downscaled automatically using `restrict`.
@@ -31,18 +34,19 @@ The function returns a tuple with three elements:
 
 2. Number of lines in the vector.
 
-3. Number of visible characters per line (others are colorcodes).
+3. Number of visible characters per line (the remaining are colorcodes).
 """
 function encodeimg{C<:Colorant}(
         ::SmallBlocks,
         colordepth::TermColorDepth,
         img::AbstractMatrix{C},
         maxheight::Int = 50,
-        maxwidth::Int = 150)
-    while ceil(size(img,1)/2) > maxheight || size(img,2) > maxwidth
-        img = restrict(img)
-    end
+        maxwidth::Int = 80)
     h, w = size(img)
+    while ceil(h/2) > maxheight || w > maxwidth
+        img = restrict(img)
+        h, w = size(img)
+    end
     io = IOBuffer()
     print(io, Crayon(reset = true))
     for y in 1:2:h
@@ -67,7 +71,7 @@ function encodeimg{C<:Colorant}(
         colordepth::TermColorDepth,
         img::AbstractMatrix{C},
         maxheight::Int = 50,
-        maxwidth::Int = 150)
+        maxwidth::Int = 80)
     h, w = size(img)
     while h > maxheight || 2w > maxwidth
         img = restrict(img)
@@ -84,7 +88,7 @@ function encodeimg{C<:Colorant}(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), ["\n"], [""]), h, 2*w
+    replace.(readlines(seek(io,0)), ["\n"], [""]), h, 2w
 end
 
 # colorant vector
@@ -92,7 +96,7 @@ function encodeimg{C<:Colorant}(
         enc::SmallBlocks,
         colordepth::TermColorDepth,
         img::AbstractVector{C},
-        maxwidth::Int = 100)
+        maxwidth::Int = 80)
     w = length(img)
     if w > maxwidth
         img = vec(imresize(reshape(img, 1, w), (1, maxwidth)))
@@ -114,9 +118,9 @@ function encodeimg{C<:Colorant}(
         enc::BigBlocks,
         colordepth::TermColorDepth,
         img::AbstractVector{C},
-        maxwidth::Int = 100)
+        maxwidth::Int = 80)
     w = length(img)
-    n = w*3 > maxwidth ? floor(Int, maxwidth/(3*2))-2 : w
+    n = 3w > maxwidth ? floor(Int, maxwidth/6)-2 : w
     io = IOBuffer()
     print(io, Crayon(reset = true))
     for i in 1:n

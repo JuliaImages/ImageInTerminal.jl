@@ -26,17 +26,13 @@ julia> colorant2ansi(Gray(.5))
 """
 function colorant2ansi(col::AbstractRGB)
     r, g, b = red(col), green(col), blue(col)
-    r24 = round(Int, r * 23)
-    g24 = round(Int, g * 23)
-    b24 = round(Int, b * 23)
+    r24, g24, b24 = map(c->round(Int, c * 23), (r, g, b))
     if r24 == g24 == b24
         # Use grayscales because of higher resultion
         # This way even grayscale RGB images look good.
         232 + r24
     else
-        r6 = round(Int, r * 5)
-        g6 = round(Int, g * 5)
-        b6 = round(Int, b * 5)
+        r6, g6, b6 = map(c->round(Int, c * 5), (r, g, b))
         16 + 36 * r6 + 6 * g6 + b6
     end
 end
@@ -55,7 +51,7 @@ _colorant2ansi(color, ::TermColor256) = colorant2ansi(color)
 # 24 bit colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
     r, g, b = red(col), green(col), blue(col)
-    round(Int, r * 255), round(Int, g * 255), round(Int, b * 255)
+    map(c->round(Int, c * 255), (r, g, b))
 end
 
 function _colorant2ansi{T}(gr::Color{T,1}, ::TermColor24bit)
