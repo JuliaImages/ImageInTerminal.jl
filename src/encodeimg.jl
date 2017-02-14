@@ -10,7 +10,7 @@ function _charof(alpha)
 end
 
 """
-    encodeimg(enc::ImageEncoder, img, [maxheight], [maxwidth])
+    encodeimg(enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
 
 Transforms the pixel of the given image `img`, which has to be an
 array of `Colorant`, into a string of unicode characters using
@@ -47,9 +47,9 @@ function encodeimg{C<:Colorant}(
     print(io, Crayon(reset = true))
     for y in 1:2:h
         for x in 1:w
-            fgcol = colorant2ansi(img[y,x], colordepth)
+            fgcol = _colorant2ansi(img[y,x], colordepth)
             bgcol = if y+1 <= h
-                colorant2ansi(img[y+1,x], colordepth)
+                _colorant2ansi(img[y+1,x], colordepth)
             else
                 # if reached it means that the last character row
                 # has only the upper pixel defined.
@@ -78,7 +78,7 @@ function encodeimg{C<:Colorant}(
     for y in 1:h
         for x in 1:w
             color = img[y,x]
-            fgcol = colorant2ansi(color, colordepth)
+            fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
             print(io, Crayon(foreground = fgcol), chr, chr)
         end
@@ -102,7 +102,7 @@ function encodeimg{C<:Colorant}(
     print(io, Crayon(reset = true))
     for i in 1:w
         color = img[i]
-        fgcol = colorant2ansi(color, colordepth)
+        fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr)
     end
@@ -121,7 +121,7 @@ function encodeimg{C<:Colorant}(
     print(io, Crayon(reset = true))
     for i in 1:n
         color = img[i]
-        fgcol = colorant2ansi(color, colordepth)
+        fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr, chr, " ")
     end
@@ -129,7 +129,7 @@ function encodeimg{C<:Colorant}(
         print(io, Crayon(reset = true), " … ")
         for i in w-n:w
             color = img[i]
-            fgcol = colorant2ansi(color, colordepth)
+            fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
             print(io, Crayon(foreground = fgcol), chr, chr, " ")
         end

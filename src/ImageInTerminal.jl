@@ -49,7 +49,7 @@ end
 
 # colorant
 function Base.show(io::IO, ::MIME"text/plain", color::Colorant)
-    fgcol = colorant2ansi(color, colormode[1])
+    fgcol = _colorant2ansi(color, colormode[1])
     chr = _charof(alpha(color))
     print(io, Crayon(foreground = fgcol), "$(chr)$(chr) ")
     print(io, Crayon(foreground = :white), color)
