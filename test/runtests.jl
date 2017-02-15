@@ -1,5 +1,13 @@
-using ImageInTerminal
+using ImageInTerminal, ImageCore, ColorTypes, FixedPointNumbers
 using Base.Test
 
-# write your own tests here
-@test 1 == 2
+tests = [
+    "tst_colorant2ansi.jl",
+]
+
+for t in tests
+    @testset "$t" begin
+        include(t)
+    end
+end
+
