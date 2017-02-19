@@ -24,7 +24,16 @@ julia> colorant2ansi(Gray(.5))
 244
 ```
 """
-function colorant2ansi(col::AbstractRGB)
+colorant2ansi(color) = _colorant2ansi(color, TermColor256())
+
+# Fallback for non-rgb and transparent colors (convert to rgb)
+_colorant2ansi(gr::Color, colordepth::TermColorDepth) =
+    _colorant2ansi(convert(RGB, gr), colordepth)
+_colorant2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
+    _colorant2ansi(color(gr), colordepth)
+
+# 256 colors
+function _colorant2ansi(col::AbstractRGB, ::TermColor256)
     r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
     r24, g24, b24 = map(c->round(Int, c * 23), (r, g, b))
     if r24 == g24 == b24
@@ -37,16 +46,7 @@ function colorant2ansi(col::AbstractRGB)
     end
 end
 
-colorant2ansi{T}(gr::Color{T,1}) = round(Int, 232 + clamp01nan(real(gr)) * 23)
-
-# Fallback for non-rgb and transparent colors (convert to rgb)
-colorant2ansi(gr::Color) = colorant2ansi(convert(RGB, gr))
-colorant2ansi(gr::TransparentColor) = colorant2ansi(color(gr))
-
-# -------------------------------------------------------------------
-# unexported version that can also return a 24bit RGB tuple
-
-_colorant2ansi(color, ::TermColor256) = colorant2ansi(color)
+_colorant2ansi{T}(gr::Color{T,1}, ::TermColor256) = round(Int, 232 + clamp01nan(real(gr)) * 23)
 
 # 24 bit colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
@@ -58,10 +58,4 @@ function _colorant2ansi{T}(gr::Color{T,1}, ::TermColor24bit)
     r = round(Int, clamp01nan(real(gr)) * 255)
     r, r, r
 end
-
-# Fallback for non-rgb and transparent colors (convert to rgb)
-_colorant2ansi(gr::Color, ::TermColor24bit) =
-    _colorant2ansi(convert(RGB, gr), colordepth)
-_colorant2ansi(gr::TransparentColor, ::TermColor24bit) =
-    _colorant2ansi(color(gr), colordepth)
 

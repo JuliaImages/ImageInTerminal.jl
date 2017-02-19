@@ -1,4 +1,4 @@
-using ImageInTerminal, ImageCore, ColorTypes, FixedPointNumbers
+using ImageInTerminal, ImageCore, ColorTypes
 using Base.Test
 
 tests = [
