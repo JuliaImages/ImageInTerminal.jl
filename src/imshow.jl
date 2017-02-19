@@ -44,7 +44,7 @@ function imshow{C<:Colorant}(
     end
 end
 
-imshow(img) = imshow(STDOUT, img, TermColor256())
+imshow(img) = imshow(STDOUT, img, colormode[1])
 
 """
     imshow256([stream], img)
