@@ -48,8 +48,8 @@ function encodeimg{C<:Colorant}(
         h, w = size(img)
     end
     io = IOBuffer()
-    print(io, Crayon(reset = true))
     for y in 1:2:h
+        print(io, Crayon(reset = true))
         for x in 1:w
             fgcol = _colorant2ansi(img[y,x], colordepth)
             bgcol = if y+1 <= h
@@ -63,7 +63,7 @@ function encodeimg{C<:Colorant}(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), ["\n"], [""]), length(1:2:h), w
+    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, length(1:2:h), w
 end
 
 function encodeimg{C<:Colorant}(
@@ -78,8 +78,8 @@ function encodeimg{C<:Colorant}(
         h, w = size(img)
     end
     io = IOBuffer()
-    print(io, Crayon(reset = true))
     for y in 1:h
+        print(io, Crayon(reset = true))
         for x in 1:w
             color = img[y,x]
             fgcol = _colorant2ansi(color, colordepth)
@@ -88,7 +88,7 @@ function encodeimg{C<:Colorant}(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), ["\n"], [""]), h, 2w
+    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, h, 2w
 end
 
 # colorant vector

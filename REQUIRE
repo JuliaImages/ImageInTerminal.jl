@@ -2,4 +2,4 @@ julia 0.5
 Crayons 0.1.0
 ColorTypes 0.3.2
 ImageCore 0.1.1
-ImageTransformations
+ImageTransformations 0.1.0
