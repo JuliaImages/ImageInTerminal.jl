@@ -111,7 +111,7 @@ function encodeimg{C<:Colorant}(
         print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), ["\n"], [""]), 1, w
+    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, 1, w
 end
 
 function encodeimg{C<:Colorant}(
@@ -120,7 +120,7 @@ function encodeimg{C<:Colorant}(
         img::AbstractVector{C},
         maxwidth::Int = 80)
     w = length(img)
-    n = 3w > maxwidth ? floor(Int, maxwidth/6)-2 : w
+    n = 3w > maxwidth ? floor(Int,maxwidth/6) : w
     io = IOBuffer()
     print(io, Crayon(reset = true))
     for i in 1:n
@@ -131,7 +131,7 @@ function encodeimg{C<:Colorant}(
     end
     if n < w
         print(io, Crayon(reset = true), " … ")
-        for i in w-n:w
+        for i in w-n+1:w
             color = img[i]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
@@ -139,6 +139,6 @@ function encodeimg{C<:Colorant}(
         end
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), ["\n"], [""]), 1, 3*(length(1:n) + 1 + length(w-n:w))
+    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
 end
 

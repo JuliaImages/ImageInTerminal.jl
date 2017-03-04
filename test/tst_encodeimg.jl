@@ -14,6 +14,10 @@ end
 # define some test images
 gray_square = colorview(Gray, N0f8[0. 0.3; 0.7 1])
 gray_square_alpha = colorview(GrayA, N0f8[0. 0.3; 0.7 1], N0f8[1 0.7; 0.3 0])
+gray_line = colorview(Gray, N0f8[0., 0.3, 0.7, 1])
+gray_line_alpha = colorview(GrayA, N0f8[0., 0.3, 0.7, 1], N0f8[1, 0.7, 0.3, 0])
+rgb_line = colorview(RGB, linspace(0,1,20), zeroarray, linspace(1,0,20))
+
 camera_man = testimage("camera")
 lighthouse = testimage("lighthouse")
 toucan = testimage("toucan")
@@ -21,7 +25,7 @@ toucan = testimage("toucan")
 # ====================================================================
 
 @testset "encodeimg 256 small" begin
-    @testset "grey square" begin
+    @testset "gray square" begin
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), gray_square, 2, 2)
         @test typeof(res) <: Vector{String}
         @test h === 1
@@ -29,7 +33,7 @@ toucan = testimage("toucan")
         @test length(res) === 1
         @test res[1] == "\e[0m\e[38;5;232;48;5;248m▀\e[38;5;239;48;5;255m▀\e[0m"
     end
-    @testset "transparent grey square" begin
+    @testset "transparent gray square" begin
         # alpha is ignored for small block encoding.
         # So this yields the exact same results as above.
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), gray_square_alpha, 2, 2)
@@ -75,7 +79,7 @@ end
 # ====================================================================
 
 @testset "encodeimg 256 big" begin
-    @testset "grey square" begin
+    @testset "gray square" begin
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), gray_square, 4, 4)
         @test typeof(res) <: Vector{String}
         @test h === 2
@@ -84,7 +88,7 @@ end
         @test res[1] == "\e[0m\e[38;5;232m██\e[38;5;239m██\e[0m"
         @test res[2] == "\e[0m\e[38;5;248m██\e[38;5;255m██\e[0m"
     end
-    @testset "transparent grey square" begin
+    @testset "transparent gray square" begin
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), gray_square_alpha, 4, 4)
         @test typeof(res) <: Vector{String}
         @test h === 2
@@ -121,7 +125,7 @@ end
 # ====================================================================
 
 @testset "encodeimg 24bit small" begin
-    @testset "grey square" begin
+    @testset "gray square" begin
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), gray_square, 2, 2)
         @test typeof(res) <: Vector{String}
         @test h === 1
@@ -129,7 +133,7 @@ end
         @test length(res) === 1
         @test res[1] == "\e[0m\e[38;2;0;0;0;48;2;178;178;178m▀\e[38;2;76;76;76;48;2;255;255;255m▀\e[0m"
     end
-    @testset "transparent grey square" begin
+    @testset "transparent gray square" begin
         # alpha is ignored for small block encoding.
         # So this yields the exact same results as above.
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), gray_square_alpha, 2, 2)
@@ -175,7 +179,7 @@ end
 # ====================================================================
 
 @testset "encodeimg 24bit big" begin
-    @testset "grey square" begin
+    @testset "gray square" begin
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), gray_square, 4, 4)
         @test typeof(res) <: Vector{String}
         @test h === 2
@@ -184,7 +188,7 @@ end
         @test res[1] == "\e[0m\e[38;2;0;0;0m██\e[38;2;76;76;76m██\e[0m"
         @test res[2] == "\e[0m\e[38;2;178;178;178m██\e[38;2;255;255;255m██\e[0m"
     end
-    @testset "transparent grey square" begin
+    @testset "transparent gray square" begin
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), gray_square_alpha, 4, 4)
         @test typeof(res) <: Vector{String}
         @test h === 2
@@ -215,6 +219,82 @@ end
         @test h === 20
         @test w === 44
         @test_reference "toucan_big_60x60_24bit" res
+    end
+end
+
+# ====================================================================
+
+@testset "encodeimg 256 small" begin
+    @testset "gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), gray_line, 10)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 4
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;232m█\e[38;5;239m█\e[38;5;248m█\e[38;5;255m█\e[0m"
+    end
+    @testset "transparent gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), gray_line_alpha, 10)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 4
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;232m█\e[38;5;239m▓\e[38;5;248m░\e[38;5;255m⋅\e[0m"
+    end
+    #@testset "rgb line" begin
+    #    res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), rgb_line, 8)
+    #    @test typeof(res) <: Vector{String}
+    #    @test h === 1
+    #    @test w === 8
+    #    @test length(res) === 1
+    #    @test res[1] == "\e[0m\e[38;5;21m█\e[38;5;56m█\e[38;5;91m█\e[38;5;91m█\e[38;5;126m█\e[38;5;126m█\e[38;5;161m█\e[38;5;196m█\e[0m"
+    #end
+end
+
+# ====================================================================
+
+@testset "encodeimg 256 big" begin
+    @testset "gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), gray_line, 9)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 9
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;232m██ \e[0m … \e[38;5;255m██ \e[0m"
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), gray_line, 12)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 12
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;232m██ \e[38;5;239m██ \e[38;5;248m██ \e[38;5;255m██ \e[0m"
+    end
+    @testset "transparent gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), gray_line_alpha, 10)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 9
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;232m██ \e[0m … \e[38;5;255m⋅⋅ \e[0m"
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), gray_line_alpha, 12)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 12
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;232m██ \e[38;5;239m▓▓ \e[38;5;248m░░ \e[38;5;255m⋅⋅ \e[0m"
+    end
+    @testset "rgb line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), rgb_line, 9)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 9
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;21m██ \e[0m … \e[38;5;196m██ \e[0m"
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), rgb_line, 22)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 21
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;21m██ \e[38;5;21m██ \e[38;5;56m██ \e[0m … \e[38;5;161m██ \e[38;5;196m██ \e[38;5;196m██ \e[0m"
     end
 end
 
