@@ -241,14 +241,14 @@ end
         @test length(res) === 1
         @test res[1] == "\e[0m\e[38;5;232m█\e[38;5;239m▓\e[38;5;248m░\e[38;5;255m⋅\e[0m"
     end
-    #@testset "rgb line" begin
-    #    res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), rgb_line, 8)
-    #    @test typeof(res) <: Vector{String}
-    #    @test h === 1
-    #    @test w === 8
-    #    @test length(res) === 1
-    #    @test res[1] == "\e[0m\e[38;5;21m█\e[38;5;56m█\e[38;5;91m█\e[38;5;91m█\e[38;5;126m█\e[38;5;126m█\e[38;5;161m█\e[38;5;196m█\e[0m"
-    #end
+    @testset "rgb line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), rgb_line, 8)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 8
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;5;21m█\e[38;5;56m█\e[38;5;91m█\e[38;5;91m█\e[38;5;126m█\e[38;5;126m█\e[38;5;161m█\e[38;5;196m█\e[0m"
+    end
 end
 
 # ====================================================================

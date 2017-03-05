@@ -99,7 +99,7 @@ function encodeimg{C<:Colorant}(
         maxwidth::Int = 80)
     w = length(img)
     if w > maxwidth
-        img = vec(imresize(reshape(img, 1, w), (1, maxwidth)))
+        img = imresize(img, maxwidth)
         w = length(img)
     end
     io = IOBuffer()
