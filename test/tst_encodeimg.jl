@@ -298,3 +298,79 @@ end
     end
 end
 
+# ====================================================================
+
+@testset "encodeimg 24bit small" begin
+    @testset "gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), gray_line, 10)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 4
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;0m█\e[38;2;76;76;76m█\e[38;2;178;178;178m█\e[38;2;255;255;255m█\e[0m"
+    end
+    @testset "transparent gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), gray_line_alpha, 10)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 4
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;0m█\e[38;2;76;76;76m▓\e[38;2;178;178;178m░\e[38;2;255;255;255m⋅\e[0m"
+    end
+    @testset "rgb line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), rgb_line, 8)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 8
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;10;0;245m█\e[38;2;44;0;211m█\e[38;2;77;0;178m█\e[38;2;111;0;144m█\e[38;2;144;0;111m█\e[38;2;178;0;77m█\e[38;2;211;0;44m█\e[38;2;245;0;10m█\e[0m"
+    end
+end
+
+# ====================================================================
+
+@testset "encodeimg 24bit big" begin
+    @testset "gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), gray_line, 9)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 9
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;0m██ \e[0m … \e[38;2;255;255;255m██ \e[0m"
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), gray_line, 12)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 12
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;0m██ \e[38;2;76;76;76m██ \e[38;2;178;178;178m██ \e[38;2;255;255;255m██ \e[0m"
+    end
+    @testset "transparent gray line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), gray_line_alpha, 10)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 9
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;0m██ \e[0m … \e[38;2;255;255;255m⋅⋅ \e[0m"
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), gray_line_alpha, 12)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 12
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;0m██ \e[38;2;76;76;76m▓▓ \e[38;2;178;178;178m░░ \e[38;2;255;255;255m⋅⋅ \e[0m"
+    end
+    @testset "rgb line" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), rgb_line, 9)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 9
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;255m██ \e[0m … \e[38;2;255;0;0m██ \e[0m"
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), rgb_line, 22)
+        @test typeof(res) <: Vector{String}
+        @test h === 1
+        @test w === 21
+        @test length(res) === 1
+        @test res[1] == "\e[0m\e[38;2;0;0;255m██ \e[38;2;13;0;242m██ \e[38;2;27;0;228m██ \e[0m … \e[38;2;228;0;27m██ \e[38;2;242;0;13m██ \e[38;2;255;0;0m██ \e[0m"
+    end
+end
+
