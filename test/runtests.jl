@@ -27,7 +27,7 @@ function test_reference_impl(filename, actual)
         end
     catch # File doesn't exist
         if isinteractive()
-            println("Reference file for \"$filename\" does not exist. Do you want to create it with the following content?")
+            println("Reference file for \"$filename\" does not exist.")
             println("- NEW CONTENT -----------------")
             println.(actual)
             println("-------------------------------")
@@ -48,6 +48,7 @@ end
 tests = [
     "tst_colorant2ansi.jl",
     "tst_encodeimg.jl",
+    "tst_imshow.jl",
 ]
 
 for t in tests
