@@ -42,6 +42,8 @@ function encodeimg{C<:Colorant}(
         img::AbstractMatrix{C},
         maxheight::Int = 50,
         maxwidth::Int = 80)
+    maxheight = max(maxheight, 5)
+    maxwidth  = max(maxwidth,  5)
     h, w = size(img)
     while ceil(h/2) > maxheight || w > maxwidth
         img = restrict(img)
@@ -72,6 +74,8 @@ function encodeimg{C<:Colorant}(
         img::AbstractMatrix{C},
         maxheight::Int = 50,
         maxwidth::Int = 80)
+    maxheight = max(maxheight, 5)
+    maxwidth  = max(maxwidth,  5)
     h, w = size(img)
     while h > maxheight || 2w > maxwidth
         img = restrict(img)
@@ -97,6 +101,7 @@ function encodeimg{C<:Colorant}(
         colordepth::TermColorDepth,
         img::AbstractVector{C},
         maxwidth::Int = 80)
+    maxwidth  = max(maxwidth, 5)
     w = length(img)
     if w > maxwidth
         img = imresize(img, maxwidth)
@@ -119,6 +124,7 @@ function encodeimg{C<:Colorant}(
         colordepth::TermColorDepth,
         img::AbstractVector{C},
         maxwidth::Int = 80)
+    maxwidth  = max(maxwidth, 5)
     w = length(img)
     n = 3w > maxwidth ? floor(Int,maxwidth/6) : w
     io = IOBuffer()

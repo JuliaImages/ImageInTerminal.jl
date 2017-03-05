@@ -53,6 +53,12 @@ toucan = testimage("toucan")
         @test h === 9
         @test w === 17
         @test_reference "camera_small_20x20_256" res
+        # too small size
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), camera_man, 1, 1)
+        @test typeof(res) <: Vector{String}
+        @test h === 3
+        @test w === 5
+        @test_reference "camera_small_1x1_256" res
         # bigger version
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), camera_man, 60, 60)
         @test typeof(res) <: Vector{String}
