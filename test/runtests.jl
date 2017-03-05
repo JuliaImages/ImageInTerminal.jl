@@ -1,4 +1,4 @@
-using ImageInTerminal, ImageCore, ColorTypes, FixedPointNumbers, TestImages
+using ImageInTerminal, ImageCore, ColorTypes, FixedPointNumbers, TestImages, ImageTransformations
 using Base.Test
 
 reference_path(filename) = joinpath(dirname(@__FILE__), "reference", "$(filename).txt")

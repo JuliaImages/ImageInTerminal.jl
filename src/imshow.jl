@@ -1,5 +1,5 @@
 """
-    imshow([stream], img, [depth::TermColorDepth])
+    imshow([stream], img, [depth::TermColorDepth], [maxsize])
 
 Displays the given image `img` using unicode characters and
 terminal colors (defaults to 256 colors).
@@ -46,10 +46,11 @@ function imshow{C<:Colorant}(
     end
 end
 
+imshow(io::IO, img, args...) = imshow(io, img, colormode[1], args...)
 imshow(img, args...) = imshow(STDOUT, img, colormode[1], args...)
 
 """
-    imshow256([stream], img)
+    imshow256([stream], img, [maxsize])
 
 Displays the given image `img` using unicode characters and
 the widely supported 256 terminal colors.
@@ -63,7 +64,7 @@ imshow256(io::IO, img, args...) = imshow(io, img, TermColor256(), args...)
 imshow256(img, args...) = imshow256(STDOUT, img, args...)
 
 """
-    imshow256([stream], img)
+    imshow24bit([stream], img, [maxsize])
 
 Displays the given image `img` using unicode characters and
 the 24 terminal colors that some modern terminals support.
