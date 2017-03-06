@@ -9,21 +9,6 @@
     @test @inferred(ImageInTerminal._charof(1.0)) === '█'
 end
 
-# ====================================================================
-
-# define some test images
-gray_square = colorview(Gray, N0f8[0. 0.3; 0.7 1])
-gray_square_alpha = colorview(GrayA, N0f8[0. 0.3; 0.7 1], N0f8[1 0.7; 0.3 0])
-gray_line = colorview(Gray, N0f8[0., 0.3, 0.7, 1])
-gray_line_alpha = colorview(GrayA, N0f8[0., 0.3, 0.7, 1], N0f8[1, 0.7, 0.3, 0])
-rgb_line = colorview(RGB, linspace(0,1,20), zeroarray, linspace(1,0,20))
-
-camera_man = testimage("camera")
-lighthouse = testimage("lighthouse")
-toucan = testimage("toucan")
-
-# ====================================================================
-
 @testset "encodeimg 256 small" begin
     @testset "gray square" begin
         res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), gray_square, 2, 2)

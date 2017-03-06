@@ -1,6 +1,3 @@
-rgb_line = colorview(RGB, linspace(0,1,20), zeroarray, linspace(1,0,20))
-lena = testimage("lena")
-
 @testset "STDOUT" begin
     # make sure it compiles and executes
     # TODO: replace this with VT100 tests

@@ -45,10 +45,27 @@ macro test_reference(filename, expr)
     :(test_reference_impl($filename, $expr))
 end
 
+# ====================================================================
+
+# define some test images
+gray_square = colorview(Gray, N0f8[0. 0.3; 0.7 1])
+gray_square_alpha = colorview(GrayA, N0f8[0. 0.3; 0.7 1], N0f8[1 0.7; 0.3 0])
+gray_line = colorview(Gray, N0f8[0., 0.3, 0.7, 1])
+gray_line_alpha = colorview(GrayA, N0f8[0., 0.3, 0.7, 1], N0f8[1, 0.7, 0.3, 0])
+rgb_line = colorview(RGB, linspace(0,1,20), zeroarray, linspace(1,0,20))
+
+camera_man = testimage("camera")
+lighthouse = testimage("lighthouse")
+toucan = testimage("toucan")
+lena = testimage("lena")
+
+# ====================================================================
+
 tests = [
     "tst_colorant2ansi.jl",
     "tst_encodeimg.jl",
     "tst_imshow.jl",
+    "tst_baseshow.jl",
 ]
 
 for t in tests
