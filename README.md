@@ -1,8 +1,8 @@
 # ImageInTerminal
 
 [![Build Status](https://travis-ci.org/JuliaImages/ImageInTerminal.jl.svg?branch=master)](https://travis-ci.org/JuliaImages/ImageInTerminal.jl)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/1b63qanrofre1rd2?svg=true)](https://ci.appveyor.com/project/Evizero/imageinterminal-jl)
 [![codecov.io](http://codecov.io/github/JuliaImages/ImageInTerminal.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaImages/ImageInTerminal.jl?branch=master)
-[![Coverage Status](https://coveralls.io/repos/JuliaImages/ImageInTerminal.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/JuliaImages/ImageInTerminal.jl?branch=master)
 
 ImageInTerminal.jl is a drop-in package that once imported
 changes a how a single `Colorant` and whole `Colorant` arrays (i.e.
