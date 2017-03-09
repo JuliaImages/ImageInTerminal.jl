@@ -42,7 +42,7 @@ end
 
 # using a macro looks more consistent
 macro test_reference(filename, expr)
-    :(test_reference_impl($filename, $expr))
+    esc(:(test_reference_impl($filename, $expr)))
 end
 
 # ====================================================================

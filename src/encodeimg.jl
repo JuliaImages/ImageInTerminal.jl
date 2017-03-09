@@ -1,5 +1,5 @@
 # not exported
-abstract ImageEncoder
+@compat abstract type ImageEncoder end
 immutable BigBlocks   <: ImageEncoder end
 immutable SmallBlocks <: ImageEncoder end
 

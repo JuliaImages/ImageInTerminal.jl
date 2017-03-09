@@ -5,6 +5,7 @@ using Crayons
 using ColorTypes
 using ImageCore
 using ImageTransformations
+using Compat
 
 export
 

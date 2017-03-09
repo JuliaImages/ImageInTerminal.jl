@@ -1,4 +1,4 @@
-abstract TermColorDepth
+@compat abstract type TermColorDepth end
 immutable TermColor256   <: TermColorDepth end
 immutable TermColor24bit <: TermColorDepth end
 
