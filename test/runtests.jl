@@ -57,7 +57,7 @@ rgb_line = colorview(RGB, linspace(0,1,20), zeroarray, linspace(1,0,20))
 camera_man = testimage("camera")
 lighthouse = testimage("lighthouse")
 toucan = testimage("toucan")
-lena = testimage("lena")
+lena = testimage("lena_color_256")
 
 # ====================================================================
 
@@ -73,4 +73,3 @@ for t in tests
         include(t)
     end
 end
-
