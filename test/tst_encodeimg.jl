@@ -365,3 +365,12 @@ end
     end
 end
 
+@testset "non-1 indexing" begin
+    @testset "lighthouse" begin
+        res, h, w = @inferred ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), OffsetArray(lighthouse, (2,-10)), 60, 60)
+        @test typeof(res) <: Vector{String}
+        @test h === 17
+        @test w === 49
+        @test_reference "lighthouse_small_60x60_256" res
+    end
+end

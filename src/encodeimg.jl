@@ -44,17 +44,18 @@ function encodeimg{C<:Colorant}(
         maxwidth::Int = 80)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
-    h, w = size(img)
+    h, w = map(length, indices(img))
     while ceil(h/2) > maxheight || w > maxwidth
         img = restrict(img)
-        h, w = size(img)
+        h, w = map(length, indices(img))
     end
+    yinds, xinds = indices(img)
     io = IOBuffer()
-    for y in 1:2:h
+    for y in first(yinds):2:last(yinds)
         print(io, Crayon(reset = true))
-        for x in 1:w
+        for x in xinds
             fgcol = _colorant2ansi(img[y,x], colordepth)
-            bgcol = if y+1 <= h
+            bgcol = if y+1 <= last(yinds)
                 _colorant2ansi(img[y+1,x], colordepth)
             else
                 # if reached it means that the last character row
@@ -76,15 +77,16 @@ function encodeimg{C<:Colorant}(
         maxwidth::Int = 80)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
-    h, w = size(img)
+    h, w = map(length, indices(img))
     while h > maxheight || 2w > maxwidth
         img = restrict(img)
-        h, w = size(img)
+        h, w = map(length, indices(img))
     end
+    yinds, xinds = indices(img)
     io = IOBuffer()
-    for y in 1:h
+    for y in yinds
         print(io, Crayon(reset = true))
-        for x in 1:w
+        for x in xinds
             color = img[y,x]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
@@ -102,14 +104,14 @@ function encodeimg{C<:Colorant}(
         img::AbstractVector{C},
         maxwidth::Int = 80)
     maxwidth  = max(maxwidth, 5)
-    w = length(img)
+    w = length(indices(img, 1))
     if w > maxwidth
         img = imresize(img, maxwidth)
-        w = length(img)
+        w = length(indices(img, 1))
     end
     io = IOBuffer()
     print(io, Crayon(reset = true))
-    for i in 1:w
+    for i in indices(img, 1)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
@@ -125,11 +127,12 @@ function encodeimg{C<:Colorant}(
         img::AbstractVector{C},
         maxwidth::Int = 80)
     maxwidth  = max(maxwidth, 5)
-    w = length(img)
+    inds = indices(img, 1)
+    w = length(inds)
     n = 3w > maxwidth ? floor(Int,maxwidth/6) : w
     io = IOBuffer()
     print(io, Crayon(reset = true))
-    for i in 1:n
+    for i in (0:n-1)+first(inds)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
@@ -137,7 +140,7 @@ function encodeimg{C<:Colorant}(
     end
     if n < w
         print(io, Crayon(reset = true), " … ")
-        for i in w-n+1:w
+        for i in last(inds)-n+1:last(inds)
             color = img[i]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
@@ -147,4 +150,3 @@ function encodeimg{C<:Colorant}(
     println(io, Crayon(reset = true))
     replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
 end
-
