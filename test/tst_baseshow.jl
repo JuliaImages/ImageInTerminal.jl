@@ -34,3 +34,4 @@ end
     @test_reference "colorant_show_24bit" res
 end
 
+ImageInTerminal.use_256()
