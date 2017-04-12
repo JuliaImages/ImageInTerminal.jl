@@ -15,7 +15,7 @@ function imshow{C<:Colorant}(
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
     io_h, io_w = maxsize
-    img_h, img_w = size(img)
+    img_h, img_w = map(length, indices(img))
     str = if img_h <= io_h-4 && 2img_w <= io_w
         first(encodeimg(BigBlocks(),   colordepth, img, io_h-4, io_w))
     else
@@ -76,4 +76,3 @@ downsampled to fit into the display (using `restrict`).
 """
 imshow24bit(io::IO, img, args...) = imshow(io, img, TermColor24bit(), args...)
 imshow24bit(img, args...) = imshow24bit(STDOUT, img, args...)
-

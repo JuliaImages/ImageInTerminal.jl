@@ -23,6 +23,8 @@ matrix:
     - JULIAVERSION: "julianightlies/bin/winnt/x86/julia-latest-win32.exe"
     - JULIAVERSION: "julianightlies/bin/winnt/x64/julia-latest-win64.exe"
 
+build: off
+
 install:
 # Download most recent Julia Windows binary
   - ps: (new-object net.webclient).DownloadFile(

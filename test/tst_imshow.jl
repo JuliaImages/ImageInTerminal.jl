@@ -75,3 +75,20 @@ end
     end
 end
 
+@testset "imshow non1" begin
+    @testset "lena" begin
+        img = OffsetArray(imresize(lena, 10, 10), (-10,5))
+        io = IOBuffer()
+        imshow(io, img)
+        res = replace.(readlines(seek(io,0)), ["\n"], [""])
+        @test_reference "lena_big_imshow" res
+    end
+    @testset "rotation" begin
+        tfm = recenter(RotMatrix(pi/4), center(lighthouse))
+        lhr = warp(lighthouse, tfm)
+        io = IOBuffer()
+        imshow(io, lhr)
+        res = replace.(readlines(seek(io,0)), ["\n"], [""])
+        @test_reference "lighthouse_rotated" res
+    end
+end
