@@ -48,6 +48,7 @@ end
 
 imshow(io::IO, img, args...) = imshow(io, img, colormode[1], args...)
 imshow(img, args...) = imshow(STDOUT, img, colormode[1], args...)
+imshow(io::IO, img, colordepth::TermColorDepth, args...) = throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
 
 """
     imshow256([stream], img, [maxsize])
