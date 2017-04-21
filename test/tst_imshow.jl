@@ -10,6 +10,10 @@
 end
 
 @testset "imshow" begin
+    @testset "non colorant" begin
+        @test_throws ArgumentError imshow(rand(5,5))
+        @test_throws ArgumentError imshow(sprand(5,5,.5))
+    end
     @testset "lena" begin
         img = imresize(lena, 10, 10)
         io = IOBuffer()
@@ -20,6 +24,10 @@ end
 end
 
 @testset "imshow256" begin
+    @testset "non colorant" begin
+        @test_throws ArgumentError imshow256(rand(5,5))
+        @test_throws ArgumentError imshow256(sprand(5,5,.5))
+    end
     @testset "rgb line" begin
         io = IOBuffer()
         imshow256(io, rgb_line)
@@ -48,6 +56,10 @@ end
 end
 
 @testset "imshow24bit" begin
+    @testset "non colorant" begin
+        @test_throws ArgumentError imshow24bit(rand(5,5))
+        @test_throws ArgumentError imshow24bit(sprand(5,5,.5))
+    end
     @testset "rgb line" begin
         io = IOBuffer()
         imshow24bit(io, rgb_line)
