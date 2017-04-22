@@ -7,35 +7,43 @@ function test_reference_impl(filename, actual)
     try
         reference = replace.(readlines(reference_path(filename)), ["\n"], [""])
         try
-            @test reference == actual
             @assert reference == actual # to throw error
+            @test true # to increase test counter if reached
         catch # test failed
+            println("Test for \"$filename\" failed.")
+            println("- REFERENCE -------------------")
+            println.(reference)
+            println("-------------------------------")
+            println("- ACTUAL ----------------------")
+            println.(actual)
+            println("-------------------------------")
             if isinteractive()
-                println("Test for \"$filename\" failed.")
-                println("- REFERENCE -------------------")
-                println.(reference)
-                println("-------------------------------")
-                println("- ACTUAL ----------------------")
-                println.(actual)
-                println("-------------------------------")
                 print("Replace reference with actual result? [y/n] ")
                 answer = first(readline())
                 if answer == 'y'
                     write(reference_path(filename), join(actual, "\n"))
                 end
+            else
+                error("You need to run the tests interactively with 'include(\"test/runtests.jl\")' to update reference images")
             end
         end
-    catch # File doesn't exist
-        if isinteractive()
+    catch ex
+        if isa(ex, SystemError) # File doesn't exist
             println("Reference file for \"$filename\" does not exist.")
             println("- NEW CONTENT -----------------")
             println.(actual)
             println("-------------------------------")
-            print("Create reference file with above content? [y/n] ")
-            answer = first(readline())
-            if answer == 'y'
-                write(reference_path(filename), join(actual, "\n"))
+            if isinteractive()
+                print("Create reference file with above content? [y/n] ")
+                answer = first(readline())
+                if answer == 'y'
+                    write(reference_path(filename), join(actual, "\n"))
+                end
+            else
+                error("You need to run the tests interactively with 'include(\"test/runtests.jl\")' to create new reference images")
             end
+        else
+            throw(ex)
         end
     end
 end
