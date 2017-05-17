@@ -53,6 +53,16 @@ macro test_reference(filename, expr)
     esc(:(test_reference_impl($filename, $expr)))
 end
 
+function ensurecolor(f, args...)
+    old_color = Base.have_color
+    try
+        eval(Base, :(have_color = true))
+        return f(args...)
+    finally
+        eval(Base, :(have_color = $old_color))
+    end
+end
+
 # ====================================================================
 
 # define some test images

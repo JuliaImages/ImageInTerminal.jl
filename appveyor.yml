@@ -41,4 +41,4 @@ build_script:
       Pkg.clone(pwd(), \"ImageInTerminal\"); Pkg.build(\"ImageInTerminal\")"
 
 test_script:
-  - C:\projects\julia\bin\julia --color=yes -e "Pkg.test(\"ImageInTerminal\")"
+  - C:\projects\julia\bin\julia -e "Pkg.test(\"ImageInTerminal\")"
