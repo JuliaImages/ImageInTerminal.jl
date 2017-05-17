@@ -57,7 +57,7 @@ function ensurecolor(f, args...)
     old_color = Base.have_color
     try
         eval(Base, :(have_color = true))
-        return f(args...)
+        return @inferred f(args...)
     finally
         eval(Base, :(have_color = $old_color))
     end
