@@ -96,8 +96,8 @@ end
         @test_reference "lena_big_imshow" res
     end
     @testset "rotation" begin
-        tfm = recenter(RotMatrix(pi/4), center(lighthouse))
-        lhr = warp(lighthouse, tfm)
+        tfm = recenter(RotMatrix(-pi/4), center(lighthouse))
+        lhr = ImageTransformations.warp_new(lighthouse, tfm)
         io = IOBuffer()
         ensurecolor(imshow, io, lhr)
         res = replace.(readlines(seek(io,0)), ["\n"], [""])
