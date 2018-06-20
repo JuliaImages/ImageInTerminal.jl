@@ -5,7 +5,6 @@ using Crayons
 using ColorTypes
 using ImageCore
 using ImageTransformations
-using Compat
 
 export
 
@@ -41,9 +40,9 @@ Call `ImageInTerminal.use_256()` to restore default behaviour.
 use_24bit() = (colormode[1] = TermColor24bit())
 
 # colorant arrays
-function Base.show{C <: Colorant}(
+function Base.show(
         io::IO, ::MIME"text/plain",
-        img::AbstractVecOrMat{C})
+        img::AbstractVecOrMat{<:Colorant})
     println(io, summary(img), ":")
     ImageInTerminal.imshow(io, img, colormode[1])
 end

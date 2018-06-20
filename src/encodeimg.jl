@@ -1,7 +1,7 @@
 # not exported
-@compat abstract type ImageEncoder end
-immutable BigBlocks   <: ImageEncoder end
-immutable SmallBlocks <: ImageEncoder end
+abstract type ImageEncoder end
+struct BigBlocks   <: ImageEncoder end
+struct SmallBlocks <: ImageEncoder end
 
 const alpha_chars = ('⋅', '░', '▒', '▓', '█')
 function _charof(alpha)
@@ -36,10 +36,10 @@ The function returns a tuple with three elements:
 
 3. Number of visible characters per line (the remaining are colorcodes).
 """
-function encodeimg{C<:Colorant}(
+function encodeimg(
         ::SmallBlocks,
         colordepth::TermColorDepth,
-        img::AbstractMatrix{C},
+        img::AbstractMatrix{<:Colorant},
         maxheight::Int = 50,
         maxwidth::Int = 80)
     maxheight = max(maxheight, 5)
@@ -69,10 +69,10 @@ function encodeimg{C<:Colorant}(
     replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, length(1:2:h), w
 end
 
-function encodeimg{C<:Colorant}(
+function encodeimg(
         ::BigBlocks,
         colordepth::TermColorDepth,
-        img::AbstractMatrix{C},
+        img::AbstractMatrix{<:Colorant},
         maxheight::Int = 50,
         maxwidth::Int = 80)
     maxheight = max(maxheight, 5)
@@ -98,10 +98,10 @@ function encodeimg{C<:Colorant}(
 end
 
 # colorant vector
-function encodeimg{C<:Colorant}(
+function encodeimg(
         enc::SmallBlocks,
         colordepth::TermColorDepth,
-        img::AbstractVector{C},
+        img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
     maxwidth  = max(maxwidth, 5)
     w = length(indices(img, 1))
@@ -121,10 +121,10 @@ function encodeimg{C<:Colorant}(
     replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, 1, w
 end
 
-function encodeimg{C<:Colorant}(
+function encodeimg(
         enc::BigBlocks,
         colordepth::TermColorDepth,
-        img::AbstractVector{C},
+        img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
     maxwidth  = max(maxwidth, 5)
     inds = indices(img, 1)

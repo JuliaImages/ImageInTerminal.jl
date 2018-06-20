@@ -9,9 +9,9 @@ If working in the REPL, the function tries to choose the encoding
 based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
-function imshow{C<:Colorant}(
+function imshow(
         io::IO,
-        img::AbstractMatrix{C},
+        img::AbstractMatrix{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
     io_h, io_w = maxsize
@@ -28,9 +28,9 @@ function imshow{C<:Colorant}(
 end
 
 # colorant vector
-function imshow{C<:Colorant}(
+function imshow(
         io::IO,
-        img::AbstractVector{C},
+        img::AbstractVector{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
     io_h, io_w = maxsize

@@ -97,7 +97,7 @@ end
     end
     @testset "rotation" begin
         tfm = recenter(RotMatrix(-pi/4), center(lighthouse))
-        lhr = ImageTransformations.warp_new(lighthouse, tfm)
+        lhr = ImageTransformations.warp(lighthouse, tfm)
         io = IOBuffer()
         ensurecolor(imshow, io, lhr)
         res = replace.(readlines(seek(io,0)), ["\n"], [""])
