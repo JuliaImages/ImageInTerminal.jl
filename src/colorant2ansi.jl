@@ -1,6 +1,6 @@
-@compat abstract type TermColorDepth end
-immutable TermColor256   <: TermColorDepth end
-immutable TermColor24bit <: TermColorDepth end
+abstract type TermColorDepth end
+struct TermColor256   <: TermColorDepth end
+struct TermColor24bit <: TermColorDepth end
 
 """
     colorant2ansi(color::Colorant) -> Int
@@ -46,7 +46,7 @@ function _colorant2ansi(col::AbstractRGB, ::TermColor256)
     end
 end
 
-_colorant2ansi{T}(gr::Color{T,1}, ::TermColor256) = round(Int, 232 + clamp01nan(real(gr)) * 23)
+_colorant2ansi(gr::Color{<:Any,1}, ::TermColor256) = round(Int, 232 + clamp01nan(real(gr)) * 23)
 
 # 24 bit colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
@@ -54,7 +54,7 @@ function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
     map(c->round(Int, c * 255), (r, g, b))
 end
 
-function _colorant2ansi{T}(gr::Color{T,1}, ::TermColor24bit)
+function _colorant2ansi(gr::Color{<:Any,1}, ::TermColor24bit)
     r = round(Int, clamp01nan(real(gr)) * 255)
     r, r, r
 end
