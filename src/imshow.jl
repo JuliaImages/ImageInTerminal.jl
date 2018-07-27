@@ -15,7 +15,7 @@ function imshow(
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
     io_h, io_w = maxsize
-    img_h, img_w = map(length, indices(img))
+    img_h, img_w = map(length, axes(img))
     str = if img_h <= io_h-4 && 2img_w <= io_w
         first(encodeimg(BigBlocks(),   colordepth, img, io_h-4, io_w))
     else
@@ -47,7 +47,7 @@ function imshow(
 end
 
 imshow(io::IO, img, args...) = imshow(io, img, colormode[1], args...)
-imshow(img, args...) = imshow(STDOUT, img, colormode[1], args...)
+imshow(img, args...) = imshow(stdout, img, colormode[1], args...)
 imshow(io::IO, img, colordepth::TermColorDepth, args...) = throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
 
 """
@@ -62,7 +62,7 @@ based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
 imshow256(io::IO, img, args...) = imshow(io, img, TermColor256(), args...)
-imshow256(img, args...) = imshow256(STDOUT, img, args...)
+imshow256(img, args...) = imshow256(stdout, img, args...)
 
 """
     imshow24bit([stream], img, [maxsize])
@@ -76,4 +76,4 @@ based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
 imshow24bit(io::IO, img, args...) = imshow(io, img, TermColor24bit(), args...)
-imshow24bit(img, args...) = imshow24bit(STDOUT, img, args...)
+imshow24bit(img, args...) = imshow24bit(stdout, img, args...)

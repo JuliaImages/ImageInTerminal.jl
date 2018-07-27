@@ -1,4 +1,4 @@
-_tostring(io) = replace.(replace.(readlines(seek(io,0)), ["\n"], [""]), ["$Int"], ["Int64"])
+_tostring(io) = replace.(replace.(readlines(seek(io,0)), ["\n"] => [""]), ["$Int"], ["Int64"])
 
 @testset "256 colors" begin
     ImageInTerminal.use_256()

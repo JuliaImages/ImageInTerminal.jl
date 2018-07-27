@@ -44,12 +44,12 @@ function encodeimg(
         maxwidth::Int = 80)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
-    h, w = map(length, indices(img))
+    h, w = map(length, axes(img))
     while ceil(h/2) > maxheight || w > maxwidth
         img = restrict(img)
-        h, w = map(length, indices(img))
+        h, w = map(length, axes(img))
     end
-    yinds, xinds = indices(img)
+    yinds, xinds = axes(img)
     io = IOBuffer()
     for y in first(yinds):2:last(yinds)
         print(io, Crayon(reset = true))
@@ -66,7 +66,7 @@ function encodeimg(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, length(1:2:h), w
+    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, length(1:2:h), w
 end
 
 function encodeimg(
@@ -77,12 +77,12 @@ function encodeimg(
         maxwidth::Int = 80)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
-    h, w = map(length, indices(img))
+    h, w = map(length, axes(img))
     while h > maxheight || 2w > maxwidth
         img = restrict(img)
-        h, w = map(length, indices(img))
+        h, w = map(length, axes(img))
     end
-    yinds, xinds = indices(img)
+    yinds, xinds = axes(img)
     io = IOBuffer()
     for y in yinds
         print(io, Crayon(reset = true))
@@ -94,7 +94,7 @@ function encodeimg(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, h, 2w
+    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, h, 2w
 end
 
 # colorant vector
@@ -104,21 +104,21 @@ function encodeimg(
         img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
     maxwidth  = max(maxwidth, 5)
-    w = length(indices(img, 1))
+    w = length(axes(img, 1))
     if w > maxwidth
         img = imresize(img, maxwidth)
-        w = length(indices(img, 1))
+        w = length(axes(img, 1))
     end
     io = IOBuffer()
     print(io, Crayon(reset = true))
-    for i in indices(img, 1)
+    for i in axes(img, 1)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, 1, w
+    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, 1, w
 end
 
 function encodeimg(
@@ -127,12 +127,12 @@ function encodeimg(
         img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
     maxwidth  = max(maxwidth, 5)
-    inds = indices(img, 1)
+    inds = axes(img, 1)
     w = length(inds)
     n = 3w > maxwidth ? floor(Int,maxwidth/6) : w
     io = IOBuffer()
     print(io, Crayon(reset = true))
-    for i in (0:n-1)+first(inds)
+    for i in (0:n-1) .+ first(inds)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
@@ -148,5 +148,5 @@ function encodeimg(
         end
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), ["\n"], [""])::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
+    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
 end
