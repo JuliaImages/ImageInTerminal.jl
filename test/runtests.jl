@@ -1,11 +1,14 @@
-using ImageInTerminal, ImageCore, ColorTypes, FixedPointNumbers, TestImages, ImageTransformations, CoordinateTransformations, Rotations, OffsetArrays
-using Base.Test
+using ImageInTerminal, ImageCore, ColorTypes, FixedPointNumbers
+using TestImages, ImageTransformations, CoordinateTransformations
+using Rotations, OffsetArrays
+using SparseArrays
+using Test
 
 reference_path(filename) = joinpath(dirname(@__FILE__), "reference", "$(filename).txt")
 
 function test_reference_impl(filename, actual)
     try
-        reference = replace.(readlines(reference_path(filename)), ["\n"], [""])
+        reference = replace.(readlines(reference_path(filename)), ["\n"] => [""])
         try
             @assert reference == actual # to throw error
             @test true # to increase test counter if reached
@@ -56,10 +59,10 @@ end
 function ensurecolor(f, args...)
     old_color = Base.have_color
     try
-        eval(Base, :(have_color = true))
+        Core.eval(Base, :(have_color = true))
         return @inferred f(args...)
     finally
-        eval(Base, :(have_color = $old_color))
+        Core.eval(Base, :(have_color = $old_color))
     end
 end
 
@@ -70,7 +73,7 @@ gray_square = colorview(Gray, N0f8[0. 0.3; 0.7 1])
 gray_square_alpha = colorview(GrayA, N0f8[0. 0.3; 0.7 1], N0f8[1 0.7; 0.3 0])
 gray_line = colorview(Gray, N0f8[0., 0.3, 0.7, 1])
 gray_line_alpha = colorview(GrayA, N0f8[0., 0.3, 0.7, 1], N0f8[1, 0.7, 0.3, 0])
-rgb_line = colorview(RGB, linspace(0,1,20), zeroarray, linspace(1,0,20))
+rgb_line = colorview(RGB, range(0, stop=1, length=20), zeroarray, range(1, stop=0, length=20))
 
 camera_man = testimage("camera")
 lighthouse = testimage("lighthouse")
