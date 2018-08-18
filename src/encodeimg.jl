@@ -66,7 +66,7 @@ function encodeimg(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, length(1:2:h), w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, length(1:2:h), w
 end
 
 function encodeimg(
@@ -94,7 +94,7 @@ function encodeimg(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, h, 2w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, h, 2w
 end
 
 # colorant vector
@@ -118,7 +118,7 @@ function encodeimg(
         print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, 1, w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, w
 end
 
 function encodeimg(
@@ -148,5 +148,5 @@ function encodeimg(
         end
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), ["\n"] => [""])::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
 end
