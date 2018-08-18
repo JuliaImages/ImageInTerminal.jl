@@ -8,7 +8,7 @@ reference_path(filename) = joinpath(dirname(@__FILE__), "reference", "$(filename
 
 function test_reference_impl(filename, actual)
     try
-        reference = replace.(readlines(reference_path(filename)), ["\n"] => [""])
+        reference = replace.(readlines(reference_path(filename)), Ref("\n" => ""))
         try
             @assert reference == actual # to throw error
             @test true # to increase test counter if reached
