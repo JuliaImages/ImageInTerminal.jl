@@ -15,15 +15,15 @@ script:
     - julia --check-bounds=yes --color=yes -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("ImageInTerminal"); Pkg.test("ImageInTerminal"; coverage=true)';
 
 # control of actual deployment is in the Documenter make script
-jobs:
-  include:
-    - stage: deploy
-      julia: 1.0
-      os: linux
-      script:
-        - julia -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("ImageInTerminal")'
-        - julia -e 'import Pkg; Pkg.add("Documenter")'
-        - julia -e 'import ImageInTerminal; ENV["DOCUMENTER_DEBUG"] = "true"; include(joinpath("docs","make.jl"))'
+#jobs:
+#  include:
+#    - stage: deploy
+#      julia: 1.0
+#      os: linux
+#      script:
+#        - julia -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("ImageInTerminal")'
+#        - julia -e 'import Pkg; Pkg.add("Documenter")'
+#        - julia -e 'import ImageInTerminal; ENV["DOCUMENTER_DEBUG"] = "true"; include(joinpath("docs","make.jl"))'
 
 after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
