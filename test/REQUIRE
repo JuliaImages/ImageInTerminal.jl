@@ -3,6 +3,4 @@ TestImages
 OffsetArrays
 CoordinateTransformations
 Rotations
-@windows ImageMagick
-@linux ImageMagick
-@osx QuartzImageIO
+ImageMagick
