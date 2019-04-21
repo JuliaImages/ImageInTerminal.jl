@@ -4,15 +4,14 @@ os:
   - linux
   - osx
 julia:
-  - 0.7
   - 1.0
+  - 1.1
   - nightly
 matrix:
   allow_failures:
     - julia: nightly
-script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia --check-bounds=yes --color=yes -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("ImageInTerminal"); Pkg.test("ImageInTerminal"; coverage=true)';
+
+# use default travis script to test
 
 # control of actual deployment is in the Documenter make script
 #jobs:
