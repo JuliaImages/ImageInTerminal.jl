@@ -13,7 +13,7 @@ ColorTypes = ">= 0.3.2"
 Crayons = ">= 0.1.0"
 ImageCore = ">= 0.7"
 ImageTransformations = ">= 0.3.0"
-julia = ">= 0.7"
+julia = ">= 1.0"
 
 [extras]
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
