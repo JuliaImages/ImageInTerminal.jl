@@ -11,6 +11,15 @@ downsampled to fit into the display (using `restrict`).
 """
 function imshow(
         io::IO,
+        img::AbstractArray{<:Colorant},
+        colordepth::TermColorDepth,
+        maxsize::Tuple = displaysize(io))
+    print_matrix(io, x) = imshow(io, x, colordepth, maxsize)
+    Base.show_nd(io, img, print_matrix, true)
+end
+
+function imshow(
+        io::IO,
         img::AbstractMatrix{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))

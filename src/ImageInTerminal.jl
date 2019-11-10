@@ -41,7 +41,7 @@ use_24bit() = (colormode[1] = TermColor24bit())
 # colorant arrays
 function Base.show(
         io::IO, ::MIME"text/plain",
-        img::AbstractVecOrMat{<:Colorant})
+        img::AbstractArray{<:Colorant})
     println(io, summary(img), ":")
     ImageInTerminal.imshow(io, img, colormode[1])
 end
@@ -56,4 +56,3 @@ function Base.show(io::IO, ::MIME"text/plain", color::Colorant)
 end
 
 end # module
-
