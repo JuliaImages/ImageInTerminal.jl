@@ -39,10 +39,9 @@ Call `ImageInTerminal.use_256()` to restore default behaviour.
 use_24bit() = (colormode[1] = TermColor24bit())
 
 # colorant arrays
-function Base.show(
-        io::IO, ::MIME"text/plain",
+function Base.print_matrix(
+        io::IO,
         img::AbstractVecOrMat{<:Colorant})
-    println(io, summary(img), ":")
     ImageInTerminal.imshow(io, img, colormode[1])
 end
 
