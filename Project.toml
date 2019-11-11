@@ -1,6 +1,6 @@
 name = "ImageInTerminal"
 uuid = "d8c32880-2388-543b-8c61-d9f865259254"
-version = "0.4.0"
+version = "0.4.1"
 
 [deps]
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
@@ -13,7 +13,7 @@ ColorTypes = ">= 0.3.2"
 Crayons = ">= 0.1.0"
 ImageCore = ">= 0.7"
 ImageTransformations = ">= 0.3.0"
-julia = ">= 1.0"
+julia = "1"
 
 [extras]
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
