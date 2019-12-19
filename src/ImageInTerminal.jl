@@ -1,7 +1,6 @@
 module ImageInTerminal
 
 using Crayons
-using ColorTypes
 using ImageCore
 using ImageTransformations
 
