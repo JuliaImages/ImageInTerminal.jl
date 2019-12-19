@@ -1,6 +1,5 @@
-using ImageInTerminal, ImageCore, ColorTypes, FixedPointNumbers
+using ImageInTerminal, ImageCore
 using TestImages, ImageTransformations, CoordinateTransformations
-using ImageMagick
 using Rotations, OffsetArrays
 using SparseArrays
 using Test
