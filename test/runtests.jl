@@ -2,59 +2,7 @@ using ImageInTerminal, ImageCore
 using TestImages, ImageTransformations, CoordinateTransformations
 using Rotations, OffsetArrays
 using SparseArrays
-using Test
-
-reference_path(filename) = joinpath(dirname(@__FILE__), "reference", "$(filename).txt")
-
-function test_reference_impl(filename, actual)
-    try
-        reference = replace.(readlines(reference_path(filename)), Ref("\n" => ""))
-        try
-            @assert reference == actual # to throw error
-            @test true # to increase test counter if reached
-        catch # test failed
-            println("Test for \"$filename\" failed.")
-            println("- REFERENCE -------------------")
-            println.(reference)
-            println("-------------------------------")
-            println("- ACTUAL ----------------------")
-            println.(actual)
-            println("-------------------------------")
-            if isinteractive()
-                print("Replace reference with actual result? [y/n] ")
-                answer = first(readline())
-                if answer == 'y'
-                    write(reference_path(filename), join(actual, "\n"))
-                end
-            else
-                error("You need to run the tests interactively with 'include(\"test/runtests.jl\")' to update reference images")
-            end
-        end
-    catch ex
-        if isa(ex, SystemError) # File doesn't exist
-            println("Reference file for \"$filename\" does not exist.")
-            println("- NEW CONTENT -----------------")
-            println.(actual)
-            println("-------------------------------")
-            if isinteractive()
-                print("Create reference file with above content? [y/n] ")
-                answer = first(readline())
-                if answer == 'y'
-                    write(reference_path(filename), join(actual, "\n"))
-                end
-            else
-                error("You need to run the tests interactively with 'include(\"test/runtests.jl\")' to create new reference images")
-            end
-        else
-            throw(ex)
-        end
-    end
-end
-
-# using a macro looks more consistent
-macro test_reference(filename, expr)
-    esc(:(test_reference_impl($filename, $expr)))
-end
+using Test, ReferenceTests
 
 function ensurecolor(f, args...)
     old_color = Base.have_color

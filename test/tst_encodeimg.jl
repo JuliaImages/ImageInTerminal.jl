@@ -37,33 +37,33 @@ end
         @test typeof(res) <: Vector{String}
         @test h === 9
         @test w === 17
-        @test_reference "camera_small_20x20_256" res
+        @test_reference "reference/camera_small_20x20_256.txt" res
         # too small size
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), camera_man, 1, 1)
         @test typeof(res) <: Vector{String}
         @test h === 3
         @test w === 5
-        @test_reference "camera_small_1x1_256" res
+        @test_reference "reference/camera_small_1x1_256.txt" res
         # bigger version
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), camera_man, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 33
-        @test_reference "camera_small_60x60_256" res
+        @test_reference "reference/camera_small_60x60_256.txt" res
     end
     @testset "lighthouse" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), lighthouse, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 49
-        @test_reference "lighthouse_small_60x60_256" res
+        @test_reference "reference/lighthouse_small_60x60_256.txt" res
     end
     @testset "toucan" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), toucan, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 20
         @test w === 42
-        @test_reference "toucan_small_60x60_256" res
+        @test_reference "reference/toucan_small_60x60_256.txt" res
     end
 end
 
@@ -95,21 +95,21 @@ end
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 34
-        @test_reference "camera_big_20x20_256" res
+        @test_reference "reference/camera_big_20x20_256.txt" res
     end
     @testset "lighthouse" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), lighthouse, 50, 50)
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 50
-        @test_reference "lighthouse_big_50x50_256" res
+        @test_reference "reference/lighthouse_big_50x50_256.txt" res
     end
     @testset "toucan" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), toucan, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 20
         @test w === 44
-        @test_reference "toucan_big_60x60_256" res
+        @test_reference "reference/toucan_big_60x60_256.txt" res
     end
 end
 
@@ -143,27 +143,27 @@ end
         @test typeof(res) <: Vector{String}
         @test h === 9
         @test w === 17
-        @test_reference "camera_small_20x20_24bit" res
+        @test_reference "reference/camera_small_20x20_24bit.txt" res
         # bigger version
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), camera_man, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 33
-        @test_reference "camera_small_60x60_24bit" res
+        @test_reference "reference/camera_small_60x60_24bit.txt" res
     end
     @testset "lighthouse" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), lighthouse, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 49
-        @test_reference "lighthouse_small_60x60_24bit" res
+        @test_reference "reference/lighthouse_small_60x60_24bit.txt" res
     end
     @testset "toucan" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), toucan, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 20
         @test w === 42
-        @test_reference "toucan_small_60x60_24bit" res
+        @test_reference "reference/toucan_small_60x60_24bit.txt" res
     end
 end
 
@@ -195,21 +195,21 @@ end
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 34
-        @test_reference "camera_big_20x20_24bit" res
+        @test_reference "reference/camera_big_20x20_24bit.txt" res
     end
     @testset "lighthouse" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), lighthouse, 50, 50)
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 50
-        @test_reference "lighthouse_big_50x50_24bit" res
+        @test_reference "reference/lighthouse_big_50x50_24bit.txt" res
     end
     @testset "toucan" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor24bit(), toucan, 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 20
         @test w === 44
-        @test_reference "toucan_big_60x60_24bit" res
+        @test_reference "reference/toucan_big_60x60_24bit.txt" res
     end
 end
 
@@ -393,6 +393,6 @@ end
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 49
-        @test_reference "lighthouse_small_60x60_256" res
+        @test_reference "reference/lighthouse_small_60x60_256.txt" res
     end
 end
