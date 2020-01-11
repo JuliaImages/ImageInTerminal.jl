@@ -5,12 +5,10 @@ version = "0.4.2"
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 ImageCore = "a09fc81d-aa75-5fe9-8630-4744c3626534"
-ImageTransformations = "02fcd773-0e25-5acc-982a-7f6622650795"
 
 [compat]
 Crayons = "0.5, 1, 2, 3, 4"
 ImageCore = "0.8.1"
-ImageTransformations = "0.5, 0.6, 0.7, 0.8"
 julia = "1"
 
 [extras]

@@ -2,7 +2,6 @@ module ImageInTerminal
 
 using Crayons
 using ImageCore
-using ImageTransformations
 
 export
 

@@ -40,23 +40,19 @@ function encodeimg(
         ::SmallBlocks,
         colordepth::TermColorDepth,
         img::AbstractMatrix{<:Colorant},
-        maxheight::Int = 50,
-        maxwidth::Int = 80)
-    maxheight = max(maxheight, 5)
+        maxheight::Integer = 50,
+        maxwidth::Integer = 80)
+    maxheight = max(maxheight, 5)*2
     maxwidth  = max(maxwidth,  5)
-    h, w = map(length, axes(img))
-    while ceil(h/2) > maxheight || w > maxwidth
-        img = restrict(img)
-        h, w = map(length, axes(img))
-    end
-    yinds, xinds = axes(img)
+    img⬇ = _imresize(img, maxwidth, maxheight)
+    yinds, xinds = axes(img⬇)
     io = IOBuffer()
     for y in first(yinds):2:last(yinds)
         print(io, Crayon(reset = true))
         for x in xinds
-            fgcol = _colorant2ansi(img[y,x], colordepth)
+            fgcol = _colorant2ansi(img⬇[y,x], colordepth)
             bgcol = if y+1 <= last(yinds)
-                _colorant2ansi(img[y+1,x], colordepth)
+                _colorant2ansi(img⬇[y+1,x], colordepth)
             else
                 # if reached it means that the last character row
                 # has only the upper pixel defined.
@@ -66,35 +62,31 @@ function encodeimg(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, length(1:2:h), w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, size(img⬇)...
 end
 
 function encodeimg(
         ::BigBlocks,
         colordepth::TermColorDepth,
         img::AbstractMatrix{<:Colorant},
-        maxheight::Int = 50,
-        maxwidth::Int = 80)
+        maxheight::Integer = 50,
+        maxwidth::Integer = 80)
     maxheight = max(maxheight, 5)
-    maxwidth  = max(maxwidth,  5)
-    h, w = map(length, axes(img))
-    while h > maxheight || 2w > maxwidth
-        img = restrict(img)
-        h, w = map(length, axes(img))
-    end
-    yinds, xinds = axes(img)
+    maxwidth  = max(maxwidth,  5)÷2
+    img⬇ = _imresize(img, maxwidth, maxheight)
+    yinds, xinds = axes(img⬇)
     io = IOBuffer()
     for y in yinds
         print(io, Crayon(reset = true))
         for x in xinds
-            color = img[y,x]
+            color = img⬇[y,x]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
             print(io, Crayon(foreground = fgcol), chr, chr)
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, h, 2w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, size(img⬇)...
 end
 
 # colorant vector
@@ -102,30 +94,26 @@ function encodeimg(
         enc::SmallBlocks,
         colordepth::TermColorDepth,
         img::AbstractVector{<:Colorant},
-        maxwidth::Int = 80)
+        maxwidth::Integer = 80)
     maxwidth  = max(maxwidth, 5)
-    w = length(axes(img, 1))
-    if w > maxwidth
-        img = imresize(img, maxwidth)
-        w = length(axes(img, 1))
-    end
+    img⬇ = _imresize(img, maxwidth)
     io = IOBuffer()
     print(io, Crayon(reset = true))
-    for i in axes(img, 1)
-        color = img[i]
+    for i in axes(img⬇, 1)
+        color = img⬇[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, size(img⬇, 1)
 end
 
 function encodeimg(
         enc::BigBlocks,
         colordepth::TermColorDepth,
         img::AbstractVector{<:Colorant},
-        maxwidth::Int = 80)
+        maxwidth::Integer = 80)
     maxwidth  = max(maxwidth, 5)
     inds = axes(img, 1)
     w = length(inds)
@@ -149,4 +137,20 @@ function encodeimg(
     end
     println(io, Crayon(reset = true))
     replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
+end
+
+function _imresize(img, maxwidth::Integer, maxheight::Integer)
+    img⬇ = img
+    while any(size(img⬇) .> (maxheight, maxwidth))
+        img⬇ = img⬇[1:2:end, 1:2:end]
+    end
+    return img⬇
+end
+
+function _imresize(img, maxwidth::Integer)
+    img⬇ = img
+    while size(img⬇, 2) > maxwidth
+        img⬇ = img⬇[1:2:end, :]
+    end
+    return img⬇
 end
