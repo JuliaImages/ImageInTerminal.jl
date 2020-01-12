@@ -19,14 +19,14 @@ end
         io = IOBuffer()
         ensurecolor(imshow, io, img)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "lena_big_imshow" res
+        @test_reference "reference/lena_big_imshow.txt" res
     end
     @testset "ndarray" begin
         img = rgb_line_4d
         io = IOBuffer()
         ensurecolor(imshow, io, img)
         res = readlines(seek(io,0))
-        @test_reference "ndarray_imshow" res
+        @test_reference "reference/ndarray_imshow.txt" res
     end
 end
 
@@ -39,33 +39,33 @@ end
         io = IOBuffer()
         ensurecolor(imshow256, io, rgb_line)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "rgbline_big_imshow256" res
+        @test_reference "reference/rgbline_big_imshow256.txt" res
         io = IOBuffer()
         ensurecolor(imshow256, io, rgb_line, (1, 45))
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "rgbline_small1_imshow256" res
+        @test_reference "reference/rgbline_small1_imshow256.txt" res
         io = IOBuffer()
         ensurecolor(imshow256, io, rgb_line, (1, 19))
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "rgbline_small2_imshow256" res
+        @test_reference "reference/rgbline_small2_imshow256.txt" res
     end
     @testset "lena" begin
         img = imresize(lena, 10, 10)
         io = IOBuffer()
         ensurecolor(imshow256, io, img)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "lena_big_imshow256" res
+        @test_reference "reference/lena_big_imshow256.txt" res
         io = IOBuffer()
         ensurecolor(imshow256, io, img, (10, 20))
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "lena_small_imshow256" res
+        @test_reference "reference/lena_small_imshow256.txt" res
     end
     @testset "ndarray" begin
         img = rgb_line_4d
         io = IOBuffer()
         ensurecolor(imshow256, io, img)
         res = readlines(seek(io,0))
-        @test_reference "ndarray_imshow256" res
+        @test_reference "reference/ndarray_imshow256.txt" res
     end
 end
 
@@ -78,33 +78,33 @@ end
         io = IOBuffer()
         ensurecolor(imshow24bit, io, rgb_line)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "rgbline_big_imshow24bit" res
+        @test_reference "reference/rgbline_big_imshow24bit.txt" res
         io = IOBuffer()
         ensurecolor(imshow24bit, io, rgb_line, (1, 45))
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "rgbline_small1_imshow24bit" res
+        @test_reference "reference/rgbline_small1_imshow24bit.txt" res
         io = IOBuffer()
         ensurecolor(imshow24bit, io, rgb_line, (1, 19))
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "rgbline_small2_imshow24bit" res
+        @test_reference "reference/rgbline_small2_imshow24bit.txt" res
     end
     @testset "lena" begin
         img = imresize(lena, 10, 10)
         io = IOBuffer()
         ensurecolor(imshow24bit, io, img)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "lena_big_imshow24bit" res
+        @test_reference "reference/lena_big_imshow24bit.txt" res
         io = IOBuffer()
         ensurecolor(imshow24bit, io, img, (10, 20))
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "lena_small_imshow24bit" res
+        @test_reference "reference/lena_small_imshow24bit.txt" res
     end
     @testset "ndarray" begin
         img = rgb_line_4d
         io = IOBuffer()
         ensurecolor(imshow24bit, io, img)
         res = readlines(seek(io,0))
-        @test_reference "ndarray_imshow24bit" res
+        @test_reference "reference/ndarray_imshow24bit.txt" res
     end
 end
 
@@ -114,7 +114,7 @@ end
         io = IOBuffer()
         ensurecolor(imshow, io, img)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "lena_big_imshow" res
+        @test_reference "reference/lena_big_imshow.txt" res
     end
     @testset "rotation" begin
         tfm = recenter(RotMatrix(-pi/4), center(lighthouse))
@@ -122,6 +122,6 @@ end
         io = IOBuffer()
         ensurecolor(imshow, io, lhr)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "lighthouse_rotated" res
+        @test_reference "reference/lighthouse_rotated.txt" res
     end
 end
