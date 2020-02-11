@@ -1,8 +1,9 @@
 # ImageInTerminal
 
-[![Build Status](https://travis-ci.org/JuliaImages/ImageInTerminal.jl.svg?branch=master)](https://travis-ci.org/JuliaImages/ImageInTerminal.jl)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/1b63qanrofre1rd2?svg=true)](https://ci.appveyor.com/project/Evizero/imageinterminal-jl)
-[![codecov.io](http://codecov.io/github/JuliaImages/ImageInTerminal.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaImages/ImageInTerminal.jl?branch=master)
+[![][travis-img]][travis-url]
+[![][appveyor-img]][appveyor-url]
+[![][pkgeval-img]][pkgeval-url]
+[![][codecov-img]][codecov-url]
 
 ImageInTerminal.jl is a drop-in package that once imported
 changes a how a single `Colorant` and whole `Colorant` arrays (i.e.
@@ -72,3 +73,14 @@ in an unfortunate way. Try changing font or reducing your
 terminal's line-spacing. If your font is Source Code Pro, update to
 the latest version.
 
+
+<!-- URLS -->
+
+[pkgeval-img]: https://juliaci.github.io/NanosoldierReports/pkgeval_badges/I/ImageInTerminal.svg
+[pkgeval-url]: https://juliaci.github.io/NanosoldierReports/pkgeval_badges/report.html
+[travis-img]: https://travis-ci.org/JuliaImages/ImageInTerminal.jl.svg?branch=master
+[travis-url]: https://travis-ci.org/JuliaImages/ImageInTerminal.jl
+[appveyor-img]: https://ci.appveyor.com/api/projects/status/1b63qanrofre1rd2?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/Evizero/imageinterminal-jl
+[codecov-img]: https://codecov.io/github/JuliaImages/ImageInTerminal.jl/coverage.svg?branch=master
+[codecov-url]: https://codecov.io/github/JuliaImages/ImageInTerminal.jl?branch=master
