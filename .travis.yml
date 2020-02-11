@@ -5,6 +5,8 @@ os:
   - linux
 julia:
   - 1.0
+notifications:
+  email: false
 
 after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
