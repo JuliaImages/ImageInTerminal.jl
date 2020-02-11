@@ -1,28 +1,12 @@
-# Documentation: http://docs.travis-ci.com/user/languages/julia/
+# Until https://github.com/julia-actions/julia-uploadcodecov/issues/1 get fixed
+# submit coverage report via travis
 language: julia
 os:
   - linux
-  - osx
 julia:
   - 1.0
-  - 1
-  - nightly
-matrix:
-  allow_failures:
-    - julia: nightly
-
-# use default travis script to test
-
-# control of actual deployment is in the Documenter make script
-#jobs:
-#  include:
-#    - stage: deploy
-#      julia: 1.0
-#      os: linux
-#      script:
-#        - julia -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("ImageInTerminal")'
-#        - julia -e 'import Pkg; Pkg.add("Documenter")'
-#        - julia -e 'import ImageInTerminal; ENV["DOCUMENTER_DEBUG"] = "true"; include(joinpath("docs","make.jl"))'
+notifications:
+  email: false
 
 after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
