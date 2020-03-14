@@ -11,15 +11,6 @@ Images) are displayed in the interactive REPL.
 The displayed images will be downscaled to fit into the size of
 your active terminal session.
 
-To activate this package simply import it into your Julia session.
-By default this packages uses 256 colors. If your terminal supports
-24 bit colors you can make use of them by typing the following:
-
-```julia
-using ImageInTerminal
-ImageInTerminal.use_24bit()
-````
-
 ### Without this package
 
 ```julia
