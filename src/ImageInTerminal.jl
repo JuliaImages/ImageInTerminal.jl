@@ -54,4 +54,9 @@ function Base.show(io::IO, ::MIME"text/plain", color::Colorant)
     print(io, Crayon(reset = true))
 end
 
+function __init__()
+    # use 24bit if the terminal supports it
+    lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "truecolor") && use_24bit()
+end
+
 end # module
