@@ -73,12 +73,12 @@ ImageInTerminal.use_256()
 
 Note that 24 bits format only works as expected if your terminal supports it,
 otherwise you are likely to get some random outputs. To check if your terminal
-supports 24 bits color, please check if the environment variable `COLORTERM` is
-`24bit`(or `truecolor`).
+supports 24 bits color, you can check if the environment variable `COLORTERM` is
+`24bit` (or `truecolor`).
 
 Here's how images are displayed in 24-bit colors:
 
-![24bit color](https://user-images.githubusercontent.com/8684355/76688030-26169b80-6664-11ea-96da-72e348835634.png)
+![24bit color](https://user-images.githubusercontent.com/8684355/76688541-a17a4c00-6668-11ea-9fb9-41669fbec07e.png)
 
 
 ## Troubleshooting
