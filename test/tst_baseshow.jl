@@ -2,6 +2,10 @@ function _tostring(io)
     contents = map(readlines(seek(io,0))) do line
         replace(strip(line), "$Int" => "Int64")
     end
+
+    # ignore summary changes from upstream
+    contents[1] = replace(contents[1], "Normed{UInt8,8}"=>"N0f8")
+    contents
 end
 
 @testset "enable/disable encoding" begin
