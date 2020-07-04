@@ -7,6 +7,9 @@ julia:
   - 1.0
 notifications:
   email: false
+cache:
+  directories:
+    - $HOME/.julia/artifacts
 
 after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
