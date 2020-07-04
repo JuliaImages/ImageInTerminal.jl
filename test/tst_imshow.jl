@@ -17,14 +17,14 @@ end
     @testset "lena" begin
         img = imresize(lena, 10, 10)
         io = IOBuffer()
-        ensurecolor(imshow, io, img)
+        ensurecolor(imshow256, io, img)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
         @test_reference "reference/lena_big_imshow.txt" res
     end
     @testset "ndarray" begin
         img = rgb_line_4d
         io = IOBuffer()
-        ensurecolor(imshow, io, img)
+        ensurecolor(imshow256, io, img)
         res = readlines(seek(io,0))
         @test_reference "reference/ndarray_imshow.txt" res
     end
@@ -112,7 +112,7 @@ end
     @testset "lena" begin
         img = OffsetArray(imresize(lena, 10, 10), (-10,5))
         io = IOBuffer()
-        ensurecolor(imshow, io, img)
+        ensurecolor(imshow256, io, img)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
         @test_reference "reference/lena_big_imshow.txt" res
     end
@@ -120,7 +120,7 @@ end
         tfm = recenter(RotMatrix(-pi/4), center(lighthouse))
         lhr = ImageTransformations.warp(lighthouse, tfm)
         io = IOBuffer()
-        ensurecolor(imshow, io, lhr)
+        ensurecolor(imshow256, io, lhr)
         res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
         @test_reference "reference/lighthouse_rotated.txt" res
     end

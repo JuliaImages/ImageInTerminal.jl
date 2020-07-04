@@ -80,6 +80,11 @@ Here's how images are displayed in 24-bit colors:
 
 ![24bit color](https://user-images.githubusercontent.com/8684355/76688541-a17a4c00-6668-11ea-9fb9-41669fbec07e.png)
 
+### Enable and disable
+
+If you want to temporarily disable this package, you can call `ImageInTerminal.disable_encoding()`. And
+restore the encoding functionality with `ImageInTerminal.enable_encoding()`(automode), `ImageInTerminal.use_24bit()`,
+or `ImageInTerminal.use_256()`.
 
 ## Troubleshooting
 

@@ -1,0 +1,5 @@
+4×4 Array{RGB{Float64},2} with eltype RGB{Float64}:
+RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)
+RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)
+RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)
+RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)  RGB{Float64}(1.0,1.0,1.0)
