@@ -1,11 +1,10 @@
-function _tostring(io)
+function _tostring(io; strip_summary=false)
     contents = map(readlines(seek(io,0))) do line
         replace(strip(line), "$Int" => "Int64")
     end
 
-    # ignore summary changes from upstream
-    contents[1] = replace(contents[1], "Normed{UInt8,8}"=>"N0f8")
-    contents
+    # ignore summary
+    strip_summary ? contents[2:end] : contents
 end
 
 @testset "enable/disable encoding" begin
@@ -40,10 +39,10 @@ end
     io = IOBuffer()
     img = fill(RGB(1.0, 1.0, 1.0), 4, 4)
     show(io, MIME"text/plain"(), img)
-    @test_reference "reference/2d_show_raw.txt" _tostring(io)
+    @test_reference "reference/2d_show_raw.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     show(io, MIME"text/plain"(), collect(rgb_line))
-    @test_reference "reference/rgbline_show_raw.txt" _tostring(io)
+    @test_reference "reference/rgbline_show_raw.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     show(io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
     @test_reference "reference/colorant_show_raw.txt" _tostring(io)
@@ -53,10 +52,10 @@ end
     ImageInTerminal.use_256()
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), lena)
-    @test_reference "reference/lena_show_256.txt" _tostring(io)
+    @test_reference "reference/lena_show_256.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
-    @test_reference "reference/rgbline_show_256.txt" _tostring(io)
+    @test_reference "reference/rgbline_show_256.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
     @test_reference "reference/colorant_show_256.txt" _tostring(io)
@@ -66,10 +65,10 @@ end
     ImageInTerminal.use_24bit()
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), lena)
-    @test_reference "reference/lena_show_24bit.txt" _tostring(io)
+    @test_reference "reference/lena_show_24bit.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
-    @test_reference "reference/rgbline_show_24bit.txt" _tostring(io)
+    @test_reference "reference/rgbline_show_24bit.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
     @test_reference "reference/colorant_show_24bit.txt" _tostring(io)
