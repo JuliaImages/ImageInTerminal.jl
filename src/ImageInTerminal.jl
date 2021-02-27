@@ -5,7 +5,8 @@ using ImageCore
 using ImageTransformations
 
 export
-
+    play,
+    explore,
     colorant2ansi,
     imshow,
     imshow256,
@@ -14,6 +15,7 @@ export
 include("colorant2ansi.jl")
 include("encodeimg.jl")
 include("imshow.jl")
+include("multipage.jl")
 
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
@@ -62,7 +64,7 @@ enable_encoding() = (should_render_image[1] = true)
 function Base.show(
         io::IO, mime::MIME"text/plain",
         img::AbstractArray{<:Colorant})
-    if should_render_image[1]    
+    if should_render_image[1]
         println(io, summary(img), ":")
         ImageInTerminal.imshow(io, img, colormode[1])
     else
@@ -87,7 +89,7 @@ function __init__()
     # use 24bit if the terminal supports it
     lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "truecolor") && use_24bit()
     enable_encoding()
-    
+
     if VERSION < v"1.6.0-DEV.888" && Sys.iswindows()
         # https://discourse.julialang.org/t/image-in-repl-does-not-correct/46359
         @warn "ImageInTerminal is not supported for Windows platform: Julia at least v1.6.0 is required."

@@ -86,6 +86,31 @@ If you want to temporarily disable this package, you can call `ImageInTerminal.d
 restore the encoding functionality with `ImageInTerminal.enable_encoding()`. `ImageInTerminal.use_24bit()`
 and `ImageInTerminal.use_256()` will also enable encodings, too.
 
+### Exploring framestacks and 3D image arrays
+
+The `play` and `explore` functions allow playback and exploration of stacks of images, or to move along a given
+dimension in a 3D image array.
+
+```julia
+using ImageInTerminal, TestImages
+img3D = testimage("mri-stack")
+explore(img, 3) # explore along dimension 3
+```
+![explore mri](https://user-images.githubusercontent.com/1694067/109374814-1351a280-7886-11eb-956e-c08403ae9afb.png)
+
+```julia
+using ImageInTerminal, ImageCore
+framestack = map(_->rand(Gray{N0f8}, 100, 100), 1:200)
+play(framestack, fps = 24) # play framestack back at a target of 24 fps
+```
+
+Control keys are available in both modes:
+
+- `p` or `space-bar`: pause
+- `left` or `up-arrow`: step backward
+- `right` or `down-arrow`: step forward
+- `ctrl-c` or `q`: exit
+
 ## Troubleshooting
 
 If you see out of place horizontal lines in your Image it means
