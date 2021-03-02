@@ -60,11 +60,11 @@ function play(io::IO, arr::T, dim::Int; fps::Real=30, maxsize::Tuple = displaysi
 
     try
         while !should_exit && 1<= frame_idx <= nframes
-            tim = Timer(1/fps)
-            t = @elapsed render_frame(arr, dim, frame_idx, nframes, actual_fps, maxsize)
+            fps_value = paused ? 0 : actual_fps
+            actual_fps = fixed_fps(fps) do
+                render_frame(arr, dim, frame_idx, nframes, fps_value, maxsize)
+            end
             paused || (frame_idx += 1)
-            wait(tim)
-            actual_fps = paused ? 0 : 1 / t
         end
     catch e
         e isa InterruptException || rethrow(e)
@@ -93,6 +93,7 @@ function render_frame(arr, dim, frame_idx, nframes, actual_fps, maxsize; first_f
     println("Preview: $(cols)x$(rows) Frame: $frame_idx/$nframes FPS: $(round(actual_fps, digits=1))", " "^5)
     println("exit: ctrl-c. play/pause: space-bar. seek: arrow keys")
 end
+
 play(arr::T, dim::Int; kwargs...) where {T<:AbstractArray} = play(stdout, arr, dim; kwargs...)
 play(io::IO, framestack::Vector{T}; kwargs...) where {T<:AbstractArray} = play(io, framestack, 1; kwargs...)
 
@@ -168,4 +169,17 @@ function read_key()
         setraw!(stdin, false)
     end
     return control_value
+end
+
+"""
+    fixed_fps(f::Function, fps)
+
+Run function f() at a fixed fps rate if possible.
+"""
+function fixed_fps(f, fps)
+    tim = Timer(1/fps)
+    t = @elapsed f()
+    wait(tim)
+    close(tim)
+    return 1/t
 end
