@@ -8,7 +8,7 @@ function ensurecolor(f, args...)
     old_color = Base.have_color
     try
         Core.eval(Base, :(have_color = true))
-        return @inferred f(args...)
+        return f(args...)
     finally
         Core.eval(Base, :(have_color = $old_color))
     end
