@@ -60,7 +60,7 @@ julia> colorview(RGB, rand(3, 10, 10))
 ### Sixel encoder (Julia 1.6+)
 
 If [`Sixel`](https://github.com/johnnychen94/Sixel.jl) (requires Julia 1.6+) is loaded, this package will try to encode
-the content using `Sixel` encoder, and thus bring much better image visualization experience in terminal:
+the content using `Sixel` encoder for large images, and thus bring much better image visualization experience in terminal:
 
 <img src="https://user-images.githubusercontent.com/8684355/118361462-20954800-b5be-11eb-8505-9455a0b00ec0.png" alt="Sixel" width="500">
 

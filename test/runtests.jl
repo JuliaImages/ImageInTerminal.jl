@@ -2,6 +2,7 @@ using ImageInTerminal, ImageCore
 using TestImages, ImageTransformations, CoordinateTransformations
 using Rotations, OffsetArrays
 using SparseArrays
+using ImageQualityIndexes
 using Test, ReferenceTests
 
 function ensurecolor(f, args...)
@@ -38,6 +39,25 @@ tests = [
     "tst_baseshow.jl",
 ]
 
+
+if VERSION >= v"1.6"
+    # Sixel is an additional test target and requires Julia at least v1.6
+    # It's not installed with `Pkg.instantiate` because it's not listed in
+    # `Project.toml`, but instead be manually added in
+    # `.github/workflows/UnitTest.yml` in CI setup time.
+    try
+        @info "Install additional dependencies"
+        using Pkg
+        Pkg.add(PackageSpec(name="Sixel"))
+        using Sixel
+        push!(tests, "sixel.jl")
+    catch e
+        @warn "Sixel test disabled: Unable to load package `Sixel`."
+        @warn e
+    end
+end
+
+ImageInTerminal.encoder_backend[1] = :ImageInTerminal # manually disable Sixel
 for t in tests
     @testset "$t" begin
         include(t)
