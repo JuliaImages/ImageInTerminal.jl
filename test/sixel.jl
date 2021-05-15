@@ -13,12 +13,26 @@
         @test assess_psnr(sixel_decode(io), img) > 30
     end
     @testset "small images" begin
-        # small images still use ImageInTerminal for encoding
+        # small images still use ImageInTerminal's fallback encoding
         img = imresize(lena, 10, 10)
         io = IOBuffer()
         ensurecolor(imshow256, io, img)
-        res = replace.(readlines(seek(io,0)), Ref("\n" => ""))
-        @test_reference "reference/lena_sixel_small.txt" res
+        res = replace.(readlines(seek(io,0)), Ref("\n" => ""))[1]
+        @test !startswith(res, "\ePq\"") # not sixel encoding
+    end
+    @testset "vector" begin
+        # vectors, no matter how large it is, does not use sixel
+        img = rgb_line
+        io = IOBuffer()
+        ensurecolor(imshow256, io, img)
+        res = replace.(readlines(seek(io,0)), Ref("\n" => ""))[1]
+        @test !startswith(res, "\ePq\"") # not sixel encoding
+
+        io = IOBuffer()
+        img = repeat(img, 10)
+        ensurecolor(imshow256, io, img)
+        res = replace.(readlines(seek(io,0)), Ref("\n" => ""))[1]
+        @test !startswith(res, "\ePq\"") # not sixel encoding
     end
 
     # restore encoder to previous one

@@ -51,8 +51,9 @@ if VERSION >= v"1.6"
         Pkg.add(PackageSpec(name="Sixel"))
         using Sixel
         push!(tests, "sixel.jl")
+        @info "Sixel test: enabled."
     catch e
-        @warn "Sixel test disabled: Unable to load package `Sixel`."
+        @warn "Sixel test: disabled."
         @warn e
     end
 end
