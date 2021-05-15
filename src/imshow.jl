@@ -14,6 +14,9 @@ function imshow(
         img::AbstractArray{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
+    encoder_backend[1] == :Sixel && return sixel_encode(img)
+
+    # otherwise, use our own implementation
     print_matrix(io, x) = imshow(io, x, colordepth, maxsize)
     Base.show_nd(io, img, print_matrix, true)
 end
@@ -23,6 +26,9 @@ function imshow(
         img::AbstractMatrix{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
+    encoder_backend[1] == :Sixel && return sixel_encode(img)
+
+    # otherwise, use our own implementation
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
     str = if img_h <= io_h-4 && 2img_w <= io_w
@@ -42,6 +48,9 @@ function imshow(
         img::AbstractVector{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
+    encoder_backend[1] == :Sixel && return sixel_encode(img)
+
+    # otherwise, use our own implementation
     io_h, io_w = maxsize
     img_w = length(img)
     str = if 3img_w <= io_w

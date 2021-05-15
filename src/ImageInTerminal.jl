@@ -1,5 +1,9 @@
 module ImageInTerminal
 
+# Sixel.jl requires Julia v1.6, for backward-compatibility issue
+# we use Requires.jl to optionally set sixel encoder backend.
+using Requires
+
 using Crayons
 using ImageCore
 using ImageTransformations
@@ -20,6 +24,7 @@ include("imshow.jl")
 
 const colormode = TermColorDepth[TermColor256()]
 const should_render_image = Bool[true]
+const encoder_backend = [:ImageInTerminal]
 
 """
     use_256()
@@ -92,6 +97,13 @@ function __init__()
         # https://discourse.julialang.org/t/image-in-repl-does-not-correct/46359
         @warn "ImageInTerminal is not supported for Windows platform: Julia at least v1.6.0 is required."
         disable_encoding()
+    end
+
+    @require Sixel="45858cf5-a6b0-47a3-bbea-62219f50df47" begin
+        if Sixel.is_sixel_supported()
+            encoder_backend[1] = :Sixel
+        end
+        sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
     end
 end
 
