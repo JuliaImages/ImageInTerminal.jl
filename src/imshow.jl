@@ -1,3 +1,18 @@
+function use_sixel(img::AbstractArray)
+    encoder_backend[1] == :Sixel || return false
+
+    # Sixel requires at least 6 pixels in row direction and thus doesn't perform very well for vectors.
+    # ImageInTerminal encoder is good enough for vector case.
+    ndims(img) == 1 && return false
+
+    # Small images really do not need sixel encoding.
+    # `100` is a randomly chosen value; it's not the best because
+    # 100×100 image will be very small in terminal after sixel encoding.
+    any(size(img) .<= 12) && return false
+    all(size(img) .<= 100) && return false
+    return true
+end
+
 """
     imshow([stream], img, [depth::TermColorDepth], [maxsize])
 
@@ -14,6 +29,9 @@ function imshow(
         img::AbstractArray{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
+    use_sixel(img) && return sixel_encode(io, img)
+
+    # otherwise, use our own implementation
     print_matrix(io, x) = imshow(io, x, colordepth, maxsize)
     Base.show_nd(io, img, print_matrix, true)
 end
@@ -23,6 +41,9 @@ function imshow(
         img::AbstractMatrix{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
+    use_sixel(img) && return sixel_encode(io, img)
+
+    # otherwise, use our own implementation
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
     str = if img_h <= io_h-4 && 2img_w <= io_w
@@ -42,6 +63,8 @@ function imshow(
         img::AbstractVector{<:Colorant},
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
+    @assert !use_sixel(img) "Sixel should be disabled for Vector colorant"
+
     io_h, io_w = maxsize
     img_w = length(img)
     str = if 3img_w <= io_w

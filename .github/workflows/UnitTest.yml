@@ -25,7 +25,14 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
-
+      - name: "Compat fix for Julia < v1.3.0"
+        if: ${{ matrix.julia-version == '1.0' }}
+        run: |
+          using Pkg
+          Pkg.add([
+            PackageSpec(name="AbstractFFTs", version="0.5"),
+          ])
+        shell: julia --project=. --startup=no --color=yes {0}
       - name: Cache artifacts
         uses: actions/cache@v1
         env:
@@ -37,7 +44,6 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-
       - name: "Unit Test"
         uses: julia-actions/julia-runtest@master
 
