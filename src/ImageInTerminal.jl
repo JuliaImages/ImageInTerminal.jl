@@ -3,7 +3,7 @@ module ImageInTerminal
 using Requires
 using Crayons
 using ImageCore
-using ImageTransformations
+using ImageBase: restrict
 
 export
 

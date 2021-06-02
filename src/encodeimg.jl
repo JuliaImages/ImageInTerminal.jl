@@ -104,10 +104,8 @@ function encodeimg(
         img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
     maxwidth  = max(maxwidth, 5)
-    w = length(axes(img, 1))
-    if w > maxwidth
-        img = imresize(img, maxwidth)
-        w = length(axes(img, 1))
+    while size(img, 1) > maxwidth
+        img = restrict(img)
     end
     io = IOBuffer()
     print(io, Crayon(reset = true))
@@ -118,7 +116,7 @@ function encodeimg(
         print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, size(img, 1)
 end
 
 function encodeimg(
