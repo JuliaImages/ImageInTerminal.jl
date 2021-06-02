@@ -236,9 +236,9 @@ end
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), rgb_line, 8)
         @test typeof(res) <: Vector{String}
         @test h === 1
-        @test w === 8
+        @test w === 6
         @test length(res) === 1
-        @test res[1] == "\e[0m\e[38;5;21m█\e[38;5;56m█\e[38;5;91m█\e[38;5;91m█\e[38;5;126m█\e[38;5;126m█\e[38;5;161m█\e[38;5;196m█\e[0m"
+        @test res[1] == "\e[0m\e[38;5;18m█\e[38;5;56m█\e[38;5;91m█\e[38;5;126m█\e[38;5;161m█\e[38;5;88m█\e[0m"
     end
 end
 
@@ -312,9 +312,9 @@ end
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor24bit(), rgb_line, 8)
         @test typeof(res) <: Vector{String}
         @test h === 1
-        @test w === 8
+        @test w === 6
         @test length(res) === 1
-        @test res[1] == "\e[0m\e[38;2;10;0;245m█\e[38;2;44;0;211m█\e[38;2;77;0;178m█\e[38;2;111;0;144m█\e[38;2;144;0;111m█\e[38;2;178;0;77m█\e[38;2;211;0;44m█\e[38;2;245;0;10m█\e[0m"
+        @test res[1] == "\e[0m\e[38;2;6;0;122m█\e[38;2;47;0;208m█\e[38;2;101;0;154m█\e[38;2;154;0;101m█\e[38;2;208;0;47m█\e[38;2;122;0;6m█\e[0m"
     end
 end
 
@@ -370,9 +370,9 @@ end
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), OffsetArray(rgb_line, (-1,)), 8)
         @test typeof(res) <: Vector{String}
         @test h === 1
-        @test w === 8
+        @test w === 6
         @test length(res) === 1
-        @test res[1] == "\e[0m\e[38;5;21m█\e[38;5;56m█\e[38;5;91m█\e[38;5;91m█\e[38;5;126m█\e[38;5;126m█\e[38;5;161m█\e[38;5;196m█\e[0m"
+        @test res[1] == "\e[0m\e[38;5;18m█\e[38;5;56m█\e[38;5;91m█\e[38;5;126m█\e[38;5;161m█\e[38;5;88m█\e[0m"
     end
     @testset "rgb line2" begin
         res, h, w = ensurecolor(ImageInTerminal.encodeimg, ImageInTerminal.BigBlocks(), ImageInTerminal.TermColor256(), OffsetArray(rgb_line, (2,)), 9)
