@@ -58,7 +58,7 @@ if VERSION >= v"1.6"
     end
 end
 
-ImageInTerminal.encoder_backend[1] = :ImageInTerminal # manually disable Sixel
+ImageInTerminal.encoder_backend[] = :ImageInTerminal  # manually disable Sixel
 for t in tests
     @testset "$t" begin
         include(t)

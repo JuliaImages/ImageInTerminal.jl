@@ -1,16 +1,20 @@
 function use_sixel(img::AbstractArray)
-    encoder_backend[1] == :Sixel || return false
+    encoder_backend[] == :Sixel || return false
 
     # Sixel requires at least 6 pixels in row direction and thus doesn't perform very well for vectors.
     # ImageInTerminal encoder is good enough for vector case.
     ndims(img) == 1 && return false
 
-    # Small images really do not need sixel encoding.
-    # `100` is a randomly chosen value; it's not the best because
-    # 100×100 image will be very small in terminal after sixel encoding.
-    any(size(img) .<= 12) && return false
-    all(size(img) .<= 100) && return false
-    return true
+    if small_imgs_sixel[]
+        return true
+    else
+        # Small images really do not need sixel encoding.
+        # `60` is a randomly chosen value; it's not the best because
+        # 60×60 image will be very small in terminal after sixel encoding.
+        any(size(img) .<= 12) && return false
+        all(size(img) .<= 60) && return false
+        return true
+    end
 end
 
 """
@@ -46,11 +50,8 @@ function imshow(
     # otherwise, use our own implementation
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
-    str = if img_h <= io_h-4 && 2img_w <= io_w
-        first(encodeimg(BigBlocks(),   colordepth, img, io_h-4, io_w))
-    else
-        first(encodeimg(SmallBlocks(), colordepth, img, io_h-4, io_w))
-    end
+    enc = img_h <= io_h-4 && 2img_w <= io_w ? BigBlocks() : SmallBlocks()
+    str = first(encodeimg(enc, colordepth, img, io_h-4, io_w))
     for (idx, line) in enumerate(str)
         print(io, line)
         idx < length(str) && println(io)
@@ -67,19 +68,16 @@ function imshow(
 
     io_h, io_w = maxsize
     img_w = length(img)
-    str = if 3img_w <= io_w
-        first(encodeimg(BigBlocks(),   colordepth, img, io_w))
-    else
-        first(encodeimg(SmallBlocks(), colordepth, img, io_w))
-    end
+    enc = 3img_w <= io_w ? BigBlocks() : SmallBlocks()
+    str = first(encodeimg(enc, colordepth, img, io_w))
     for (idx, line) in enumerate(str)
         print(io, line)
         idx < length(str) && println(io)
     end
 end
 
-imshow(io::IO, img, args...) = imshow(io, img, colormode[1], args...)
-imshow(img, args...) = imshow(stdout, img, colormode[1], args...)
+imshow(io::IO, img, args...) = imshow(io, img, colormode[], args...)
+imshow(img, args...) = imshow(stdout, img, colormode[], args...)
 imshow(io::IO, img, colordepth::TermColorDepth, args...) = throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
 
 """
