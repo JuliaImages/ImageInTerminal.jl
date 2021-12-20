@@ -1,7 +1,7 @@
 @testset "encoder/sixel" begin
     # Force sixel encoding
-    old_encoder = ImageInTerminal.encoder_backend[1]
-    ImageInTerminal.encoder_backend[1] = :Sixel
+    old_encoder = ImageInTerminal.encoder_backend[]
+    ImageInTerminal.encoder_backend[] = :Sixel
 
     @testset "lena" begin
         img = imresize(lena, 128, 128)
@@ -36,5 +36,5 @@
     end
 
     # restore encoder to previous one
-    ImageInTerminal.encoder_backend[1] = old_encoder
+    ImageInTerminal.encoder_backend[] = old_encoder
 end

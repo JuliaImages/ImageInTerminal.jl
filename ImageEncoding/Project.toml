@@ -1,0 +1,26 @@
+name = "ImageEncoding"
+uuid = "d64ea8f1-9d40-4cda-bb88-5de2505cd5c8"
+version = "0.1.0"
+
+[deps]
+Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+ImageBase = "c817782e-172a-44cc-b673-b171935fbb9e"
+ImageCore = "a09fc81d-aa75-5fe9-8630-4744c3626534"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+
+[compat]
+Crayons = "0.5, 1, 2, 3, 4"
+ImageBase = "0.1"
+ImageCore = "0.9"
+Requires = "1"
+julia = "1.6"
+
+[extras]
+ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
+OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+ReferenceTests = "324d217c-45ce-50fc-942e-d289b448e8cf"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
+
+[targets]
+test = ["ImageMagick", "OffsetArrays", "ReferenceTests", "Test", "TestImages"]

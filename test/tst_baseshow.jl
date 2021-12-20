@@ -8,30 +8,30 @@ function _tostring(io; strip_summary=false)
 end
 
 @testset "enable/disable encoding" begin
-    old_colormode = ImageInTerminal.colormode[1]
-    old_should_render_image = ImageInTerminal.should_render_image[1]
+    old_colormode = ImageInTerminal.colormode[]
+    old_should_render_image = ImageInTerminal.should_render_image[]
 
     ImageInTerminal.enable_encoding()
-    @test ImageInTerminal.colormode[1] == old_colormode
-    @test ImageInTerminal.should_render_image[1] == true
+    @test ImageInTerminal.colormode[] == old_colormode
+    @test ImageInTerminal.should_render_image[] == true
 
     ImageInTerminal.enable_encoding()
     ImageInTerminal.disable_encoding()
-    @test ImageInTerminal.colormode[1] == old_colormode
-    @test ImageInTerminal.should_render_image[1] == false
+    @test ImageInTerminal.colormode[] == old_colormode
+    @test ImageInTerminal.should_render_image[] == false
 
     ImageInTerminal.disable_encoding()
     ImageInTerminal.use_256()
-    @test ImageInTerminal.colormode[1] == ImageInTerminal.TermColor256()
-    @test ImageInTerminal.should_render_image[1] == true
+    @test ImageInTerminal.colormode[] == ImageInTerminal.TermColor256()
+    @test ImageInTerminal.should_render_image[] == true
 
     ImageInTerminal.disable_encoding()
     ImageInTerminal.use_24bit()
-    @test ImageInTerminal.colormode[1] == ImageInTerminal.TermColor24bit()
-    @test ImageInTerminal.should_render_image[1] == true
+    @test ImageInTerminal.colormode[] == ImageInTerminal.TermColor24bit()
+    @test ImageInTerminal.should_render_image[] == true
 
-    ImageInTerminal.colormode[1] = old_colormode
-    ImageInTerminal.should_render_image[1] = old_should_render_image
+    ImageInTerminal.colormode[] = old_colormode
+    ImageInTerminal.should_render_image[] = old_should_render_image
 end
 
 @testset "no encoding" begin

@@ -1,4 +1,3 @@
-# not exported
 abstract type ImageEncoder end
 struct BigBlocks   <: ImageEncoder end
 struct SmallBlocks <: ImageEncoder end
@@ -146,5 +145,5 @@ function encodeimg(
         end
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3*(length(1:n) + 1 + length(w-n+1:w)) : 3w
+    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3(length(1:n) + 1 + length(w-n+1:w)) : 3w
 end

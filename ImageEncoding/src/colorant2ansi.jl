@@ -35,27 +35,27 @@ _colorant2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
 # 256 colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor256)
     r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
-    r24, g24, b24 = map(c->round(Int, c * 23), (r, g, b))
+    r24, g24, b24 = map(c->round(Int, 23c), (r, g, b))
     if r24 == g24 == b24
         # Use grayscales because of higher resultion
         # This way even grayscale RGB images look good.
         232 + r24
     else
-        r6, g6, b6 = map(c->round(Int, c * 5), (r, g, b))
-        16 + 36 * r6 + 6 * g6 + b6
+        r6, g6, b6 = map(c->round(Int, 5c), (r, g, b))
+        16 + 36r6 + 6g6 + b6
     end
 end
 
-_colorant2ansi(gr::Color{<:Any,1}, ::TermColor256) = round(Int, 232 + clamp01nan(real(gr)) * 23)
+_colorant2ansi(gr::Color{<:Any,1}, ::TermColor256) = round(Int, 232 + 23clamp01nan(real(gr)))
 
 # 24 bit colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
     r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
-    map(c->round(Int, c * 255), (r, g, b))
+    map(c->round(Int, 255c), (r, g, b))
 end
 
 function _colorant2ansi(gr::Color{<:Any,1}, ::TermColor24bit)
-    r = round(Int, clamp01nan(real(gr)) * 255)
+    r = round(Int, 255clamp01nan(real(gr)))
     r, r, r
 end
 

@@ -1,6 +1,6 @@
 @testset "Not exported Interface" begin
-    @test supertype(ImageInTerminal.TermColor256) <: ImageInTerminal.TermColorDepth
-    @test supertype(ImageInTerminal.TermColor24bit) <: ImageInTerminal.TermColorDepth
+    @test supertype(TermColor256) <: TermColorDepth
+    @test supertype(TermColor24bit) <: TermColorDepth
 
     # This tests if the mapping from RGB to the
     # 256 ansi color codes is correct
@@ -18,16 +18,16 @@
                 r, g, b = red(col), green(col), blue(col)
                 ri, gi, bi = map(c->round(Int, 23c), (r, g, b))
                 if ri == gi == bi
-                    @test ImageInTerminal._colorant2ansi(col, ImageInTerminal.TermColor256()) === _ref_col2ansi(r)
+                    @test ImageEncoding._colorant2ansi(col, TermColor256()) === _ref_col2ansi(r)
                 else
-                    @test ImageInTerminal._colorant2ansi(col, ImageInTerminal.TermColor256()) === _ref_col2ansi(r, g, b)
+                    @test ImageEncoding._colorant2ansi(col, TermColor256()) === _ref_col2ansi(r, g, b)
                 end
             end
         end
         @testset "Gray" begin
             for col in rand(Gray, 10)
                 r = real(col)
-                @test ImageInTerminal._colorant2ansi(col, ImageInTerminal.TermColor256()) === _ref_col2ansi(r)
+                @test ImageEncoding._colorant2ansi(col, TermColor256()) === _ref_col2ansi(r)
             end
         end
     end
@@ -39,13 +39,13 @@
             for col in rand(RGB, 10)
                 r, g, b = red(col), green(col), blue(col)
                 ri, gi, bi = map(c->round(Int,255c), (r,g,b))
-                @test ImageInTerminal._colorant2ansi(col, ImageInTerminal.TermColor24bit()) === (ri, gi, bi)
+                @test ImageEncoding._colorant2ansi(col, TermColor24bit()) === (ri, gi, bi)
             end
         end
         @testset "Gray" begin
             for col in rand(Gray, 10)
                 r = round(Int, 255*real(col))
-                @test ImageInTerminal._colorant2ansi(col, ImageInTerminal.TermColor24bit()) === (r, r, r)
+                @test ImageEncoding._colorant2ansi(col, TermColor24bit()) === (r, r, r)
             end
         end
     end
@@ -55,7 +55,7 @@
     @testset "Non RGB" begin
         for col_rgb in rand(RGB, 10)
             col_other = convert(HSV, col_rgb)
-            @test ImageInTerminal._colorant2ansi(col_rgb, ImageInTerminal.TermColor24bit()) === ImageInTerminal._colorant2ansi(col_other, ImageInTerminal.TermColor24bit())
+            @test ImageEncoding._colorant2ansi(col_rgb, TermColor24bit()) === ImageEncoding._colorant2ansi(col_other, TermColor24bit())
         end
     end
 
@@ -64,7 +64,7 @@
     @testset "TransparentColor" begin
         for col in (rand(RGB, 10)..., rand(HSV, 10)...)
             acol = alphacolor(col, rand())
-            @test ImageInTerminal._colorant2ansi(col, ImageInTerminal.TermColor24bit()) === ImageInTerminal._colorant2ansi(acol, ImageInTerminal.TermColor24bit())
+            @test ImageEncoding._colorant2ansi(col, TermColor24bit()) === ImageEncoding._colorant2ansi(acol, TermColor24bit())
         end
     end
 end
@@ -74,17 +74,15 @@ end
 # Also compare functionality against the functions tested above
 @testset "Exported Interface" begin
     @testset "Validate exported interface boundaries" begin
-        @test_throws UndefVarError TermColor256()
-        @test_throws UndefVarError TermColor24bit()
-        @test_throws MethodError colorant2ansi(RGB(1.,1.,1.), ImageInTerminal.TermColor256())
-        @test_throws MethodError colorant2ansi(RGB(1.,1.,1.), ImageInTerminal.TermColor24bit())
+        @test_throws MethodError colorant2ansi(RGB(1.,1.,1.), TermColor256())
+        @test_throws MethodError colorant2ansi(RGB(1.,1.,1.), TermColor24bit())
     end
 
     @testset "256 colors" begin
         for col in (rand(RGB, 10)..., rand(Gray, 10)...)
             # compare against non-exported interface,
             # which we already tested above
-            @test colorant2ansi(col) === ImageInTerminal._colorant2ansi(col, ImageInTerminal.TermColor256())
+            @test colorant2ansi(col) === ImageEncoding._colorant2ansi(col, TermColor256())
         end
     end
 
