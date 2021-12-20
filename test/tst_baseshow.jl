@@ -1,5 +1,5 @@
 function _tostring(io; strip_summary=false)
-    contents = map(readlines(seek(io,0))) do line
+    contents = map(readlines(seek(io, 0))) do line
         replace(strip(line), "$Int" => "Int64")
     end
 
@@ -51,8 +51,8 @@ end
 @testset "256 colors" begin
     ImageInTerminal.use_256()
     io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), lena)
-    @test_reference "reference/lena_show_256.txt" _tostring(io; strip_summary=true)
+    ensurecolor(show, io, MIME"text/plain"(), monarch)
+    @test_reference "reference/monarch_show_256.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
     @test_reference "reference/rgbline_show_256.txt" _tostring(io; strip_summary=true)
@@ -64,8 +64,8 @@ end
 @testset "24 bit" begin
     ImageInTerminal.use_24bit()
     io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), lena)
-    @test_reference "reference/lena_show_24bit.txt" _tostring(io; strip_summary=true)
+    ensurecolor(show, io, MIME"text/plain"(), monarch)
+    @test_reference "reference/monarch_show_24bit.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
     @test_reference "reference/rgbline_show_24bit.txt" _tostring(io; strip_summary=true)

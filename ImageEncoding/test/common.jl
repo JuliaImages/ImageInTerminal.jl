@@ -11,7 +11,7 @@ rgb_line_4d = repeat(repeat(rgb_line', 1, 1, 1, 1), 1, 1, 2, 2)
 camera_man = testimage("camera")
 lighthouse = testimage("lighthouse")
 toucan = testimage("toucan")
-lena = testimage("lena_color_256")
+monarch = testimage("monarch_color_256")
 
 function ensurecolor(f, args...)
     old_color = Base.have_color
