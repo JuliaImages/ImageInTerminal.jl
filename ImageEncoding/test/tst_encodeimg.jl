@@ -2,11 +2,11 @@
 @test supertype(SmallBlocks) <: ImageEncoder
 
 @testset "_charof" begin
-    @test @inferred(ImageEncoding._charof(0.0)) === '⋅'
-    @test @inferred(ImageEncoding._charof(0.2)) === '░'
-    @test @inferred(ImageEncoding._charof(0.5)) === '▒'
-    @test @inferred(ImageEncoding._charof(0.8)) === '▓'
-    @test @inferred(ImageEncoding._charof(1.0)) === '█'
+    @test @inferred(ImageEncoding._charof(0.)) === '⋅'
+    @test @inferred(ImageEncoding._charof(.2)) === '░'
+    @test @inferred(ImageEncoding._charof(.5)) === '▒'
+    @test @inferred(ImageEncoding._charof(.8)) === '▓'
+    @test @inferred(ImageEncoding._charof(1.)) === '█'
 end
 
 @testset "encodeimg 256 small" begin
@@ -389,7 +389,7 @@ end
         @test res[1] == "\e[0m\e[38;5;21m██ \e[38;5;21m██ \e[38;5;56m██ \e[0m … \e[38;5;161m██ \e[38;5;196m██ \e[38;5;196m██ \e[0m"
     end
     @testset "lighthouse" begin
-        res, h, w = ensurecolor(encodeimg, SmallBlocks(), TermColor256(), OffsetArray(lighthouse, (2,-10)), 60, 60)
+        res, h, w = ensurecolor(encodeimg, SmallBlocks(), TermColor256(), OffsetArray(lighthouse, (2, -10)), 60, 60)
         @test typeof(res) <: Vector{String}
         @test h === 17
         @test w === 49

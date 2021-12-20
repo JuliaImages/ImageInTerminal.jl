@@ -17,22 +17,22 @@
         img = imresize(monarch, 10, 10)
         io = IOBuffer()
         ensurecolor(imshow256, io, img)
-        res = replace.(readlines(seek(io, 0)), Ref("\n" => ""))[1]
-        @test !startswith(res, "\ePq\"") # not sixel encoding
+        res = replace.(readlines(seek(io, 0)), Ref("\n"=>""))[1]
+        @test !startswith(res, "\ePq\"")  # not sixel encoding
     end
     @testset "vector" begin
         # vectors, no matter how large it is, does not use sixel
         img = rgb_line
         io = IOBuffer()
         ensurecolor(imshow256, io, img)
-        res = replace.(readlines(seek(io, 0)), Ref("\n" => ""))[1]
-        @test !startswith(res, "\ePq\"") # not sixel encoding
+        res = replace.(readlines(seek(io, 0)), Ref("\n"=>""))[1]
+        @test !startswith(res, "\ePq\"")  # not sixel encoding
 
         io = IOBuffer()
         img = repeat(img, 10)
         ensurecolor(imshow256, io, img)
-        res = replace.(readlines(seek(io, 0)), Ref("\n" => ""))[1]
-        @test !startswith(res, "\ePq\"") # not sixel encoding
+        res = replace.(readlines(seek(io, 0)), Ref("\n"=>""))[1]
+        @test !startswith(res, "\ePq\"")  # not sixel encoding
     end
 
     # restore encoder to previous one

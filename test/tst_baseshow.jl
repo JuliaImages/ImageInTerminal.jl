@@ -1,6 +1,6 @@
 function _tostring(io; strip_summary=false)
     contents = map(readlines(seek(io, 0))) do line
-        replace(strip(line), "$Int" => "Int64")
+        replace(strip(line), "$Int"=>"Int64")
     end
 
     # ignore summary
@@ -37,14 +37,14 @@ end
 @testset "no encoding" begin
     ImageInTerminal.disable_encoding()
     io = IOBuffer()
-    img = fill(RGB(1.0, 1.0, 1.0), 4, 4)
+    img = fill(RGB(1., 1., 1.), 4, 4)
     show(io, MIME"text/plain"(), img)
     @test_reference "reference/2d_show_raw.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
     show(io, MIME"text/plain"(), collect(rgb_line))
     @test_reference "reference/rgbline_show_raw.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
-    show(io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
+    show(io, MIME"text/plain"(), RGB(.5, .1, .9))
     @test_reference "reference/colorant_show_raw.txt" _tostring(io)
 end
 
@@ -57,7 +57,7 @@ end
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
     @test_reference "reference/rgbline_show_256.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
+    ensurecolor(show, io, MIME"text/plain"(), RGB(.5, .1, .9))
     @test_reference "reference/colorant_show_256.txt" _tostring(io)
 end
 
@@ -70,7 +70,7 @@ end
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
     @test_reference "reference/rgbline_show_24bit.txt" _tostring(io; strip_summary=true)
     io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
+    ensurecolor(show, io, MIME"text/plain"(), RGB(.5, .1, .9))
     @test_reference "reference/colorant_show_24bit.txt" _tostring(io)
 end
 
