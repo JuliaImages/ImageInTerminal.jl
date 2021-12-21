@@ -4,7 +4,6 @@ using ImageEncoding
 using ImageCore
 using ImageBase: restrict
 using Crayons
-using FileIO
 
 export
     imshow,
@@ -12,7 +11,6 @@ export
     imshow24bit
 
 include("imshow.jl")
-include("display.jl")
 
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
@@ -63,10 +61,11 @@ enable_encoding() = (should_render_image[] = true)
 function Base.show(
         io::IO, mime::MIME"text/plain",
         img::AbstractArray{<:Colorant})
-    if should_render_image[]    
+    if should_render_image[] && false
         println(io, summary(img), ":")
         ImageInTerminal.imshow(io, img, colormode[])
     else
+        @show 100
         invoke(Base.show, Tuple{typeof(io), typeof(mime), AbstractArray}, io, mime, img)
     end
 end
@@ -109,6 +108,7 @@ function __init__()
     end
 
     pushdisplay(TerminalGraphicDisplay(stdout, devnull))
+
 end
 
 end # module
