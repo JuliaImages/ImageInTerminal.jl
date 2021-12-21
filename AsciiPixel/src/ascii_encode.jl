@@ -61,7 +61,7 @@ function ascii_encode(
         h, w = map(length, axes(img))
     end
     yinds, xinds = axes(img)
-    io = IOBuffer()
+    io = PipeBuffer()
     for y in first(yinds):2:last(yinds)
         print(io, Crayon(reset = true))
         for x in xinds
@@ -77,7 +77,7 @@ function ascii_encode(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, length(1:2:h), w
+    replace.(readlines(io), Ref("\n" => ""))::Vector{String}, length(1:2:h), w
 end
 
 function ascii_encode(
@@ -94,7 +94,7 @@ function ascii_encode(
         h, w = map(length, axes(img))
     end
     yinds, xinds = axes(img)
-    io = IOBuffer()
+    io = PipeBuffer()
     for y in yinds
         print(io, Crayon(reset = true))
         for x in xinds
@@ -105,7 +105,7 @@ function ascii_encode(
         end
         println(io, Crayon(reset = true))
     end
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, h, 2w
+    replace.(readlines(io), Ref("\n" => ""))::Vector{String}, h, 2w
 end
 
 # colorant vector
@@ -127,7 +127,7 @@ function ascii_encode(
     while size(img, 1) > maxwidth
         img = restrict(img)
     end
-    io = IOBuffer()
+    io = PipeBuffer()
     print(io, Crayon(reset = true))
     for i in axes(img, 1)
         color = img[i]
@@ -136,7 +136,7 @@ function ascii_encode(
         print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, size(img, 1)
+    replace.(readlines(io), Ref("\n" => ""))::Vector{String}, 1, size(img, 1)
 end
 
 function ascii_encode(
@@ -148,7 +148,7 @@ function ascii_encode(
     inds = axes(img, 1)
     w = length(inds)
     n = 3w > maxwidth ? floor(Int,maxwidth/6) : w
-    io = IOBuffer()
+    io = PipeBuffer()
     print(io, Crayon(reset = true))
     for i in (0:n-1) .+ first(inds)
         color = img[i]
@@ -166,5 +166,5 @@ function ascii_encode(
         end
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3(length(1:n) + 1 + length(w-n+1:w)) : 3w
+    replace.(readlines(io), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3(length(1:n) + 1 + length(w-n+1:w)) : 3w
 end

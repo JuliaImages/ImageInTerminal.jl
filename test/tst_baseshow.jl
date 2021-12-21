@@ -1,5 +1,5 @@
 function _tostring(io; strip_summary=false)
-    contents = map(readlines(seek(io, 0))) do line
+    contents = map(readlines(io)) do line
         replace(strip(line), "$Int"=>"Int64")
     end
 
@@ -36,40 +36,40 @@ end
 
 @testset "no encoding" begin
     ImageInTerminal.disable_encoding()
-    io = IOBuffer()
+    io = PipeBuffer()
     img = fill(RGB(1., 1., 1.), 4, 4)
     show(io, MIME"text/plain"(), img)
     @test_reference "reference/2d_show_raw.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
+    io = PipeBuffer()
     show(io, MIME"text/plain"(), collect(rgb_line))
     @test_reference "reference/rgbline_show_raw.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
+    io = PipeBuffer()
     show(io, MIME"text/plain"(), RGB(.5, .1, .9))
     @test_reference "reference/colorant_show_raw.txt" _tostring(io)
 end
 
 @testset "256 colors" begin
     ImageInTerminal.use_256()
-    io = IOBuffer()
+    io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), monarch)
     @test_reference "reference/monarch_show_256.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
+    io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
     @test_reference "reference/rgbline_show_256.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
+    io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), RGB(.5, .1, .9))
     @test_reference "reference/colorant_show_256.txt" _tostring(io)
 end
 
 @testset "24 bit" begin
     ImageInTerminal.use_24bit()
-    io = IOBuffer()
+    io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), monarch)
     @test_reference "reference/monarch_show_24bit.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
+    io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), rgb_line)
     @test_reference "reference/rgbline_show_24bit.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
+    io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), RGB(.5, .1, .9))
     @test_reference "reference/colorant_show_24bit.txt" _tostring(io)
 end
