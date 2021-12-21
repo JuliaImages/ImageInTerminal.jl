@@ -1,3 +1,3 @@
-# ImageEncoder
+# AsciiPixel
 
-ImageEncoder is a backend for [ImageInTerminal](https://github.com/JuliaImages/ImageInTerminal.jl).
+AsciiPixel is a backend for [ImageInTerminal](https://github.com/JuliaImages/ImageInTerminal.jl).
