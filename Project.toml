@@ -3,6 +3,7 @@ uuid = "d8c32880-2388-543b-8c61-d9f865259254"
 version = "0.4.8"
 
 [deps]
+AsciiPixel = "d64ea8f1-9d40-4cda-bb88-5de2505cd5c8"
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 ImageBase = "c817782e-172a-44cc-b673-b171935fbb9e"
@@ -11,6 +12,7 @@ ImageEncoding = "d64ea8f1-9d40-4cda-bb88-5de2505cd5c8"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 
 [compat]
+AsciiPixel = "0.1"
 Crayons = "^4.1"
 FileIO = "^1.6"
 ImageBase = "0.1"
@@ -22,7 +24,6 @@ julia = "1.6"
 [extras]
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
 ImageQualityIndexes = "2996bd0c-7a13-11e9-2da2-2f5ce47296a9"
-ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 ImageTransformations = "02fcd773-0e25-5acc-982a-7f6622650795"
 OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"

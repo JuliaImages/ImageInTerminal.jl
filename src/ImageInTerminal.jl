@@ -1,8 +1,9 @@
 module ImageInTerminal
 
-using ImageEncoding
+using AsciiPixel
 using ImageCore
 using ImageBase: restrict
+using Requires
 using Crayons
 
 export
@@ -65,7 +66,6 @@ function Base.show(
         println(io, summary(img), ":")
         ImageInTerminal.imshow(io, img, colormode[])
     else
-        @show 100
         invoke(Base.show, Tuple{typeof(io), typeof(mime), AbstractArray}, io, mime, img)
     end
 end
@@ -73,8 +73,8 @@ end
 # colorant
 function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     if should_render_image[]
-        fgcol = ImageEncoding._colorant2ansi(color, colormode[])
-        chr = ImageEncoding._charof(alpha(color))
+        fgcol = AsciiPixel._colorant2ansi(color, colormode[])
+        chr = AsciiPixel._charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr, chr, " ")
         print(io, Crayon(foreground = :white), color)
         print(io, Crayon(reset = true))
@@ -108,7 +108,6 @@ function __init__()
     end
 
     pushdisplay(TerminalGraphicDisplay(stdout, devnull))
-
 end
 
 end # module

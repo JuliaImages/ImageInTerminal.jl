@@ -46,12 +46,9 @@ function imshow(
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
     use_sixel(img) && return sixel_encode(io, img)
-
     # otherwise, use our own implementation
     io_h, io_w = maxsize
-    img_h, img_w = map(length, axes(img))
-    enc = img_h <= io_h - 4 && 2img_w <= io_w ? BigBlocks : SmallBlocks
-    str = first(encodeimg(enc(), colordepth, img, io_h - 4, io_w))
+    str = first(ascii_encode(colordepth, img, io_h - 4, io_w))
     for (idx, line) in enumerate(str)
         print(io, line)
         idx < length(str) && println(io)
@@ -65,11 +62,8 @@ function imshow(
         colordepth::TermColorDepth,
         maxsize::Tuple = displaysize(io))
     @assert !use_sixel(img) "Sixel should be disabled for Vector colorant"
-
     io_h, io_w = maxsize
-    img_w = length(img)
-    enc = 3img_w <= io_w ? BigBlocks : SmallBlocks
-    str = first(encodeimg(enc(), colordepth, img, io_w))
+    str = first(ascii_encode(colordepth, img, io_w))
     for (idx, line) in enumerate(str)
         print(io, line)
         idx < length(str) && println(io)

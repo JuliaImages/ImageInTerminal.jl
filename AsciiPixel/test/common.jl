@@ -1,4 +1,4 @@
-# common test statements for ImageInTerminal and ImageEncoding
+# common test statements for ImageInTerminal and AsciiPixel
 
 # define some test images
 gray_square = colorview(Gray, N0f8[0. 0.3; 0.7 1])

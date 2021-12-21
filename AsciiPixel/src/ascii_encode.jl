@@ -9,7 +9,7 @@ function _charof(alpha)
 end
 
 """
-    encodeimg(enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
+    ascii_encode(enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
 
 Transforms the pixel of the given image `img`, which has to be an
 array of `Colorant`, into a string of unicode characters using
@@ -35,7 +35,19 @@ The function returns a tuple with three elements:
 
 3. Number of visible characters per line (the remaining are colorcodes).
 """
-function encodeimg(
+
+# colorant matrix
+function ascii_encode(
+        colordepth::TermColorDepth,
+        img::AbstractMatrix{<:Colorant},
+        maxheight::Int = 50,
+        maxwidth::Int = 80)
+    img_h, img_w = map(length, axes(img))
+    enc = img_h <= maxheight && 2img_w <= maxwidth ? BigBlocks : SmallBlocks
+    ascii_encode(enc(), colordepth, img, maxheight)
+end
+
+function ascii_encode(
         ::SmallBlocks,
         colordepth::TermColorDepth,
         img::AbstractMatrix{<:Colorant},
@@ -68,7 +80,7 @@ function encodeimg(
     replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, length(1:2:h), w
 end
 
-function encodeimg(
+function ascii_encode(
         ::BigBlocks,
         colordepth::TermColorDepth,
         img::AbstractMatrix{<:Colorant},
@@ -97,8 +109,17 @@ function encodeimg(
 end
 
 # colorant vector
-function encodeimg(
-        enc::SmallBlocks,
+function ascii_encode(
+        colordepth::TermColorDepth,
+        img::AbstractVector{<:Colorant},
+        maxwidth::Int = 80)
+    img_w = length(img)
+    enc = 3img_w <= maxwidth ? BigBlocks : SmallBlocks
+    ascii_encode(enc(), colordepth, img, maxwidth)
+end
+
+function ascii_encode(
+        ::SmallBlocks,
         colordepth::TermColorDepth,
         img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
@@ -118,8 +139,8 @@ function encodeimg(
     replace.(readlines(seek(io,0)), Ref("\n" => ""))::Vector{String}, 1, size(img, 1)
 end
 
-function encodeimg(
-        enc::BigBlocks,
+function ascii_encode(
+        ::BigBlocks,
         colordepth::TermColorDepth,
         img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)

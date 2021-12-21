@@ -4,8 +4,8 @@ using OffsetArrays, SparseArrays
 using ImageBase, ImageCore
 using ImageQualityIndexes
 using ImageInTerminal
-using ImageEncoding
 using ImageMagick
+using AsciiPixel
 using Rotations
 
 tests = [
@@ -30,7 +30,7 @@ if VERSION >= v"1.6"
     end
 end
 
-include(joinpath(dirname(pathof(ImageEncoding)), "..", "test", "common.jl"))
+include(joinpath(dirname(pathof(AsciiPixel)), "..", "test", "common.jl"))
 
 ImageInTerminal.encoder_backend[] = :ImageInTerminal  # manually disable Sixel
 for t in tests
