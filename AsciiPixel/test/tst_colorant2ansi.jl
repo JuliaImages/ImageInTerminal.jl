@@ -14,7 +14,7 @@
             round(Int, 232 + 23gr)
         end
         @testset "RGB" begin
-            for col ∈ rand(RGB, 10)
+            for col in rand(RGB, 10)
                 r, g, b = red(col), green(col), blue(col)
                 ri, gi, bi = map(c ->round(Int, 23c), (r, g, b))
                 if ri == gi == bi
@@ -25,7 +25,7 @@
             end
         end
         @testset "Gray" begin
-            for col ∈ rand(Gray, 10)
+            for col in rand(Gray, 10)
                 r = real(col)
                 @test _colorant2ansi(col, TermColor256()) === _ref_col2ansi(r)
             end
@@ -36,14 +36,14 @@
     # (which are in the set {0,1,...,255}) is correct.
     @testset "24 bit" begin
         @testset "RGB" begin
-            for col ∈ rand(RGB, 10)
+            for col in rand(RGB, 10)
                 r, g, b = red(col), green(col), blue(col)
                 ri, gi, bi = map(c ->round(Int, 255c), (r, g, b))
                 @test _colorant2ansi(col, TermColor24bit()) === (ri, gi, bi)
             end
         end
         @testset "Gray" begin
-            for col ∈ rand(Gray, 10)
+            for col in rand(Gray, 10)
                 r = round(Int, 255real(col))
                 @test _colorant2ansi(col, TermColor24bit()) === (r, r, r)
             end
@@ -53,7 +53,7 @@
     # Internally non RGB Colors should be converted to RGB
     # This tests if the result reflects that assumption
     @testset "Non RGB" begin
-        for col_rgb ∈ rand(RGB, 10)
+        for col_rgb in rand(RGB, 10)
             col_other = convert(HSV, col_rgb)
             @test _colorant2ansi(col_rgb, TermColor24bit()) === _colorant2ansi(col_other, TermColor24bit())
         end
@@ -62,7 +62,7 @@
     # Internally all Alpha Colors should be stripped of their alpha
     # channel. This tests if the result reflects that assumption
     @testset "TransparentColor" begin
-        for col ∈ (rand(RGB, 10)..., rand(HSV, 10)...)
+        for col in (rand(RGB, 10)..., rand(HSV, 10)...)
             acol = alphacolor(col, rand())
             @test _colorant2ansi(col, TermColor24bit()) === _colorant2ansi(acol, TermColor24bit())
         end
@@ -79,7 +79,7 @@ end
     end
 
     @testset "256 colors" begin
-        for col ∈ (rand(RGB, 10)..., rand(Gray, 10)...)
+        for col in (rand(RGB, 10)..., rand(Gray, 10)...)
             # compare against non-exported interface,
             # which we already tested above
             @test colorant2ansi(col) === _colorant2ansi(col, TermColor256())
@@ -88,7 +88,7 @@ end
 
     # Check if exported interface propagatres conversions
     @testset "Non RGB" begin
-        for col_rgb ∈ rand(RGB, 10)
+        for col_rgb in rand(RGB, 10)
             col_other = convert(HSV, col_rgb)
             @test colorant2ansi(col_rgb) === colorant2ansi(col_other)
         end
@@ -96,7 +96,7 @@ end
 
     # Check if exported interface propagatres conversions
     @testset "TransparentColor" begin
-        for col ∈ (rand(RGB, 10)..., rand(HSV, 10)...)
+        for col in (rand(RGB, 10)..., rand(HSV, 10)...)
             acol = alphacolor(col, rand())
             @test colorant2ansi(col) === colorant2ansi(acol)
         end
