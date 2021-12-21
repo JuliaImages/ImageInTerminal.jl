@@ -57,12 +57,11 @@ different encoding method, call `ImageInTerminal.use_256()` or `ImageInTerminal.
 """
 enable_encoding() = (should_render_image[] = true)
 
-
 # colorant arrays
 function Base.show(
         io::IO, mime::MIME"text/plain",
         img::AbstractArray{<:Colorant})
-    if should_render_image[] && false
+    if should_render_image[]
         println(io, summary(img), ":")
         ImageInTerminal.imshow(io, img, colormode[])
     else
