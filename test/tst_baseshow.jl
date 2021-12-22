@@ -15,20 +15,15 @@ end
     @test ImageInTerminal.colormode[] == old_colormode
     @test ImageInTerminal.should_render_image[] == true
 
-    ImageInTerminal.enable_encoding()
     ImageInTerminal.disable_encoding()
     @test ImageInTerminal.colormode[] == old_colormode
     @test ImageInTerminal.should_render_image[] == false
 
-    ImageInTerminal.disable_encoding()
-    ImageInTerminal.use_256()
-    @test ImageInTerminal.colormode[] == ImageInTerminal.TermColor256()
-    @test ImageInTerminal.should_render_image[] == true
+    AsciiPixel.use_256()
+    @test AsciiPixel.colormode[] == AsciiPixel.TermColor256()
 
-    ImageInTerminal.disable_encoding()
-    ImageInTerminal.use_24bit()
-    @test ImageInTerminal.colormode[] == ImageInTerminal.TermColor24bit()
-    @test ImageInTerminal.should_render_image[] == true
+    AsciiPixel.use_24bit()
+    @test AsciiPixel.colormode[] == AsciiPixel.TermColor24bit()
 
     ImageInTerminal.colormode[] = old_colormode
     ImageInTerminal.should_render_image[] = old_should_render_image
@@ -49,7 +44,8 @@ end
 end
 
 @testset "256 colors" begin
-    ImageInTerminal.use_256()
+    ImageInTerminal.enable_encoding()
+    AsciiPixel.use_256()
     io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), monarch)
     @test_reference "reference/monarch_show_256.txt" _tostring(io; strip_summary=true)
@@ -62,7 +58,8 @@ end
 end
 
 @testset "24 bit" begin
-    ImageInTerminal.use_24bit()
+    ImageInTerminal.enable_encoding()
+    AsciiPixel.use_24bit()
     io = PipeBuffer()
     ensurecolor(show, io, MIME"text/plain"(), monarch)
     @test_reference "reference/monarch_show_24bit.txt" _tostring(io; strip_summary=true)
@@ -74,4 +71,4 @@ end
     @test_reference "reference/colorant_show_24bit.txt" _tostring(io)
 end
 
-ImageInTerminal.use_256()
+AsciiPixel.use_256()

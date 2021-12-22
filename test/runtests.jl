@@ -1,17 +1,12 @@
-using ImageTransformations, CoordinateTransformations
 using Test, TestImages, ReferenceTests
-using OffsetArrays, SparseArrays
 using ImageBase, ImageCore
 using ImageQualityIndexes
 using ImageInTerminal
+using OffsetArrays
 using ImageMagick
 using AsciiPixel
-using Rotations
 
-tests = [
-    "tst_imshow.jl",
-    "tst_baseshow.jl",
-]
+tests = ["tst_baseshow.jl"]
 
 if VERSION >= v"1.6"
     # Sixel is an additional test target and requires Julia at least v1.6

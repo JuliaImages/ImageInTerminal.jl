@@ -6,37 +6,12 @@ using ImageBase: restrict
 using Requires
 using Crayons
 
-export
-    imshow,
-    imshow256,
-    imshow24bit
-
-include("imshow.jl")
-
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
 
-const colormode = Ref{TermColorDepth}(TermColor256())
 const encoder_backend = Ref(:ImageInTerminal)
 const should_render_image = Ref(true)
 const small_imgs_sixel = Ref(false)
-
-"""
-    use_256()
-
-Triggers `imshow256` automatically if an array of colorants is to
-be displayed in the julia REPL. (This is the default)
-"""
-use_256() = (colormode[] = TermColor256(); should_render_image[] = true)
-
-"""
-    use_24bit()
-
-Triggers `imshow24bit` automatically if an array of colorants is to
-be displayed in the julia REPL.
-Call `ImageInTerminal.use_256()` to restore default behaviour.
-"""
-use_24bit() = (colormode[] = TermColor24bit(); should_render_image[] = true)
 
 """
     disable_encoding()
@@ -57,13 +32,36 @@ different encoding method, call `ImageInTerminal.use_256()` or `ImageInTerminal.
 """
 enable_encoding() = (should_render_image[] = true)
 
+function use_sixel(img::AbstractArray)
+    encoder_backend[] == :Sixel || return false
+
+    # Sixel requires at least 6 pixels in row direction and thus doesn't perform very well for vectors.
+    # ImageInTerminal encoder is good enough for vector case.
+    ndims(img) == 1 && return false
+
+    if small_imgs_sixel[]
+        return true
+    else
+        # Small images really do not need sixel encoding.
+        # `60` is a randomly chosen value (10 sixel); it's not the best because
+        # 60x60 image will be very small in terminal after sixel encoding.
+        any(size(img) .<= 12) && return false
+        all(size(img) .<= 60) && return false
+        return true
+    end
+end
+
 # colorant arrays
 function Base.show(
         io::IO, mime::MIME"text/plain",
         img::AbstractArray{<:Colorant})
     if should_render_image[]
         println(io, summary(img), ":")
-        ImageInTerminal.imshow(io, img, colormode[])
+        if use_sixel(img)
+            sixel_encode(io, img)
+        else
+            ascii_encode(io, img)
+        end
     else
         invoke(Base.show, Tuple{typeof(io), typeof(mime), AbstractArray}, io, mime, img)
     end

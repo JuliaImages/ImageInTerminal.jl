@@ -36,17 +36,6 @@ The function returns a tuple with three elements:
 3. Number of visible characters per line (the remaining are colorcodes).
 """
 
-# colorant matrix
-function ascii_encode(
-        colordepth::TermColorDepth,
-        img::AbstractMatrix{<:Colorant},
-        maxheight::Int = 50,
-        maxwidth::Int = 80)
-    img_h, img_w = map(length, axes(img))
-    enc = img_h <= maxheight && 2img_w <= maxwidth ? BigBlocks : SmallBlocks
-    ascii_encode(enc(), colordepth, img, maxheight)
-end
-
 function ascii_encode(
         ::SmallBlocks,
         colordepth::TermColorDepth,
@@ -108,16 +97,6 @@ function ascii_encode(
     replace.(readlines(io), Ref("\n" => ""))::Vector{String}, h, 2w
 end
 
-# colorant vector
-function ascii_encode(
-        colordepth::TermColorDepth,
-        img::AbstractVector{<:Colorant},
-        maxwidth::Int = 80)
-    img_w = length(img)
-    enc = 3img_w <= maxwidth ? BigBlocks : SmallBlocks
-    ascii_encode(enc(), colordepth, img, maxwidth)
-end
-
 function ascii_encode(
         ::SmallBlocks,
         colordepth::TermColorDepth,
@@ -168,3 +147,101 @@ function ascii_encode(
     println(io, Crayon(reset = true))
     replace.(readlines(io), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3(length(1:n) + 1 + length(w-n+1:w)) : 3w
 end
+
+
+"""
+    ascii_encode([stream], img, [depth::TermColorDepth], [maxsize])
+
+Displays the given image `img` using unicode characters and
+terminal colors (defaults to 256 colors).
+`img` has to be an array of `Colorant`.
+
+If working in the REPL, the function tries to choose the encoding
+based on the current display size. The image will also be
+downsampled to fit into the display (using `restrict`).
+"""
+
+# colorant matrix
+function ascii_encode(
+        io::IO,
+        img::AbstractMatrix{<:Colorant},
+        colordepth::TermColorDepth,
+        maxsize::Tuple = displaysize(io))
+    io_h, io_w = maxsize
+    img_h, img_w = map(length, axes(img))
+    enc = img_h <= io_h - 4 && 2img_w <= io_w ? BigBlocks : SmallBlocks
+    str = first(ascii_encode(enc(), colordepth, img, io_h - 4, io_w))
+    for (idx, line) in enumerate(str)
+        print(io, line)
+        idx < length(str) && println(io)
+    end
+end
+
+# colorant vector
+function ascii_encode(
+        io::IO,
+        img::AbstractVector{<:Colorant},
+        colordepth::TermColorDepth,
+        maxsize::Tuple = displaysize(io))
+    io_h, io_w = maxsize
+    img_w = length(img)
+    enc = 3img_w <= io_w ? BigBlocks : SmallBlocks
+    str = first(ascii_encode(enc(), colordepth, img, io_w))
+    for (idx, line) in enumerate(str)
+        print(io, line)
+        idx < length(str) && println(io)
+    end
+end
+
+"""
+    ascii_encode([stream], img, [depth::TermColorDepth], [maxsize])
+
+Displays the given image `img` using unicode characters and
+terminal colors (defaults to 256 colors).
+`img` has to be an array of `Colorant`.
+
+If working in the REPL, the function tries to choose the encoding
+based on the current display size. The image will also be
+downsampled to fit into the display (using `restrict`).
+"""
+function ascii_encode(
+        io::IO,
+        img::AbstractArray{<:Colorant},
+        colordepth::TermColorDepth,
+        maxsize::Tuple = displaysize(io))
+    # otherwise, use our own implementation
+    print_matrix(io, x) = ascii_encode(io, x, colordepth, maxsize)
+    Base.show_nd(io, img, print_matrix, true)
+end
+
+ascii_encode(io::IO, img, args...) = ascii_encode(io, img, colormode[], args...)
+ascii_encode(img, args...) = ascii_encode(stdout, img, colormode[], args...)
+ascii_encode(io::IO, img, colordepth::TermColorDepth, args...) = throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
+
+"""
+    ascii_encode256([stream], img, [maxsize])
+
+Displays the given image `img` using unicode characters and
+the widely supported 256 terminal colors.
+`img` has to be an array of `Colorant`.
+
+If working in the REPL, the function tries to choose the encoding
+based on the current display size. The image will also be
+downsampled to fit into the display (using `restrict`).
+"""
+ascii_encode256(io::IO, img, args...) = ascii_encode(io, img, TermColor256(), args...)
+ascii_encode256(img, args...) = ascii_encode256(stdout, img, args...)
+
+"""
+    ascii_encode24bit([stream], img, [maxsize])
+
+Displays the given image `img` using unicode characters and
+the 24 terminal colors that some modern terminals support.
+`img` has to be an array of `Colorant`.
+
+If working in the REPL, the function tries to choose the encoding
+based on the current display size. The image will also be
+downsampled to fit into the display (using `restrict`).
+"""
+ascii_encode24bit(io::IO, img, args...) = ascii_encode(io, img, TermColor24bit(), args...)
+ascii_encode24bit(img, args...) = ascii_encode24bit(stdout, img, args...)
