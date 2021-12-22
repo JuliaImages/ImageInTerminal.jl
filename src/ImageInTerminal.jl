@@ -2,7 +2,10 @@ module ImageInTerminal
 
 using AsciiPixel
 using ImageCore
+<<<<<<< HEAD
 using ImageBase: restrict
+=======
+>>>>>>> 301cd36 (256 -> 8bit, rework test, rework imgshow)
 using Requires
 using Crayons
 
@@ -28,7 +31,7 @@ disable_encoding() = (should_render_image[] = false)
 Enable the image encoding feature and show images in terminal.
 
 This can be disabled by calling `ImageInTerminal.disable_encoding()`. To choose between
-different encoding method, call `ImageInTerminal.use_256()` or `ImageInTerminal.use_24bit()`.
+different encoding method, call `AsciiPixel.use_256()` or `AsciiPixel.use_24bit()`.
 """
 enable_encoding() = (should_render_image[] = true)
 
@@ -60,7 +63,7 @@ function Base.show(
         if use_sixel(img)
             sixel_encode(io, img)
         else
-            ascii_encode(io, img)
+            imshow(io, img)
         end
     else
         invoke(Base.show, Tuple{typeof(io), typeof(mime), AbstractArray}, io, mime, img)
@@ -70,7 +73,7 @@ end
 # colorant
 function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     if should_render_image[]
-        fgcol = AsciiPixel._colorant2ansi(color, colormode[])
+        fgcol = AsciiPixel._colorant2ansi(color, AsciiPixel.colormode[])
         chr = AsciiPixel._charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr, chr, " ")
         print(io, Crayon(foreground = :white), color)
@@ -82,9 +85,37 @@ end
 
 include("display.jl")
 
+"""
+    imshow([stream], img, [maxsize])
+
+Displays the given image `img` using unicode characters and
+terminal colors (defaults to 256 colors).
+`img` has to be an array of `Colorant`.
+
+If working in the REPL, the function tries to choose the encoding
+based on the current display size. The image will also be
+downsampled to fit into the display (using `restrict`).
+"""
+
+function imshow(
+        io::IO,
+        img::AbstractArray{<:Colorant},
+        maxsize::Tuple = displaysize(io))
+    if use_sixel(img)
+        sixel_encode(io, img)
+    else
+        if ndims(img) > 2
+            Base.show_nd(io, img, (io, x) -> ascii_encode(io, x), true)
+        else
+            ascii_encode(io, img)
+        end
+    end
+end
+
+imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
+imshow(img, args...) = throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
+
 function __init__()
-    # use 24bit if the terminal supports it
-    lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "truecolor") && use_24bit()
     enable_encoding()
     
     if VERSION < v"1.6.0-DEV.888" && Sys.iswindows()

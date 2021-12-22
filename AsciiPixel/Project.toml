@@ -14,16 +14,12 @@ ImageCore = "0.9"
 julia = "1.6"
 
 [extras]
-CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
-ImageTransformations = "02fcd773-0e25-5acc-982a-7f6622650795"
 OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 ReferenceTests = "324d217c-45ce-50fc-942e-d289b448e8cf"
-Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
-SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 
 [targets]
-test = ["CoordinateTransformations", "ImageIO", "ImageMagick", "ImageTransformations", "OffsetArrays", "Rotations", "ReferenceTests", "SparseArrays", "Test", "TestImages"]
+test = ["ImageIO", "ImageMagick", "OffsetArrays", "ReferenceTests", "Test", "TestImages"]

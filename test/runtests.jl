@@ -1,12 +1,20 @@
 using Test, TestImages, ReferenceTests
+using OffsetArrays, SparseArrays
+using CoordinateTransformations
 using ImageBase, ImageCore
+using ImageTransformations
 using ImageQualityIndexes
 using ImageInTerminal
-using OffsetArrays
 using ImageMagick
 using AsciiPixel
+using Rotations
 
-tests = ["tst_baseshow.jl"]
+import ImageInTerminal: imshow
+
+tests = [
+    "tst_baseshow.jl",
+    "tst_imshow.jl",
+]
 
 if VERSION >= v"1.6"
     # Sixel is an additional test target and requires Julia at least v1.6
@@ -26,6 +34,21 @@ if VERSION >= v"1.6"
 end
 
 include(joinpath(dirname(pathof(AsciiPixel)), "..", "test", "common.jl"))
+
+# deprecated functions
+function imshow256(args...)
+    old_colormode = AsciiPixel.colormode[]
+    AsciiPixel.set_colordepth(8)
+    imshow(args...)
+    AsciiPixel.colormode[] = old_colormode
+end
+
+function imshow24bit(args...)
+    old_colormode = AsciiPixel.colormode[]
+    AsciiPixel.set_colordepth(24)
+    imshow(args...)
+    AsciiPixel.colormode[] = old_colormode
+end
 
 ImageInTerminal.encoder_backend[] = :ImageInTerminal  # manually disable Sixel
 for t in tests

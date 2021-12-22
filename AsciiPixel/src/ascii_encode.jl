@@ -18,7 +18,7 @@ ansi terminal colors.
 - The encoder `enc` specifies which kind of unicode represenation
   should be used.
 
-- The `colordepth` can either be `TermColor256()` or `TermColor24bit()`
+- The `colordepth` can either be `TermColor8bit()` or `TermColor24bit()`
   and specifies which terminal color codes should be used.
 
 - `maxheight` and `maxwidth` specify the maximum numbers of
@@ -152,8 +152,7 @@ end
 """
     ascii_encode([stream], img, [depth::TermColorDepth], [maxsize])
 
-Displays the given image `img` using unicode characters and
-terminal colors (defaults to 256 colors).
+Displays the given image `img` using unicode characters and terminal colors.
 `img` has to be an array of `Colorant`.
 
 If working in the REPL, the function tries to choose the encoding
@@ -193,55 +192,4 @@ function ascii_encode(
     end
 end
 
-"""
-    ascii_encode([stream], img, [depth::TermColorDepth], [maxsize])
-
-Displays the given image `img` using unicode characters and
-terminal colors (defaults to 256 colors).
-`img` has to be an array of `Colorant`.
-
-If working in the REPL, the function tries to choose the encoding
-based on the current display size. The image will also be
-downsampled to fit into the display (using `restrict`).
-"""
-function ascii_encode(
-        io::IO,
-        img::AbstractArray{<:Colorant},
-        colordepth::TermColorDepth,
-        maxsize::Tuple = displaysize(io))
-    # otherwise, use our own implementation
-    print_matrix(io, x) = ascii_encode(io, x, colordepth, maxsize)
-    Base.show_nd(io, img, print_matrix, true)
-end
-
-ascii_encode(io::IO, img, args...) = ascii_encode(io, img, colormode[], args...)
-ascii_encode(img, args...) = ascii_encode(stdout, img, colormode[], args...)
-ascii_encode(io::IO, img, colordepth::TermColorDepth, args...) = throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
-
-"""
-    ascii_encode256([stream], img, [maxsize])
-
-Displays the given image `img` using unicode characters and
-the widely supported 256 terminal colors.
-`img` has to be an array of `Colorant`.
-
-If working in the REPL, the function tries to choose the encoding
-based on the current display size. The image will also be
-downsampled to fit into the display (using `restrict`).
-"""
-ascii_encode256(io::IO, img, args...) = ascii_encode(io, img, TermColor256(), args...)
-ascii_encode256(img, args...) = ascii_encode256(stdout, img, args...)
-
-"""
-    ascii_encode24bit([stream], img, [maxsize])
-
-Displays the given image `img` using unicode characters and
-the 24 terminal colors that some modern terminals support.
-`img` has to be an array of `Colorant`.
-
-If working in the REPL, the function tries to choose the encoding
-based on the current display size. The image will also be
-downsampled to fit into the display (using `restrict`).
-"""
-ascii_encode24bit(io::IO, img, args...) = ascii_encode(io, img, TermColor24bit(), args...)
-ascii_encode24bit(img, args...) = ascii_encode24bit(stdout, img, args...)
+ascii_encode(io::IO, img::AbstractArray{<:Colorant}) = ascii_encode(io, img, colormode[])

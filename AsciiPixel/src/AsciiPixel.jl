@@ -9,23 +9,31 @@ export ascii_encode
 include("colorant2ansi.jl")
 include("ascii_encode.jl")
 
-const colormode = Ref{TermColorDepth}(TermColor256())
+const colormode = Ref{TermColorDepth}(TermColor8bit())
 
 """
-    use_256()
+    set_colordepth(bit::Int)
 
-Triggers `ascii_encode256` (256 colors, 8bit) automatically if an array of colorants is to
-be displayed in the julia REPL. (This is the default)
+Sets the terminal color depth to the given argument.
 """
-use_256() = (colormode[] = TermColor256())
+function set_colordepth(bit::Int)
+    if bit == 8
+        colormode[] = TermColor8bit()
+    elseif bit == 24
+        colormode[] = TermColor24bit()
+    else
+        error("Setting color depth to $bit-bit is not supported, valid mode are:
+          - 8bit (256 colors)
+          - 24bit")
+    end
+    colormode[]
+end
 
-"""
-    use_24bit()
+set_colordepth(bit::AbstractString) = set_colordepth(parse(Int, replace(bit, r"[^0-9]"=>"")))
 
-Triggers `ascii_encode24bit` automatically if an array of colorants is to
-be displayed in the julia REPL.
-Call `AsciiPixel.use_256()` to restore default behaviour.
-"""
-use_24bit() = (colormode[] = TermColor24bit())
+function __init__()
+    # use 24bit if the terminal supports it
+    lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "truecolor") && set_colordepth(24)
+end
 
 end # module

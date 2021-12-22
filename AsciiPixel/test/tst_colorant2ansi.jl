@@ -1,10 +1,10 @@
 @testset "Not exported Interface" begin
-    @test supertype(TermColor256) <: TermColorDepth
+    @test supertype(TermColor8bit) <: TermColorDepth
     @test supertype(TermColor24bit) <: TermColorDepth
 
     # This tests if the mapping from RGB to the
-    # 256 ansi color codes is correct
-    @testset "256 colors" begin
+    # 8bit (256) ansi color codes is correct
+    @testset "8bit colors" begin
         # reference functions to compare against
         function _ref_col2ansi(r, g, b)
             r6, g6, b6 = map(c ->round(Int, 5c), (r, g, b))
@@ -18,23 +18,23 @@
                 r, g, b = red(col), green(col), blue(col)
                 ri, gi, bi = map(c ->round(Int, 23c), (r, g, b))
                 if ri == gi == bi
-                    @test _colorant2ansi(col, TermColor256()) === _ref_col2ansi(r)
+                    @test _colorant2ansi(col, TermColor8bit()) === _ref_col2ansi(r)
                 else
-                    @test _colorant2ansi(col, TermColor256()) === _ref_col2ansi(r, g, b)
+                    @test _colorant2ansi(col, TermColor8bit()) === _ref_col2ansi(r, g, b)
                 end
             end
         end
         @testset "Gray" begin
             for col in rand(Gray, 10)
                 r = real(col)
-                @test _colorant2ansi(col, TermColor256()) === _ref_col2ansi(r)
+                @test _colorant2ansi(col, TermColor8bit()) === _ref_col2ansi(r)
             end
         end
     end
 
     # This tests if the mapping from RGB to the 24 bit r g b tuples
     # (which are in the set {0,1,...,255}) is correct.
-    @testset "24 bit" begin
+    @testset "24 bit colors" begin
         @testset "RGB" begin
             for col in rand(RGB, 10)
                 r, g, b = red(col), green(col), blue(col)
@@ -74,15 +74,15 @@ end
 # Also compare functionality against the functions tested above
 @testset "Exported Interface" begin
     @testset "Validate exported interface boundaries" begin
-        @test_throws MethodError colorant2ansi(RGB(1., 1., 1.), TermColor256())
+        @test_throws MethodError colorant2ansi(RGB(1., 1., 1.), TermColor8bit())
         @test_throws MethodError colorant2ansi(RGB(1., 1., 1.), TermColor24bit())
     end
 
-    @testset "256 colors" begin
+    @testset "8bit colors" begin
         for col in (rand(RGB, 10)..., rand(Gray, 10)...)
             # compare against non-exported interface,
             # which we already tested above
-            @test colorant2ansi(col) === _colorant2ansi(col, TermColor256())
+            @test colorant2ansi(col) === _colorant2ansi(col, TermColor8bit())
         end
     end
 

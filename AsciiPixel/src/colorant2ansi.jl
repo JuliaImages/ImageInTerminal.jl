@@ -1,5 +1,5 @@
 abstract type TermColorDepth end
-struct TermColor256   <: TermColorDepth end
+struct TermColor8bit  <: TermColorDepth end
 struct TermColor24bit <: TermColorDepth end
 
 """
@@ -24,7 +24,7 @@ julia> colorant2ansi(Gray(.5))
 244
 ```
 """
-colorant2ansi(color) = _colorant2ansi(color, TermColor256())
+colorant2ansi(color) = _colorant2ansi(color, TermColor8bit())
 
 # Fallback for non-rgb and transparent colors (convert to rgb)
 _colorant2ansi(gr::Color, colordepth::TermColorDepth) =
@@ -32,8 +32,8 @@ _colorant2ansi(gr::Color, colordepth::TermColorDepth) =
 _colorant2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
     _colorant2ansi(color(gr), colordepth)
 
-# 256 colors
-function _colorant2ansi(col::AbstractRGB, ::TermColor256)
+# 8bit (256) colors
+function _colorant2ansi(col::AbstractRGB, ::TermColor8bit)
     r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
     r24, g24, b24 = map(c->round(Int, 23c), (r, g, b))
     if r24 == g24 == b24
@@ -46,7 +46,7 @@ function _colorant2ansi(col::AbstractRGB, ::TermColor256)
     end
 end
 
-_colorant2ansi(gr::Color{<:Any,1}, ::TermColor256) = round(Int, 232 + 23clamp01nan(real(gr)))
+_colorant2ansi(gr::Color{<:Any,1}, ::TermColor8bit) = round(Int, 232 + 23clamp01nan(real(gr)))
 
 # 24 bit colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
@@ -58,4 +58,3 @@ function _colorant2ansi(gr::Color{<:Any,1}, ::TermColor24bit)
     r = round(Int, 255clamp01nan(real(gr)))
     r, r, r
 end
-
