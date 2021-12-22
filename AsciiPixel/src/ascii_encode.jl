@@ -14,6 +14,20 @@ function _charof(alpha)
     alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
 end
 
+"""
+    downscale_XXX(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+
+Larger images are downscaled automatically using `restrict`.
+
+- `maxheight` and `maxwidth` specify the maximum numbers of
+  string characters that should be used for the resulting image.
+
+Returns
+    1. Downscaled image
+    2. Selected encoder with `size` containing:
+        1. number of lines in the vector.
+        2. number of visible characters per line (the remaining are colorcodes).
+"""
 function downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
@@ -52,11 +66,11 @@ function downscale_big(img::AbstractVector{<:Colorant}, maxwidth::Int)
 end
 
 """
-    ascii_encode(enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
+    ascii_encode([io::IO], enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
 
 Transforms the pixel of the given image `img`, which has to be an
 array of `Colorant`, into a string of unicode characters using
-ansi terminal colors.
+ansi terminal colors or directly writes into a i/o stream.
 
 - The encoder `enc` specifies which kind of unicode represenation
   should be used.
@@ -64,19 +78,8 @@ ansi terminal colors.
 - The `colordepth` can either be `TermColor8bit()` or `TermColor24bit()`
   and specifies which terminal color codes should be used.
 
-- `maxheight` and `maxwidth` specify the maximum numbers of
-  string characters that should be used for the resulting image.
-  Larger images are downscaled automatically using `restrict`.
-
-The function returns a tuple with three elements:
-
-1. A vector of strings containing the encoded image.
-   Each element represent one line. The lines do not contain
-   newline characters.
-
-2. Number of lines in the vector.
-
-3. Number of visible characters per line (the remaining are colorcodes).
+It `ret` is set, the function returns a vector of strings containing the encoded image.
+Each element represent one line. The lines do not contain newline characters.
 """
 
 function ascii_encode(
@@ -238,4 +241,5 @@ function ascii_display(
     io
 end
 
-ascii_display(io::IO, img::AbstractArray{<:Colorant}; kwargs...) = ascii_display(io, img, colormode[]; kwargs...)
+ascii_display(io::IO, img::AbstractArray{<:Colorant}; kwargs...) =
+    ascii_display(io, img, colormode[]; kwargs...)
