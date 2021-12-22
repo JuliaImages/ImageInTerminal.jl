@@ -98,7 +98,7 @@ function imshow(
         sixel_encode(io, img)
     else
         if ndims(img) > 2
-            Base.show_nd(io, img, (io, x) -> ascii_display(io, x), true)
+            Base.show_nd(io, img, (io, x) -> ascii_display(io, x; trail_nl=false), true)
         else
             ascii_display(io, img)
         end

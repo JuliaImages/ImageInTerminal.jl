@@ -29,6 +29,7 @@ colorant2ansi(color) = _colorant2ansi(color, TermColor8bit())
 # Fallback for non-rgb and transparent colors (convert to rgb)
 _colorant2ansi(gr::Color, colordepth::TermColorDepth) =
     _colorant2ansi(convert(RGB, gr), colordepth)
+
 _colorant2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
     _colorant2ansi(color(gr), colordepth)
 

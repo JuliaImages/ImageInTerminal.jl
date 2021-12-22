@@ -6,7 +6,9 @@ struct SmallBlocks <: ImageEncoder
     size::NTuple{2, Int}
 end
 
+const RESET = Crayon(reset = true)
 const alpha_chars = ('⋅', '░', '▒', '▓', '█')
+
 function _charof(alpha)
     idx = round(Int, alpha * (length(alpha_chars)-1))
     alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
@@ -46,7 +48,7 @@ function downscale_big(img::AbstractVector{<:Colorant}, maxwidth::Int)
     maxwidth = max(maxwidth, 5)
     w = length(img)
     n = 3w > maxwidth ? maxwidth ÷ 6 : w
-    return img, BigBlocks((1, n < w ? 3(2n + 1) : 3w))
+    img, BigBlocks((1, n < w ? 3(2n + 1) : 3w))  # downscaling of img here is 'fake'
 end
 
 """
@@ -78,13 +80,16 @@ The function returns a tuple with three elements:
 """
 
 function ascii_encode(
-        enc::SmallBlocks,
-        colordepth::TermColorDepth,
-        img::AbstractMatrix{<:Colorant})
+    io::IO,
+    ::SmallBlocks,
+    colordepth::TermColorDepth,
+    img::AbstractMatrix{<:Colorant};
+    trail_nl::Bool = false,
+    ret::Bool = false
+)
     yinds, xinds = axes(img)
-    io = PipeBuffer()
     for y in first(yinds):2:last(yinds)
-        print(io, Crayon(reset = true))
+        print(io, RESET)
         for x in xinds
             fgcol = _colorant2ansi(img[y, x], colordepth)
             bgcol = if y+1 <= last(yinds)
@@ -100,55 +105,70 @@ function ascii_encode(
             end
             print(io, Crayon(foreground=fgcol, background=bgcol), "▀")
         end
-        println(io, Crayon(reset = true))
+        if trail_nl || y < last(yinds)
+            println(io, RESET)
+        else
+            print(io, RESET)
+        end
     end
-    readlines(io)
+    ret ? readlines(io) : nothing
 end
 
 function ascii_encode(
-        enc::BigBlocks,
-        colordepth::TermColorDepth,
-        img::AbstractMatrix{<:Colorant})
+    io::IO,
+    ::BigBlocks,
+    colordepth::TermColorDepth,
+    img::AbstractMatrix{<:Colorant};
+    trail_nl::Bool = false,
+    ret::Bool = false,
+)
     yinds, xinds = axes(img)
-    io = PipeBuffer()
     for y in yinds
-        print(io, Crayon(reset = true))
+        print(io, RESET)
         for x in xinds
             color = img[y, x]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
             print(io, Crayon(foreground = fgcol), chr, chr)
         end
-        println(io, Crayon(reset = true))
+        if trail_nl || y < last(yinds)
+            println(io, RESET)
+        else
+            print(io, RESET)
+        end
     end
-    readlines(io)
+    ret ? readlines(io) : nothing
 end
 
 function ascii_encode(
-        enc::SmallBlocks,
-        colordepth::TermColorDepth,
-        img::AbstractVector{<:Colorant})
-    io = PipeBuffer()
-    print(io, Crayon(reset = true))
+    io::IO,
+    ::SmallBlocks,
+    colordepth::TermColorDepth,
+    img::AbstractVector{<:Colorant};
+    ret::Bool = false
+)
+    print(io, RESET)
     for i in axes(img, 1)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr)
     end
-    println(io, Crayon(reset = true))
-    readlines(io)
+    print(io, RESET)
+    ret ? readlines(io) : nothing
 end
 
 function ascii_encode(
-        enc::BigBlocks,
-        colordepth::TermColorDepth,
-        img::AbstractVector{<:Colorant})
+    io::IO,
+    enc::BigBlocks,
+    colordepth::TermColorDepth,
+    img::AbstractVector{<:Colorant};
+    ret::Bool = false
+)
     w = length(img)
     n = enc.size[2] ÷ 3 == w ? w : enc.size[2] ÷ 6
-    io = PipeBuffer()
     # left or full
-    print(io, Crayon(reset = true))
+    print(io, RESET)
     for i in (0:n-1) .+ firstindex(img)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
@@ -156,7 +176,7 @@ function ascii_encode(
         print(io, Crayon(foreground = fgcol), chr, chr, " ")
     end
     if n < w  # right part
-        print(io, Crayon(reset = true), " … ")
+        print(io, RESET, " … ")
         for i in (-n+1:0) .+ lastindex(img)
             color = img[i]
             fgcol = _colorant2ansi(color, colordepth)
@@ -164,9 +184,15 @@ function ascii_encode(
             print(io, Crayon(foreground = fgcol), chr, chr, " ")
         end
     end
-    println(io, Crayon(reset = true))
-    readlines(io)
+    print(io, RESET)
+    ret ? readlines(io) : nothing
 end
+
+ascii_encode(enc::SmallBlocks, args...) =
+    ascii_encode(PipeBuffer(), enc, args...; ret=true)
+
+ascii_encode(enc::BigBlocks, args...) =
+    ascii_encode(PipeBuffer(), enc, args...; ret=true)
 
 """
     ascii_display([stream], img, [depth::TermColorDepth], [maxsize])
@@ -188,16 +214,14 @@ function ascii_display(
         io::IO,
         img::AbstractMatrix{<:Colorant},
         colordepth::TermColorDepth,
-        maxsize::Tuple = displaysize(io))
+        maxsize::Tuple = displaysize(io);
+        trail_nl::Bool = false)
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
-    scale = img_h <= io_h - 4 && 2img_w <= io_w ? downscale_big : downscale_small
-    img, enc = scale(img, io_h - 4, io_w)
-    str = ascii_encode(enc, colordepth, img)
-    for (idx, line) in enumerate(str)
-        print(io, line)
-        idx < length(str) && println(io)
-    end
+    downscale = img_h <= io_h - 4 && 2img_w <= io_w ? downscale_big : downscale_small
+    img, enc = downscale(img, io_h - 4, io_w)
+    ascii_encode(io, enc, colordepth, img; trail_nl)
+    io
 end
 
 # colorant vector
@@ -208,13 +232,10 @@ function ascii_display(
         maxsize::Tuple = displaysize(io))
     io_h, io_w = maxsize
     img_w = length(img)
-    scale = 3img_w <= io_w ? downscale_big : downscale_small
-    img, enc = scale(img, io_w)
-    str = ascii_encode(enc, colordepth, img)
-    for (idx, line) in enumerate(str)
-        print(io, line)
-        idx < length(str) && println(io)
-    end
+    downscale = 3img_w <= io_w ? downscale_big : downscale_small
+    img, enc = downscale(img, io_w)
+    ascii_encode(io, enc, colordepth, img)
+    io
 end
 
-ascii_display(io::IO, img::AbstractArray{<:Colorant}) = ascii_display(io, img, colormode[])
+ascii_display(io::IO, img::AbstractArray{<:Colorant}; kwargs...) = ascii_display(io, img, colormode[]; kwargs...)
