@@ -1,6 +1,10 @@
 abstract type ImageEncoder end
-struct BigBlocks   <: ImageEncoder end
-struct SmallBlocks <: ImageEncoder end
+struct BigBlocks <: ImageEncoder
+    size::NTuple{2, Int}
+end
+struct SmallBlocks <: ImageEncoder
+    size::NTuple{2, Int}
+end
 
 const alpha_chars = ('⋅', '░', '▒', '▓', '█')
 function _charof(alpha)
@@ -8,7 +12,7 @@ function _charof(alpha)
     alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
 end
 
-function downscale(::SmallBlocks, img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+function downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
     h, w = map(length, axes(img))
@@ -16,10 +20,10 @@ function downscale(::SmallBlocks, img::AbstractMatrix{<:Colorant}, maxheight::In
         img = restrict(img)
         h, w = map(length, axes(img))
     end
-    img, length(1:2:h), w
+    img, SmallBlocks((length(1:2:h), w))
 end
 
-function downscale(::BigBlocks, img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+function downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
     h, w = map(length, axes(img))
@@ -27,22 +31,22 @@ function downscale(::BigBlocks, img::AbstractMatrix{<:Colorant}, maxheight::Int,
         img = restrict(img)
         h, w = map(length, axes(img))
     end
-    img, h, 2w
+    img, BigBlocks((h, 2w))
 end
 
-function downscale(::SmallBlocks, img::AbstractVector{<:Colorant}, maxwidth::Int)
+function downscale_small(img::AbstractVector{<:Colorant}, maxwidth::Int)
     maxwidth  = max(maxwidth, 5)
     while length(img) > maxwidth
         img = restrict(img)
     end
-    img, 1, length(img)
+    img, SmallBlocks((1, length(img)))
 end
 
-function downscale(::BigBlocks, img::AbstractVector{<:Colorant}, maxwidth::Int)
+function downscale_big(img::AbstractVector{<:Colorant}, maxwidth::Int)
     maxwidth = max(maxwidth, 5)
     w = length(img)
     n = 3w > maxwidth ? maxwidth ÷ 6 : w
-    return img, 1, n < w ? 3(2n + 1) : 3w
+    return img, BigBlocks((1, n < w ? 3(2n + 1) : 3w))
 end
 
 """
@@ -76,11 +80,7 @@ The function returns a tuple with three elements:
 function ascii_encode(
         enc::SmallBlocks,
         colordepth::TermColorDepth,
-        img::AbstractMatrix{<:Colorant},
-        maxheight::Int = 50,
-        maxwidth::Int = 80)
-    img, hh, ww = downscale(enc, img, maxheight, maxwidth)
-    h, w = map(length, axes(img))
+        img::AbstractMatrix{<:Colorant})
     yinds, xinds = axes(img)
     io = PipeBuffer()
     for y in first(yinds):2:last(yinds)
@@ -102,17 +102,13 @@ function ascii_encode(
         end
         println(io, Crayon(reset = true))
     end
-    readlines(io), hh, ww
+    readlines(io)
 end
 
 function ascii_encode(
         enc::BigBlocks,
         colordepth::TermColorDepth,
-        img::AbstractMatrix{<:Colorant},
-        maxheight::Int = 50,
-        maxwidth::Int = 80)
-    img, hh, ww = downscale(enc, img, maxheight, maxwidth)
-    h, w = map(length, axes(img))
+        img::AbstractMatrix{<:Colorant})
     yinds, xinds = axes(img)
     io = PipeBuffer()
     for y in yinds
@@ -125,15 +121,13 @@ function ascii_encode(
         end
         println(io, Crayon(reset = true))
     end
-    readlines(io), hh, ww
+    readlines(io)
 end
 
 function ascii_encode(
         enc::SmallBlocks,
         colordepth::TermColorDepth,
-        img::AbstractVector{<:Colorant},
-        maxwidth::Int = 80)
-    img, hh, ww = downscale(enc, img, maxwidth)
+        img::AbstractVector{<:Colorant})
     io = PipeBuffer()
     print(io, Crayon(reset = true))
     for i in axes(img, 1)
@@ -143,17 +137,15 @@ function ascii_encode(
         print(io, Crayon(foreground = fgcol), chr)
     end
     println(io, Crayon(reset = true))
-    readlines(io), hh, ww
+    readlines(io)
 end
 
 function ascii_encode(
         enc::BigBlocks,
         colordepth::TermColorDepth,
-        img::AbstractVector{<:Colorant},
-        maxwidth::Int = 80)
-    img, hh, ww = downscale(enc, img, maxwidth)
+        img::AbstractVector{<:Colorant})
     w = length(img)
-    n = ww ÷ 3 == w ? w : ww ÷ 6
+    n = enc.size[2] ÷ 3 == w ? w : enc.size[2] ÷ 6
     io = PipeBuffer()
     # left or full
     print(io, Crayon(reset = true))
@@ -173,7 +165,7 @@ function ascii_encode(
         end
     end
     println(io, Crayon(reset = true))
-    readlines(io), hh, ww
+    readlines(io)
 end
 
 """
@@ -199,12 +191,9 @@ function ascii_display(
         maxsize::Tuple = displaysize(io))
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
-    enc = img_h <= io_h - 4 && 2img_w <= io_w ? BigBlocks() : SmallBlocks()
-    # @sync for row in img_rows
-    #     buffer = ascii_encode(enc, colordepth, img[row, :], io_w)
-    #     @async print(io, buffer)
-    # end
-    str, = ascii_encode(enc, colordepth, img, io_h - 4, io_w)
+    scale = img_h <= io_h - 4 && 2img_w <= io_w ? downscale_big : downscale_small
+    img, enc = scale(img, io_h - 4, io_w)
+    str = ascii_encode(enc, colordepth, img)
     for (idx, line) in enumerate(str)
         print(io, line)
         idx < length(str) && println(io)
@@ -219,8 +208,9 @@ function ascii_display(
         maxsize::Tuple = displaysize(io))
     io_h, io_w = maxsize
     img_w = length(img)
-    enc = 3img_w <= io_w ? BigBlocks() : SmallBlocks()
-    str, = ascii_encode(enc, colordepth, img, io_w)
+    scale = 3img_w <= io_w ? downscale_big : downscale_small
+    img, enc = scale(img, io_w)
+    str = ascii_encode(enc, colordepth, img)
     for (idx, line) in enumerate(str)
         print(io, line)
         idx < length(str) && println(io)

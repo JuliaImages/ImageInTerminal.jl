@@ -4,8 +4,8 @@ using AsciiPixel
 using ImageCore
 
 import AsciiPixel: TermColorDepth, TermColor8bit, TermColor24bit
-import AsciiPixel: SmallBlocks, BigBlocks, ImageEncoder
-import AsciiPixel: colorant2ansi, _colorant2ansi, ascii_encode
+import AsciiPixel: ascii_encode, downscale_big, downscale_small
+import AsciiPixel: colorant2ansi, _colorant2ansi
 
 include("common.jl")
 
