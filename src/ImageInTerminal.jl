@@ -2,10 +2,7 @@ module ImageInTerminal
 
 using AsciiPixel
 using ImageCore
-<<<<<<< HEAD
 using ImageBase: restrict
-=======
->>>>>>> 301cd36 (256 -> 8bit, rework test, rework imgshow)
 using Requires
 using Crayons
 
@@ -60,11 +57,7 @@ function Base.show(
         img::AbstractArray{<:Colorant})
     if should_render_image[]
         println(io, summary(img), ":")
-        if use_sixel(img)
-            sixel_encode(io, img)
-        else
-            imshow(io, img)
-        end
+        imshow(io, img)
     else
         invoke(Base.show, Tuple{typeof(io), typeof(mime), AbstractArray}, io, mime, img)
     end
@@ -105,15 +98,17 @@ function imshow(
         sixel_encode(io, img)
     else
         if ndims(img) > 2
-            Base.show_nd(io, img, (io, x) -> ascii_encode(io, x), true)
+            Base.show_nd(io, img, (io, x) -> ascii_display(io, x), true)
         else
-            ascii_encode(io, img)
+            ascii_display(io, img)
         end
     end
 end
 
 imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
-imshow(img, args...) = throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
+imshow(img, args...) = throw(
+    ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions")
+)
 
 function __init__()
     enable_encoding()

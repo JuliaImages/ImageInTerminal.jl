@@ -8,6 +8,44 @@ function _charof(alpha)
     alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
 end
 
+function downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+    maxheight = max(maxheight, 5)
+    maxwidth  = max(maxwidth,  5)
+    h, w = map(length, axes(img))
+    while ceil(h/2) > maxheight || w > maxwidth
+        img = restrict(img)
+        h, w = map(length, axes(img))
+    end
+    img
+end
+
+function downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+    maxheight = max(maxheight, 5)
+    maxwidth  = max(maxwidth,  5)
+    h, w = map(length, axes(img))
+    while h > maxheight || 2w > maxwidth
+        img = restrict(img)
+        h, w = map(length, axes(img))
+    end
+    img
+end
+
+function downscale_small(img::AbstractVector{<:Colorant}, maxwidth::Int)
+    maxwidth  = max(maxwidth, 5)
+    while size(img, 1) > maxwidth
+        img = restrict(img)
+    end
+    img
+end
+
+function downscale_big(img::AbstractVector{<:Colorant}, maxwidth::Int)
+    maxwidth  = max(maxwidth, 5)
+    inds = axes(img, 1)
+    w = length(inds)
+    n = 3w > maxwidth ? floor(Int,maxwidth/6) : w
+    img[(0:n-1) .+ first(inds)], img[(-n+1:0) .+ last(inds)], w
+end
+
 """
     ascii_encode(enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
 
@@ -42,13 +80,8 @@ function ascii_encode(
         img::AbstractMatrix{<:Colorant},
         maxheight::Int = 50,
         maxwidth::Int = 80)
-    maxheight = max(maxheight, 5)
-    maxwidth  = max(maxwidth,  5)
+    img = downscale_small(img, maxheight, maxwidth)
     h, w = map(length, axes(img))
-    while ceil(h/2) > maxheight || w > maxwidth
-        img = restrict(img)
-        h, w = map(length, axes(img))
-    end
     yinds, xinds = axes(img)
     io = PipeBuffer()
     for y in first(yinds):2:last(yinds)
@@ -60,7 +93,11 @@ function ascii_encode(
             else
                 # if reached it means that the last character row
                 # has only the upper pixel defined.
+<<<<<<< HEAD
                 nothing
+=======
+                :nothing
+>>>>>>> fcd1f5f (rename ascii_encode -> ascii_display when using io, rework downscale)
             end
             print(io, Crayon(foreground=fgcol, background=bgcol), "▀")
         end
@@ -75,13 +112,8 @@ function ascii_encode(
         img::AbstractMatrix{<:Colorant},
         maxheight::Int = 50,
         maxwidth::Int = 80)
-    maxheight = max(maxheight, 5)
-    maxwidth  = max(maxwidth,  5)
+    img = downscale_big(img, maxheight, maxwidth)
     h, w = map(length, axes(img))
-    while h > maxheight || 2w > maxwidth
-        img = restrict(img)
-        h, w = map(length, axes(img))
-    end
     yinds, xinds = axes(img)
     io = PipeBuffer()
     for y in yinds
@@ -102,10 +134,7 @@ function ascii_encode(
         colordepth::TermColorDepth,
         img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
-    maxwidth  = max(maxwidth, 5)
-    while size(img, 1) > maxwidth
-        img = restrict(img)
-    end
+    img = downscale_small(img, maxwidth)
     io = PipeBuffer()
     print(io, Crayon(reset = true))
     for i in axes(img, 1)
@@ -123,73 +152,27 @@ function ascii_encode(
         colordepth::TermColorDepth,
         img::AbstractVector{<:Colorant},
         maxwidth::Int = 80)
-    maxwidth  = max(maxwidth, 5)
-    inds = axes(img, 1)
-    w = length(inds)
-    n = 3w > maxwidth ? floor(Int,maxwidth/6) : w
+    left, right, w = downscale_big(img, maxwidth)
+    inds = axes(left, 1)
+    n = length(left)
     io = PipeBuffer()
     print(io, Crayon(reset = true))
     for i in (0:n-1) .+ first(inds)
-        color = img[i]
+        color = left[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr, chr, " ")
     end
     if n < w
         print(io, Crayon(reset = true), " … ")
-        for i in last(inds)-n+1:last(inds)
-            color = img[i]
+        for i in (-n+1:0) .+ last(inds)
+            color = right[i]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
             print(io, Crayon(foreground = fgcol), chr, chr, " ")
         end
     end
     println(io, Crayon(reset = true))
-    replace.(readlines(io), Ref("\n" => ""))::Vector{String}, 1, n < w ? 3(length(1:n) + 1 + length(w-n+1:w)) : 3w
+    width = n < w ? 3(length(1:n) + 1 + length(w-n+1:w)) : 3w
+    replace.(readlines(io), Ref("\n" => ""))::Vector{String}, 1, width
 end
-
-
-"""
-    ascii_encode([stream], img, [depth::TermColorDepth], [maxsize])
-
-Displays the given image `img` using unicode characters and terminal colors.
-`img` has to be an array of `Colorant`.
-
-If working in the REPL, the function tries to choose the encoding
-based on the current display size. The image will also be
-downsampled to fit into the display (using `restrict`).
-"""
-
-# colorant matrix
-function ascii_encode(
-        io::IO,
-        img::AbstractMatrix{<:Colorant},
-        colordepth::TermColorDepth,
-        maxsize::Tuple = displaysize(io))
-    io_h, io_w = maxsize
-    img_h, img_w = map(length, axes(img))
-    enc = img_h <= io_h - 4 && 2img_w <= io_w ? BigBlocks : SmallBlocks
-    str = first(ascii_encode(enc(), colordepth, img, io_h - 4, io_w))
-    for (idx, line) in enumerate(str)
-        print(io, line)
-        idx < length(str) && println(io)
-    end
-end
-
-# colorant vector
-function ascii_encode(
-        io::IO,
-        img::AbstractVector{<:Colorant},
-        colordepth::TermColorDepth,
-        maxsize::Tuple = displaysize(io))
-    io_h, io_w = maxsize
-    img_w = length(img)
-    enc = 3img_w <= io_w ? BigBlocks : SmallBlocks
-    str = first(ascii_encode(enc(), colordepth, img, io_w))
-    for (idx, line) in enumerate(str)
-        print(io, line)
-        idx < length(str) && println(io)
-    end
-end
-
-ascii_encode(io::IO, img::AbstractArray{<:Colorant}) = ascii_encode(io, img, colormode[])

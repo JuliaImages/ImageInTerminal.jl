@@ -5,14 +5,14 @@ using ImageCore
 
 import AsciiPixel: TermColorDepth, TermColor8bit, TermColor24bit
 import AsciiPixel: SmallBlocks, BigBlocks, ImageEncoder
-import AsciiPixel: colorant2ansi, _colorant2ansi
+import AsciiPixel: colorant2ansi, _colorant2ansi, ascii_encode
 
 include("common.jl")
 
 for t in (
     "tst_colorant2ansi.jl",
     "tst_ascii_encode.jl",
-    "tst_common.jl",
+    "tst_highlevel.jl",
 )
     @testset "$t" begin
         include(t)
