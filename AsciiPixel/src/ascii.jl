@@ -14,26 +14,21 @@ function _charof(alpha)
     alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
 end
 
-"""
-    _downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
-    _downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
-
-Larger images are downscaled automatically using `restrict`.
-
-- `maxheight` and `maxwidth` specify the maximum numbers of
-  string characters that should be used for the resulting image.
-
-Returns
-    1. Downscaled image
-    2. Selected encoder (big or small blocks) with `size` containing:
-        1. number of lines in the Vector{String}.
-        2. number of visible characters per line (the remaining are colorcodes).
-"""
 function _downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+    #=
+    larger images are downscaled automatically using `restrict`.
+    `maxheight` and `maxwidth` specify the maximum numbers of string characters
+    that should be used for the resulting image.
+    Returns
+        1. Downscaled image
+        2. Selected encoder (big or small blocks) with `size` containing:
+            a. number of lines in the Vector{String}.
+            b. number of visible characters per line (the remaining are colorcodes).
+    =#
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
     h, w = map(length, axes(img))
-    while ceil(h/2) > maxheight || w > maxwidth
+    while ceil(h / 2) > maxheight || w > maxwidth
         img = restrict(img)
         h, w = map(length, axes(img))
     end

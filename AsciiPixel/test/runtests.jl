@@ -5,7 +5,7 @@ using AsciiPixel
 using ImageBase
 
 import AsciiPixel: TermColorDepth, TermColor8bit, TermColor24bit
-import AsciiPixel: ascii_encode, _downscale_big, _downscale_small
+import AsciiPixel: ascii_encode, _downscale_small, _downscale_big
 import AsciiPixel: colorant2ansi, _colorant2ansi
 
 include("common.jl")
