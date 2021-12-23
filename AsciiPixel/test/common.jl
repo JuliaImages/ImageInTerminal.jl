@@ -15,12 +15,14 @@ monarch = testimage("monarch_color_256")
 
 macro ensurecolor(ex)
     quote
-        old_color = Base.have_color
-        try
-            @eval Base have_color = true
-            return $(esc(ex))
-        finally
-            Core.eval(Base, :(have_color = $old_color))
+        _ensure_color(old_color) = begin
+            try
+                @eval Base have_color = true
+                return $(esc(ex))
+            finally
+                Core.eval(Base, :(have_color = $old_color))
+            end
         end
+        _ensure_color(Base.have_color)
     end
 end
