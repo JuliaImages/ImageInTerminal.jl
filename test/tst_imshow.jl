@@ -18,33 +18,28 @@ for name in ("imshow", "imshow256", "imshow24bit")
         end
         @testset "rgb line" begin
             io = PipeBuffer()
-            ensurecolor(func, io, rgb_line)
-            res = replace.(readlines(io), Ref("\n"=>""))
-            @test_reference "reference/rgbline_big_$(name).txt" res
+            @ensurecolor func(io, rgb_line)
+            @test_reference "reference/rgbline_big_$(name).txt" readlines(io)
             io = PipeBuffer()
-            ensurecolor(func, io, rgb_line, (1, 45))
-            res = replace.(readlines(io), Ref("\n"=>""))
-            @test_reference "reference/rgbline_small1_$(name).txt" res
+            @ensurecolor func(io, rgb_line, (1, 45))
+            @test_reference "reference/rgbline_small1_$(name).txt" readlines(io)
             io = PipeBuffer()
-            ensurecolor(func, io, rgb_line, (1, 19))
-            res = replace.(readlines(io), Ref("\n"=>""))
-            @test_reference "reference/rgbline_small2_$(name).txt" res
+            @ensurecolor func(io, rgb_line, (1, 19))
+            @test_reference "reference/rgbline_small2_$(name).txt" readlines(io)
         end
         @testset "monarch" begin
             img = imresize(monarch, 10, 10)
             io = PipeBuffer()
-            ensurecolor(func, io, img)
-            res = replace.(readlines(io), Ref("\n"=>""))
-            @test_reference "reference/monarch_big_$(name).txt" res
+            @ensurecolor func(io, img)
+            @test_reference "reference/monarch_big_$(name).txt" readlines(io)
             io = PipeBuffer()
-            ensurecolor(func, io, img, (10, 20))
-            res = replace.(readlines(io), Ref("\n"=>""))
-            @test_reference "reference/monarch_small_$(name).txt" res
+            @ensurecolor func(io, img, (10, 20))
+            @test_reference "reference/monarch_small_$(name).txt" readlines(io)
         end
         @testset "ndarray" begin
             img = rgb_line_4d
             io = PipeBuffer()
-            ensurecolor(func, io, img)
+            @ensurecolor func(io, img)
             @test_reference "reference/ndarray_$(name).txt" readlines(io)
         end
     end
@@ -54,16 +49,14 @@ end
     @testset "monarch" begin
         img = OffsetArray(imresize(monarch, 10, 10), (-10, 5))
         io = PipeBuffer()
-        ensurecolor(imshow256, io, img)
-        res = replace.(readlines(io), Ref("\n"=>""))
-        @test_reference "reference/monarch_big_imshow256.txt" res
+        @ensurecolor imshow256(io, img)
+        @test_reference "reference/monarch_big_imshow256.txt" readlines(io)
     end
     @testset "rotation" begin
         tfm = recenter(RotMatrix(-π / 4), center(lighthouse))
         lhr = ImageTransformations.warp(lighthouse, tfm)
         io = PipeBuffer()
-        ensurecolor(imshow256, io, lhr)
-        res = replace.(readlines(io), Ref("\n"=>""))
-        @test_reference "reference/lighthouse_rotated.txt" res
+        @ensurecolor imshow256(io, lhr)
+        @test_reference "reference/lighthouse_rotated.txt" readlines(io)
     end
 end

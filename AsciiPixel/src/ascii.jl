@@ -71,7 +71,6 @@ function _printc(io::IO, x::Crayon, args...)
     end
 end
 
-
 """
     ascii_encode([io::IO], enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
 

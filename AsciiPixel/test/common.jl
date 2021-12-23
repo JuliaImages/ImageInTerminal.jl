@@ -13,12 +13,14 @@ lighthouse = testimage("lighthouse")
 toucan = testimage("toucan")
 monarch = testimage("monarch_color_256")
 
-function ensurecolor(f, args...)
-  old_color = Base.have_color
-  try
-    Core.eval(Base, :(have_color=true))
-    return f(args...)
-  finally
-    Core.eval(Base, :(have_color=$old_color))
-  end
+macro ensurecolor(ex)
+    quote
+        old_color = Base.have_color
+        try
+            @eval Base have_color = true
+            return $(esc(ex))
+        finally
+            Core.eval(Base, :(have_color = $old_color))
+        end
+    end
 end

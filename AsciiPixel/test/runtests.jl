@@ -10,6 +10,11 @@ import AsciiPixel: colorant2ansi, _colorant2ansi
 
 include("common.jl")
 
+function check_encoded(res::Vector{String}, expected::Vector{String})
+    @test length(res) === length(expected)
+    @test all(res .== expected)
+end
+
 for t in (
     "tst_colorant2ansi.jl",
     "tst_ascii.jl",
