@@ -10,7 +10,7 @@ const RESET = Crayon(reset = true)
 const alpha_chars = ('⋅', '░', '▒', '▓', '█')
 
 function _charof(alpha)
-    idx = round(Int, alpha * (length(alpha_chars)-1))
+    idx = round(Int, alpha * (length(alpha_chars) - 1))
     alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
 end
 
@@ -61,6 +61,17 @@ function _downscale_big(img::AbstractVector{<:Colorant}, maxwidth::Int)
     img, BigBlocks((1, n < w ? 3(2n + 1) : 3w))  # downscaling of img here is 'fake'
 end
 
+# bypassing Crayons.print() to avoid getenv() calls
+function _printc(io::IO, x::Crayon, args...)
+    if Crayons.anyactive(x)
+        print(io, Crayons.CSI)
+        Crayons._print(io, x)
+        print(io, Crayons.END_ANSI)
+        print(io, args...)
+    end
+end
+
+
 """
     ascii_encode([io::IO], enc::ImageEncoder, colordepth::TermColorDepth, img, [maxheight], [maxwidth])
 
@@ -77,7 +88,6 @@ ansi terminal colors or directly writes into a i/o stream.
 It `ret` is set, the function returns a vector of strings containing the encoded image.
 Each element represent one line. The lines do not contain newline characters.
 """
-
 function ascii_encode(
     io::IO,
     ::SmallBlocks,
@@ -88,7 +98,7 @@ function ascii_encode(
 )
     yinds, xinds = axes(img)
     for y in first(yinds):2:last(yinds)
-        print(io, RESET)
+        _printc(io, RESET)
         for x in xinds
             fgcol = _colorant2ansi(img[y, x], colordepth)
             bgcol = if y+1 <= last(yinds)
@@ -102,13 +112,10 @@ function ascii_encode(
                 :nothing
 >>>>>>> fcd1f5f (rename ascii_encode -> ascii_display when using io, rework downscale)
             end
-            print(io, Crayon(foreground=fgcol, background=bgcol), "▀")
+            _printc(io, Crayon(foreground=fgcol, background=bgcol), "▀")
         end
-        if trail_nl || y < last(yinds)
-            println(io, RESET)
-        else
-            print(io, RESET)
-        end
+        _printc(io, RESET)
+        (trail_nl || y < last(yinds)) && println(io)
     end
     ret ? readlines(io) : nothing
 end
@@ -123,18 +130,15 @@ function ascii_encode(
 )
     yinds, xinds = axes(img)
     for y in yinds
-        print(io, RESET)
+        _printc(io, RESET)
         for x in xinds
             color = img[y, x]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
-            print(io, Crayon(foreground = fgcol), chr, chr)
+            _printc(io, Crayon(foreground = fgcol), chr, chr)
         end
-        if trail_nl || y < last(yinds)
-            println(io, RESET)
-        else
-            print(io, RESET)
-        end
+        _printc(io, RESET)
+        (trail_nl || y < last(yinds)) && println(io)
     end
     ret ? readlines(io) : nothing
 end
@@ -147,14 +151,15 @@ function ascii_encode(
     trail_nl::Bool = false,
     ret::Bool = false
 )
-    print(io, RESET)
+    _printc(io, RESET)
     for i in axes(img, 1)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
-        print(io, Crayon(foreground = fgcol), chr)
+        _printc(io, Crayon(foreground = fgcol), chr)
     end
-    trail_nl && println(io, RESET) || print(io, RESET)
+    _printc(io, RESET)
+    trail_nl && println(io)
     ret ? readlines(io) : nothing
 end
 
@@ -169,27 +174,28 @@ function ascii_encode(
     w = length(img)
     n = enc.size[2] ÷ 3 == w ? w : enc.size[2] ÷ 6
     # left or full
-    print(io, RESET)
+    _printc(io, RESET)
     for i in (0:n-1) .+ firstindex(img)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
-        print(io, Crayon(foreground = fgcol), chr, chr, " ")
+        _printc(io, Crayon(foreground = fgcol), chr, chr, " ")
     end
     if n < w  # right part
-        print(io, RESET, " … ")
+        _printc(io, RESET, " … ")
         for i in (-n+1:0) .+ lastindex(img)
             color = img[i]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
-            print(io, Crayon(foreground = fgcol), chr, chr, " ")
+            _printc(io, Crayon(foreground = fgcol), chr, chr, " ")
         end
     end
-    trail_nl && println(io, RESET) || print(io, RESET)
+    _printc(io, RESET)
+    trail_nl && println(io)
     ret ? readlines(io) : nothing
 end
 
-# uses a `PipeBuffer` as io and returns encoded data reading lines of this buffer
+# use a `PipeBuffer` as io and returns encoded data reading lines of this buffer (using `readlines(io)`)
 ascii_encode(enc::SmallBlocks, args...) =
     ascii_encode(PipeBuffer(), enc, args...; ret=true)
 
@@ -210,7 +216,6 @@ If working in the REPL, the function tries to choose the encoding
 based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
-
 function ascii_display(
     io::IO,
     img::AbstractMatrix{<:Colorant},
