@@ -53,8 +53,9 @@ end
 
 # colorant arrays
 function Base.show(
-        io::IO, mime::MIME"text/plain",
-        img::AbstractArray{<:Colorant})
+    io::IO, mime::MIME"text/plain",
+    img::AbstractArray{<:Colorant}
+)
     if should_render_image[]
         println(io, summary(img), ":")
         imshow(io, img)
@@ -91,9 +92,10 @@ downsampled to fit into the display (using `restrict`).
 """
 
 function imshow(
-        io::IO,
-        img::AbstractArray{<:Colorant},
-        maxsize::Tuple = displaysize(io))
+    io::IO,
+    img::AbstractArray{<:Colorant},
+    maxsize::Tuple = displaysize(io)
+)
     if use_sixel(img)
         sixel_encode(io, img)
     else

@@ -1,13 +1,12 @@
 module AsciiPixel
 
-using ImageBase: restrict
-using ImageCore
+using ImageBase
 using Crayons
 
 export ascii_display
 
 include("colorant2ansi.jl")
-include("ascii_encode.jl")
+include("ascii.jl")
 
 const colormode = Ref{TermColorDepth}(TermColor8bit())
 

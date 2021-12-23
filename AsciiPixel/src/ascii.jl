@@ -214,30 +214,33 @@ downsampled to fit into the display (using `restrict`).
 
 # colorant matrix
 function ascii_display(
-        io::IO,
-        img::AbstractMatrix{<:Colorant},
-        colordepth::TermColorDepth,
-        maxsize::Tuple = displaysize(io);
-        trail_nl::Bool = false)
+    io::IO,
+    img::AbstractMatrix{<:Colorant},
+    colordepth::TermColorDepth,
+    maxsize::Tuple = displaysize(io);
+    kwargs...
+)
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
     downscale = img_h <= io_h - 4 && 2img_w <= io_w ? downscale_big : downscale_small
     img, enc = downscale(img, io_h - 4, io_w)
-    ascii_encode(io, enc, colordepth, img; trail_nl)
+    ascii_encode(io, enc, colordepth, img; kwargs...)
     io
 end
 
 # colorant vector
 function ascii_display(
-        io::IO,
-        img::AbstractVector{<:Colorant},
-        colordepth::TermColorDepth,
-        maxsize::Tuple = displaysize(io))
+    io::IO,
+    img::AbstractVector{<:Colorant},
+    colordepth::TermColorDepth,
+    maxsize::Tuple = displaysize(io);
+    kwargs...
+)
     io_h, io_w = maxsize
     img_w = length(img)
     downscale = 3img_w <= io_w ? downscale_big : downscale_small
     img, enc = downscale(img, io_w)
-    ascii_encode(io, enc, colordepth, img)
+    ascii_encode(io, enc, colordepth, img; kwargs...)
     io
 end
 

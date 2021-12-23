@@ -395,3 +395,28 @@ end
         @test_reference "reference/lighthouse_small_60x60_8bit.txt" res
     end
 end
+
+@testset "ascii_display" begin
+    @testset "lighthouse 8bit" begin
+        img = imresize(lighthouse, (30, 30))
+        res = readlines(ensurecolor(  # uses small blocks
+            ascii_display, PipeBuffer(), img, TermColor8bit(), (20, 20)
+        ))
+        @test_reference "reference/display_monarch_20x20_8bit.txt" res
+        res = readlines(ensurecolor(  # uses big blocks
+            ascii_display, PipeBuffer(), img, TermColor8bit(), (80, 80)
+        ))
+        @test_reference "reference/display_monarch_80x80_8bit.txt" res
+    end
+    @testset "monarch 24bit" begin
+        img = imresize(monarch, (30, 30))
+        res = readlines(ensurecolor(  # uses small blocks
+            ascii_display, PipeBuffer(), img, TermColor24bit(), (20, 20)
+        ))
+        @test_reference "reference/display_monarch_20x20_24bit.txt" res
+        res = readlines(ensurecolor(  # uses big blocks
+            ascii_display, PipeBuffer(), img, TermColor24bit(), (80, 80)
+        ))
+        @test_reference "reference/display_monarch_80x80_24bit.txt" res
+    end
+end
