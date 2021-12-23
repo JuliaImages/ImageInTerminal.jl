@@ -15,7 +15,8 @@ function _charof(alpha)
 end
 
 """
-    downscale_XXX(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+    _downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+    _downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
 
 Larger images are downscaled automatically using `restrict`.
 
@@ -24,11 +25,11 @@ Larger images are downscaled automatically using `restrict`.
 
 Returns
     1. Downscaled image
-    2. Selected encoder with `size` containing:
-        1. number of lines in the vector.
+    2. Selected encoder (big or small blocks) with `size` containing:
+        1. number of lines in the Vector{String}.
         2. number of visible characters per line (the remaining are colorcodes).
 """
-function downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+function _downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
     h, w = map(length, axes(img))
@@ -39,7 +40,7 @@ function downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwid
     img, SmallBlocks((length(1:2:h), w))
 end
 
-function downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+function _downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
     maxheight = max(maxheight, 5)
     maxwidth  = max(maxwidth,  5)
     h, w = map(length, axes(img))
@@ -50,7 +51,7 @@ function downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth
     img, BigBlocks((h, 2w))
 end
 
-function downscale_small(img::AbstractVector{<:Colorant}, maxwidth::Int)
+function _downscale_small(img::AbstractVector{<:Colorant}, maxwidth::Int)
     maxwidth  = max(maxwidth, 5)
     while length(img) > maxwidth
         img = restrict(img)
@@ -58,7 +59,7 @@ function downscale_small(img::AbstractVector{<:Colorant}, maxwidth::Int)
     img, SmallBlocks((1, length(img)))
 end
 
-function downscale_big(img::AbstractVector{<:Colorant}, maxwidth::Int)
+function _downscale_big(img::AbstractVector{<:Colorant}, maxwidth::Int)
     maxwidth = max(maxwidth, 5)
     w = length(img)
     n = 3w > maxwidth ? maxwidth ÷ 6 : w
@@ -191,6 +192,7 @@ function ascii_encode(
     ret ? readlines(io) : nothing
 end
 
+# uses a `PipeBuffer` as io and returns encoded data reading lines of this buffer
 ascii_encode(enc::SmallBlocks, args...) =
     ascii_encode(PipeBuffer(), enc, args...; ret=true)
 
@@ -212,7 +214,6 @@ based on the current display size. The image will also be
 downsampled to fit into the display (using `restrict`).
 """
 
-# colorant matrix
 function ascii_display(
     io::IO,
     img::AbstractMatrix{<:Colorant},
@@ -222,13 +223,12 @@ function ascii_display(
 )
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
-    downscale = img_h <= io_h - 4 && 2img_w <= io_w ? downscale_big : downscale_small
+    downscale = img_h <= io_h - 4 && 2img_w <= io_w ? _downscale_big : _downscale_small
     img, enc = downscale(img, io_h - 4, io_w)
     ascii_encode(io, enc, colordepth, img; kwargs...)
     io
 end
 
-# colorant vector
 function ascii_display(
     io::IO,
     img::AbstractVector{<:Colorant},
@@ -238,11 +238,12 @@ function ascii_display(
 )
     io_h, io_w = maxsize
     img_w = length(img)
-    downscale = 3img_w <= io_w ? downscale_big : downscale_small
+    downscale = 3img_w <= io_w ? _downscale_big : _downscale_small
     img, enc = downscale(img, io_w)
     ascii_encode(io, enc, colordepth, img; kwargs...)
     io
 end
 
+# ascii_display, using the default colormode
 ascii_display(io::IO, img::AbstractArray{<:Colorant}; kwargs...) =
     ascii_display(io, img, colormode[]; kwargs...)

@@ -3,6 +3,7 @@ module ImageInTerminal
 using AsciiPixel
 using ImageCore
 using ImageBase: restrict
+using ColorTypes
 using Requires
 using Crayons
 
@@ -32,7 +33,12 @@ different encoding method, call `AsciiPixel.use_256()` or `AsciiPixel.use_24bit(
 """
 enable_encoding() = (should_render_image[] = true)
 
-function use_sixel(img::AbstractArray)
+"""
+    choose_sixel(img::AbstractArray)
+
+Choose to encode the image using sixels based on the size of the encoded image.
+"""
+function choose_sixel(img::AbstractArray)
     encoder_backend[] == :Sixel || return false
 
     # Sixel requires at least 6 pixels in row direction and thus doesn't perform very well for vectors.
@@ -88,7 +94,11 @@ terminal colors (defaults to 256 colors).
 
 If working in the REPL, the function tries to choose the encoding
 based on the current display size. The image will also be
-downsampled to fit into the display (using `restrict`).
+downsampled to fit into the display.
+
+Supported encoding:
+    - sixel (`Sixel` backend)
+    - ascii (`AsciiPixel` backend)
 """
 
 function imshow(
@@ -96,7 +106,7 @@ function imshow(
     img::AbstractArray{<:Colorant},
     maxsize::Tuple = displaysize(io)
 )
-    if use_sixel(img)
+    if choose_sixel(img)
         sixel_encode(io, img)
     else
         if ndims(img) > 2

@@ -1,12 +1,12 @@
 using Test, TestImages, ReferenceTests
 using OffsetArrays, SparseArrays
 using CoordinateTransformations
-using ImageBase, ImageCore
 using ImageTransformations
 using ImageQualityIndexes
 using ImageInTerminal
 using ImageMagick
 using AsciiPixel
+using ImageBase
 using Rotations
 
 import ImageInTerminal: imshow
@@ -35,7 +35,7 @@ end
 
 include(joinpath(dirname(pathof(AsciiPixel)), "..", "test", "common.jl"))
 
-# deprecated functions
+# deprecated functions, kept for testing
 function imshow256(args...)
     old_colormode = AsciiPixel.colormode[]
     AsciiPixel.set_colordepth(8)
