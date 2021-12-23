@@ -149,6 +149,7 @@ function ascii_encode(
     ::SmallBlocks,
     colordepth::TermColorDepth,
     img::AbstractVector{<:Colorant};
+    trail_nl::Bool = false,
     ret::Bool = false
 )
     print(io, RESET)
@@ -158,7 +159,7 @@ function ascii_encode(
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr)
     end
-    print(io, RESET)
+    trail_nl && println(io, RESET) || print(io, RESET)
     ret ? readlines(io) : nothing
 end
 
@@ -167,6 +168,7 @@ function ascii_encode(
     enc::BigBlocks,
     colordepth::TermColorDepth,
     img::AbstractVector{<:Colorant};
+    trail_nl::Bool = false,
     ret::Bool = false
 )
     w = length(img)
@@ -188,7 +190,7 @@ function ascii_encode(
             print(io, Crayon(foreground = fgcol), chr, chr, " ")
         end
     end
-    print(io, RESET)
+    trail_nl && println(io, RESET) || print(io, RESET)
     ret ? readlines(io) : nothing
 end
 

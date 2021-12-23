@@ -110,7 +110,7 @@ function imshow(
         sixel_encode(io, img)
     else
         if ndims(img) > 2
-            Base.show_nd(io, img, (io, x) -> ascii_display(io, x; trail_nl=false), true)
+            Base.show_nd(io, img, (io, x) -> ascii_display(io, x), true)
         else
             ascii_display(io, img)
         end
@@ -121,6 +121,8 @@ imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
 imshow(img, args...) = throw(
     ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions")
 )
+
+include("deprecated.jl")
 
 function __init__()
     enable_encoding()
