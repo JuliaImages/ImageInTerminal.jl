@@ -17,7 +17,7 @@ julia = "1"
 
 [extras]
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
-ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
+# ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 ImageQualityIndexes = "2996bd0c-7a13-11e9-2da2-2f5ce47296a9"
 ImageTransformations = "02fcd773-0e25-5acc-982a-7f6622650795"
@@ -30,4 +30,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 
 [targets]
-test = ["CoordinateTransformations", "ImageIO", "ImageMagick", "ImageQualityIndexes", "ImageTransformations", "ReferenceTests", "Rotations", "SparseArrays", "OffsetArrays", "Pkg", "Test", "TestImages"]
+test = ["CoordinateTransformations", "ImageMagick", "ImageQualityIndexes", "ImageTransformations", "ReferenceTests", "Rotations", "SparseArrays", "OffsetArrays", "Pkg", "Test", "TestImages"]
