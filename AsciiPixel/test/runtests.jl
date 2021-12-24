@@ -25,7 +25,7 @@ for t in (
 end
 
 @testset "Color depth" begin
-    @test AsciiPixel.set_colordepth(8) == TermColor8bit()
-    @test AsciiPixel.set_colordepth(24) == TermColor24bit()
-    @test_throws ErrorException AsciiPixel.set_colordepth(1)
+    @test AsciiPixel.set_colormode(8) == TermColor8bit()
+    @test AsciiPixel.set_colormode(24) == TermColor24bit()
+    @test_throws ErrorException AsciiPixel.set_colormode(1)
 end

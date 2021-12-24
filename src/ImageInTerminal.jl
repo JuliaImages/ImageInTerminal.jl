@@ -109,10 +109,11 @@ function imshow(
     if choose_sixel(img)
         sixel_encode(io, img)
     else
+        colormode = AsciiPixel.colormode[]
         if ndims(img) > 2
-            Base.show_nd(io, img, (io, x) -> ascii_display(io, x), true)
+            Base.show_nd(io, img, (io, x) -> ascii_display(io, x, colormode, maxsize), true)
         else
-            ascii_display(io, img)
+            ascii_display(io, img, colormode, maxsize)
         end
     end
 end

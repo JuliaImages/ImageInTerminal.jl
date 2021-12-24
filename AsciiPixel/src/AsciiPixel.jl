@@ -11,11 +11,11 @@ include("ascii.jl")
 const colormode = Ref{TermColorDepth}(TermColor8bit())
 
 """
-    set_colordepth(bit::Int)
+    set_colormode(bit::Int)
 
 Sets the terminal color depth to the given argument.
 """
-function set_colordepth(bit::Int)
+function set_colormode(bit::Int)
     if bit == 8
         colormode[] = TermColor8bit()
     elseif bit == 24
@@ -32,7 +32,7 @@ is_24bit_supported() = lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "trueco
 
 function __init__()
     # use 24bit if the terminal supports it
-    is_24bit_supported() && set_colordepth(24)
+    is_24bit_supported() && set_colormode(24)
 end
 
 end # module

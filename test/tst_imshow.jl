@@ -45,7 +45,7 @@ for name in ("imshow", "imshow256", "imshow24bit")
     end
 end
 
-@testset "imshow256 non1" begin
+@testset "imshow256 non 1 based indexing" begin
     @testset "monarch" begin
         img = OffsetArray(imresize(monarch, 10, 10), (-10, 5))
         io = PipeBuffer()

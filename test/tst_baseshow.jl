@@ -38,17 +38,17 @@ end
 for depth in (24, 8)
     @testset "$depth bit color" begin
         ImageInTerminal.enable_encoding()
-        AsciiPixel.set_colordepth(depth)
+        AsciiPixel.set_colormode(depth)
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), monarch)
-        @test_reference "reference/monarch_show_$(depth)-bit.txt" _tostring(io; strip_summary=true)
+        @test_reference "reference/monarch_show_$(depth)bit.txt" _tostring(io; strip_summary=true)
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), rgb_line)
-        @test_reference "reference/rgbline_show_$(depth)-bit.txt" _tostring(io; strip_summary=true)
+        @test_reference "reference/rgbline_show_$(depth)bit.txt" _tostring(io; strip_summary=true)
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), RGB(.5, .1, .9))
-        @test_reference "reference/colorant_show_$(depth)-bit.txt" _tostring(io)
+        @test_reference "reference/colorant_show_$(depth)bit.txt" _tostring(io)
     end
 end
 
-AsciiPixel.set_colordepth(8)  # paranoid
+AsciiPixel.set_colormode(8)  # paranoid

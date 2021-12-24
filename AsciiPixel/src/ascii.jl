@@ -14,7 +14,7 @@ function _charof(alpha)
     alpha_chars[clamp(idx + 1, 1, length(alpha_chars))]
 end
 
-function _downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
+function _downscale_small(img::AbstractMatrix{<:Colorant}, maxsize::NTuple{2,Int})
     #=
     larger images are downscaled automatically using `restrict`.
     `maxheight` and `maxwidth` specify the maximum numbers of string characters
@@ -25,8 +25,7 @@ function _downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwi
             a. number of lines in the Vector{String}.
             b. number of visible characters per line (the remaining are colorcodes).
     =#
-    maxheight = max(maxheight, 5)
-    maxwidth  = max(maxwidth,  5)
+    maxheight, maxwidth = max.(maxsize, 5)
     h, w = map(length, axes(img))
     while ceil(h / 2) > maxheight || w > maxwidth
         img = restrict(img)
@@ -35,9 +34,8 @@ function _downscale_small(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwi
     img, SmallBlocks((length(1:2:h), w))
 end
 
-function _downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidth::Int)
-    maxheight = max(maxheight, 5)
-    maxwidth  = max(maxwidth,  5)
+function _downscale_big(img::AbstractMatrix{<:Colorant}, maxsize::NTuple{2,Int})
+    maxheight, maxwidth = max.(maxsize, 5)
     h, w = map(length, axes(img))
     while h > maxheight || 2w > maxwidth
         img = restrict(img)
@@ -47,7 +45,7 @@ function _downscale_big(img::AbstractMatrix{<:Colorant}, maxheight::Int, maxwidt
 end
 
 function _downscale_small(img::AbstractVector{<:Colorant}, maxwidth::Int)
-    maxwidth  = max(maxwidth, 5)
+    maxwidth = max(maxwidth, 5)
     while length(img) > maxwidth
         img = restrict(img)
     end
@@ -63,6 +61,7 @@ end
 
 # bypassing Crayons.print() to avoid getenv() calls
 function _printc(io::IO, x::Crayon, args...)
+    # print(io, x, args...)  # slower
     if Crayons.anyactive(x)
         print(io, Crayons.CSI)
         Crayons._print(io, x)
@@ -225,7 +224,7 @@ function ascii_display(
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
     downscale = img_h <= io_h - 4 && 2img_w <= io_w ? _downscale_big : _downscale_small
-    img, enc = downscale(img, io_h - 4, io_w)
+    img, enc = downscale(img, (io_h - 4, io_w))
     ascii_encode(io, enc, colordepth, img; kwargs...)
     io
 end
@@ -244,7 +243,3 @@ function ascii_display(
     ascii_encode(io, enc, colordepth, img; kwargs...)
     io
 end
-
-# ascii_display, using the default colormode
-ascii_display(io::IO, img::AbstractArray{<:Colorant}; kwargs...) =
-    ascii_display(io, img, colormode[]; kwargs...)
