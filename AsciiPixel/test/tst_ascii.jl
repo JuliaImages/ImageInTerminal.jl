@@ -383,21 +383,21 @@ end
         res = readlines(
             @ensurecolor ascii_display(PipeBuffer(), img, TermColor8bit(), (20, 20))
         )
-        @test_reference "reference/display_monarch_20x20_8bit.txt" res
+        @test_reference "reference/display_lighthouse_20x20_8bit.txt" res
         res = readlines(
             @ensurecolor ascii_display(PipeBuffer(), img, TermColor8bit(), (80, 80))
         )
-        @test_reference "reference/display_monarch_80x80_8bit.txt" res
+        @test_reference "reference/display_lighthouse_80x80_8bit.txt" res
     end
-    @testset "monarch 24bit" begin
-        img = imresize(monarch, (30, 30))
+    @testset "mandril 24bit" begin
+        img = imresize(mandril, (30, 30))
         res = readlines(
             @ensurecolor ascii_display(PipeBuffer(), img, TermColor24bit(), (20, 20))
         )
-        @test_reference "reference/display_monarch_20x20_24bit.txt" res
+        @test_reference "reference/display_mandril_20x20_24bit.txt" res
         res = readlines(
             @ensurecolor ascii_display(PipeBuffer(), img, TermColor24bit(), (80, 80))
         )
-        @test_reference "reference/display_monarch_80x80_24bit.txt" res
+        @test_reference "reference/display_mandril_80x80_24bit.txt" res
     end
 end

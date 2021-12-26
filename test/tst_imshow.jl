@@ -27,14 +27,14 @@ for name in ("imshow", "imshow256", "imshow24bit")
             @ensurecolor func(io, rgb_line, (1, 19))
             @test_reference "reference/rgbline_small2_$(name).txt" readlines(io)
         end
-        @testset "monarch" begin
-            img = imresize(monarch, 10, 10)
+        @testset "mandril" begin
+            img = imresize(mandril, 10, 10)
             io = PipeBuffer()
             @ensurecolor func(io, img)
-            @test_reference "reference/monarch_big_$(name).txt" readlines(io)
+            @test_reference "reference/mandril_big_$(name).txt" readlines(io)
             io = PipeBuffer()
             @ensurecolor func(io, img, (10, 20))
-            @test_reference "reference/monarch_small_$(name).txt" readlines(io)
+            @test_reference "reference/mandril_small_$(name).txt" readlines(io)
         end
         @testset "ndarray" begin
             img = rgb_line_4d
@@ -46,11 +46,11 @@ for name in ("imshow", "imshow256", "imshow24bit")
 end
 
 @testset "imshow256 non 1 based indexing" begin
-    @testset "monarch" begin
-        img = OffsetArray(imresize(monarch, 10, 10), (-10, 5))
+    @testset "mandril" begin
+        img = OffsetArray(imresize(mandril, 10, 10), (-10, 5))
         io = PipeBuffer()
         @ensurecolor imshow256(io, img)
-        @test_reference "reference/monarch_big_imshow256.txt" readlines(io)
+        @test_reference "reference/mandril_big_imshow256.txt" readlines(io)
     end
     @testset "rotation" begin
         tfm = recenter(RotMatrix(-π / 4), center(lighthouse))

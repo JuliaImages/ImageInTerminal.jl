@@ -3,8 +3,8 @@
     old_encoder = ImageInTerminal.encoder_backend[]
     ImageInTerminal.encoder_backend[] = :Sixel
 
-    @testset "monarch" begin
-        img = imresize(monarch, 128, 128)
+    @testset "mandril" begin
+        img = imresize(mandril, 128, 128)
         io = IOBuffer()
         imshow256(io, img)
         # we can't reference test it right now, because ReferenceTests calls
@@ -13,7 +13,7 @@
     end
     @testset "small images" begin
         # small images still use ImageInTerminal's fallback encoding
-        img = imresize(monarch, 10, 10)
+        img = imresize(mandril, 10, 10)
         io = PipeBuffer()
         @ensurecolor imshow256(io, img)
         @test !startswith(readlines(io)[1], "\ePq\"")  # not sixel encoding
