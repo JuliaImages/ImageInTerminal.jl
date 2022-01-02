@@ -46,5 +46,9 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - name: Test AsciiPixel
+        run: |
+          julia --project -e 'using Pkg; Pkg.develop(path="AsciiPixel")'
+          julia --project -e 'using Pkg; Pkg.test("AsciiPixel")'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
