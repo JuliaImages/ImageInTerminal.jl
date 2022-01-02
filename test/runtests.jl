@@ -33,7 +33,6 @@ lena = testimage("lena_color_256")
 # ====================================================================
 
 tests = [
-    "tst_colorant2ansi.jl",
     "tst_encodeimg.jl",
     "tst_imshow.jl",
     "tst_baseshow.jl",

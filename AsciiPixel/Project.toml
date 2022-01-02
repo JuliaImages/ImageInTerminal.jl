@@ -1,3 +1,10 @@
 name = "AsciiPixel"
 uuid = "d64ea8f1-9d40-4cda-bb88-5de2505cd5c8"
 version = "0.1.0"
+
+[deps]
+ImageBase = "c817782e-172a-44cc-b673-b171935fbb9e"
+
+[compat]
+ImageBase = "0.1.1"
+julia = "1.6"

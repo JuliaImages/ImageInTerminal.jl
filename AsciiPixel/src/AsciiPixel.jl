@@ -1,5 +1,7 @@
 module AsciiPixel
 
-hello(x) = println("Hello", x)
+using ImageBase
+
+include("colorant2ansi.jl")
 
 end # module

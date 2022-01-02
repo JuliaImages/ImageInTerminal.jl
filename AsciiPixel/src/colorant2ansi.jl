@@ -32,12 +32,12 @@ _colorant2ansi(gr::Color, colordepth::TermColorDepth) =
 _colorant2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
     _colorant2ansi(color(gr), colordepth)
 
-# 256 colors
+# 8bit (256) colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor256)
     r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
     r24, g24, b24 = map(c->round(Int, c * 23), (r, g, b))
     if r24 == g24 == b24
-        # Use grayscales because of higher resultion
+        # Use grayscales because of higher resolution
         # This way even grayscale RGB images look good.
         232 + r24
     else
@@ -58,4 +58,3 @@ function _colorant2ansi(gr::Color{<:Any,1}, ::TermColor24bit)
     r = round(Int, clamp01nan(real(gr)) * 255)
     r, r, r
 end
-
