@@ -63,3 +63,6 @@ for t in tests
         include(t)
     end
 end
+
+@info "Deprecation test, warnings are expected"
+include("deprecations.jl")

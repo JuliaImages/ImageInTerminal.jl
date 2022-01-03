@@ -5,19 +5,19 @@ using Crayons
 using ImageCore
 using ImageBase: restrict
 using AsciiPixel
+using Reexport
 
 export
-
-    colorant2ansi,
     imshow,
     imshow256,
     imshow24bit
 
-using AsciiPixel: TermColorDepth, TermColor256, TermColor24bit
-using AsciiPixel: colorant2ansi, _colorant2ansi
+@reexport using AsciiPixel: TermColor256, TermColor24bit
+using AsciiPixel: TermColorDepth
 
 include("encodeimg.jl")
 include("imshow.jl")
+include("deprecations.jl")
 
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
@@ -78,7 +78,7 @@ end
 # colorant
 function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     if should_render_image[1]
-        fgcol = _colorant2ansi(color, colormode[1])
+        fgcol = colormode[1](color)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr, chr, " ")
         print(io, Crayon(foreground = :white), color)

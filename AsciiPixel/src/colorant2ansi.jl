@@ -1,40 +1,31 @@
 abstract type TermColorDepth end
-struct TermColor256   <: TermColorDepth end
-struct TermColor24bit <: TermColorDepth end
+
+@inline (enc::TermColorDepth)(c::Color) = enc(RGB(c))
+@inline (enc::TermColorDepth)(c::TransparentColor) = enc(color(c))
 
 """
-    colorant2ansi(color::Colorant) -> Int
+    TermColor256()
 
-Converts the given colorant into an integer index that corresponds
-to the closest 256-colors ANSI code.
+The RGB/Grayscale to xterm-256 color codes encoder. Other color types will be converted
+to RGB first. The transparent alpha channel, if exists, will be dropped.
 
-```julia
-julia> colorant2ansi(RGB(1., 1., 0.))
+The encoder works as a functor `enc(color)`:
+
+```jldoctest; setup=:(using ImageBase; using AsciiPixel: TermColor256)
+julia> enc = TermColor256()
+AsciiPixel.TermColor256()
+
+julia> enc(RGB(1.0, 1.0, 0.0))
 226
-```
 
-This function also tries to make good use of the additional number
-of available shades of gray (ANSI codes 232 to 255).
-
-```julia
-julia> colorant2ansi(RGB(.5, .5, .5))
-244
-
-julia> colorant2ansi(Gray(.5))
+julia> enc(RGB(0.5, 0.5, 0.5))
 244
 ```
 """
-colorant2ansi(color) = _colorant2ansi(color, TermColor256())
+struct TermColor256 <: TermColorDepth end
 
-# Fallback for non-rgb and transparent colors (convert to rgb)
-_colorant2ansi(gr::Color, colordepth::TermColorDepth) =
-    _colorant2ansi(convert(RGB, gr), colordepth)
-_colorant2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
-    _colorant2ansi(color(gr), colordepth)
-
-# 8bit (256) colors
-function _colorant2ansi(col::AbstractRGB, ::TermColor256)
-    r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
+function (enc::TermColor256)(c::AbstractRGB)
+    r, g, b = clamp01nan(red(c)), clamp01nan(green(c)), clamp01nan(blue(c))
     r24, g24, b24 = map(c->round(Int, c * 23), (r, g, b))
     if r24 == g24 == b24
         # Use grayscales because of higher resolution
@@ -45,16 +36,36 @@ function _colorant2ansi(col::AbstractRGB, ::TermColor256)
         16 + 36 * r6 + 6 * g6 + b6
     end
 end
+(enc::TermColor256)(c::AbstractGray) = round(Int, 232 + clamp01nan(real(c)) * 23)
 
-_colorant2ansi(gr::Color{<:Any,1}, ::TermColor256) = round(Int, 232 + clamp01nan(real(gr)) * 23)
 
-# 24 bit colors
-function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
-    r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
-    map(c->round(Int, c * 255), (r, g, b))
+"""
+    TermColor24bit()
+
+The RGB/Grayscale to 24bit color (truecolor) codes encoder. Other color types will be converted
+to RGB first. The transparent alpha channel, if exists, will be dropped.
+
+The encoder works as a functor `enc(color)`:
+
+```jldoctest; setup=:(using ImageBase; using AsciiPixel: TermColor24bit)
+julia> enc = TermColor24bit()
+AsciiPixel.TermColor24bit()
+
+julia> enc(RGB(1.0, 1.0, 0.0))
+(255, 255, 0)
+
+julia> enc(RGB(0.5, 0.5, 0.5))
+(128, 128, 0)
+```
+"""
+struct TermColor24bit <: TermColorDepth end
+
+function (enc::TermColor24bit)(c::AbstractRGB)
+    r, g, b = red(c), green(c), blue(c)
+    map(c->round(Int, clamp01nan(c) * 255), (r, g, b))
 end
 
-function _colorant2ansi(gr::Color{<:Any,1}, ::TermColor24bit)
-    r = round(Int, clamp01nan(real(gr)) * 255)
+function (enc::TermColor24bit)(c::AbstractGray)
+    r = round(Int, clamp01nan(real(c)) * 255)
     r, r, r
 end

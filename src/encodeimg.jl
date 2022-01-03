@@ -54,9 +54,9 @@ function encodeimg(
     for y in first(yinds):2:last(yinds)
         print(io, Crayon(reset = true))
         for x in xinds
-            fgcol = _colorant2ansi(img[y,x], colordepth)
+            fgcol = colordepth(img[y,x])
             bgcol = if y+1 <= last(yinds)
-                _colorant2ansi(img[y+1,x], colordepth)
+                colordepth(img[y+1,x])
             else
                 # if reached it means that the last character row
                 # has only the upper pixel defined.
@@ -88,7 +88,7 @@ function encodeimg(
         print(io, Crayon(reset = true))
         for x in xinds
             color = img[y,x]
-            fgcol = _colorant2ansi(color, colordepth)
+            fgcol = colordepth(color)
             chr = _charof(alpha(color))
             print(io, Crayon(foreground = fgcol), chr, chr)
         end
@@ -111,7 +111,7 @@ function encodeimg(
     print(io, Crayon(reset = true))
     for i in axes(img, 1)
         color = img[i]
-        fgcol = _colorant2ansi(color, colordepth)
+        fgcol = colordepth(color)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr)
     end
@@ -132,7 +132,7 @@ function encodeimg(
     print(io, Crayon(reset = true))
     for i in (0:n-1) .+ first(inds)
         color = img[i]
-        fgcol = _colorant2ansi(color, colordepth)
+        fgcol = colordepth(color)
         chr = _charof(alpha(color))
         print(io, Crayon(foreground = fgcol), chr, chr, " ")
     end
@@ -140,7 +140,7 @@ function encodeimg(
         print(io, Crayon(reset = true), " … ")
         for i in last(inds)-n+1:last(inds)
             color = img[i]
-            fgcol = _colorant2ansi(color, colordepth)
+            fgcol = colordepth(color)
             chr = _charof(alpha(color))
             print(io, Crayon(foreground = fgcol), chr, chr, " ")
         end
