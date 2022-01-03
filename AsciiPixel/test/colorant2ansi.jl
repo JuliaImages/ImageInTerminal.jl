@@ -5,13 +5,29 @@
     # This tests if the mapping from RGB to the
     # 256 ansi color codes is correct
     @testset "256 colors" begin
-        # reference functions to compare against
+        #reference functions to compare against
         function _ref_col2ansi(r,g,b)
-            r6, g6, b6 = map(c->round(Int, 5c), (r, g, b))
-            16 + 36 * r6 + 6 * g6 + b6
+            r24, g24, b24 = map(c->round(Int, c * 23), (r, g, b))
+            if r24 == g24 == b24
+                # RGB scale color code
+                r24 == 0 && return 17   # 0x000000
+                r24 == 9 && return 60   # 0x5f5f5f
+                r24 == 12 && return 103 # 0x878787
+                r24 == 16 && return 146 # 0xafafaf
+                r24 == 19 && return 189 # 0xd7d7d7
+                r24 == 23 && return 232 # 0xffffff
+                # gray scale color code
+                232 + r24
+            else
+                r6, g6, b6 = map(c->floor(Int, c * 5), (r, g, b))
+                17 + 36 * r6 + 6 * g6 + b6
+            end
         end
         function _ref_col2ansi(gr)
-            round(Int, 232 + gr * 23)
+            val = round(Int, clamp01nan(gr) * 26)
+            val == 0 && return 17   # 0x000000
+            val > 24 && return 232  # 0xffffff
+            return 232 + val
         end
         @testset "RGB" begin
             enc = TermColor256()
@@ -30,6 +46,26 @@
             for col in rand(Gray, 10)
                 r = real(col)
                 @test enc(col) === _ref_col2ansi(r)
+            end
+        end
+
+        @testset "decoder" begin
+            enc = TermColor256()
+
+            @testset "RGB scale" begin
+                for idx in 17:232
+                    ccode = AsciiPixel.TERMCOLOR256_LOOKUP[idx]
+                    c = RGB(reinterpret(ARGB32, ccode))
+                    @test enc(c) == idx
+                end
+            end
+
+            @testset "Gray scale" begin
+                for idx in 232:256
+                    ccode = AsciiPixel.TERMCOLOR256_LOOKUP[idx]
+                    c = Gray(red(RGB(reinterpret(ARGB32, ccode))))
+                    @test enc(c) == idx
+                end
             end
         end
     end
