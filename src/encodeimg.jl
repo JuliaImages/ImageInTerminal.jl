@@ -60,7 +60,7 @@ function encodeimg(
             else
                 # if reached it means that the last character row
                 # has only the upper pixel defined.
-                Symbol("nothing")
+                nothing
             end
             print(io, Crayon(foreground=fgcol, background=bgcol), "▀")
         end
