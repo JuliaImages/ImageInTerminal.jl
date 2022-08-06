@@ -6,6 +6,7 @@ using ImageBase: restrict
 using ColorTypes
 using Requires
 using Crayons
+using FileIO
 
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
@@ -122,8 +123,6 @@ imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
 imshow(img, args...) = throw(
     ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions")
 )
-
-include("deprecated.jl")
 
 function __init__()
     enable_encoding()

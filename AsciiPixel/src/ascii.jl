@@ -104,11 +104,7 @@ function ascii_encode(
             else
                 # if reached it means that the last character row
                 # has only the upper pixel defined.
-<<<<<<< HEAD
                 nothing
-=======
-                :nothing
->>>>>>> fcd1f5f (rename ascii_encode -> ascii_display when using io, rework downscale)
             end
             _printc(io, Crayon(foreground=fgcol, background=bgcol), "▀")
         end
