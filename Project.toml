@@ -14,7 +14,8 @@ Crayons = "4.1"
 ImageBase = "0.1"
 ImageCore = "0.9"
 Requires = "1"
-julia = "1"
+FileIO = "^1.6"
+julia = "1.6"
 
 [extras]
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"

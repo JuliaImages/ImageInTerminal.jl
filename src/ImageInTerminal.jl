@@ -110,7 +110,7 @@ function __init__()
         sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
     end
 
-    pushdisplay(TerminalGraphicDisplay(stdout))
+    pushdisplay(TerminalGraphicDisplay(stdout, devnull))
 end
 
 end # module
