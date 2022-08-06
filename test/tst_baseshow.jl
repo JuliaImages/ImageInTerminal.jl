@@ -7,18 +7,18 @@ end
 
 @testset "enable/disable encoding" begin
     old_should_render_image = ImageInTerminal.should_render_image[]
-    old_colormode = AsciiPixel.colormode[]
+    old_colormode = XTermColors.colormode[]
 
     ImageInTerminal.enable_encoding()
     @test ImageInTerminal.should_render_image[] == true
-    @test AsciiPixel.colormode[] == old_colormode
+    @test XTermColors.colormode[] == old_colormode
 
     ImageInTerminal.disable_encoding()
     @test ImageInTerminal.should_render_image[] == false
-    @test AsciiPixel.colormode[] == old_colormode
+    @test XTermColors.colormode[] == old_colormode
 
     ImageInTerminal.should_render_image[] = old_should_render_image
-    AsciiPixel.colormode[] = old_colormode
+    XTermColors.colormode[] = old_colormode
 end
 
 @testset "no encoding" begin
@@ -38,7 +38,7 @@ end
 for depth in (24, 8)
     @testset "$depth bit color" begin
         ImageInTerminal.enable_encoding()
-        AsciiPixel.set_colormode(depth)
+        XTermColors.set_colormode(depth)
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), mandril)
         @test_reference "reference/mandril_show_$(depth)bit.txt" _tostring(
@@ -55,4 +55,4 @@ for depth in (24, 8)
     end
 end
 
-AsciiPixel.set_colormode(8)  # paranoid
+XTermColors.set_colormode(8)  # paranoid
