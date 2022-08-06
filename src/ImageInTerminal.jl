@@ -4,6 +4,7 @@ using Requires
 using Crayons
 using ImageCore
 using ImageBase: restrict
+using FileIO
 
 export
 
@@ -85,6 +86,8 @@ function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     end
 end
 
+include("display.jl")
+
 function __init__()
     # use 24bit if the terminal supports it
     lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "truecolor") && use_24bit()
@@ -106,6 +109,8 @@ function __init__()
         end
         sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
     end
+
+    pushdisplay(TerminalGraphicDisplay(stdout, devnull))
 end
 
 end # module
