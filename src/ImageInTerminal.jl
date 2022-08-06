@@ -15,6 +15,7 @@ import Sixel
 const encoder_backend = Ref(:ImageInTerminal)
 const should_render_image = Ref(true)
 const small_imgs_sixel = Ref(false)
+const print_summary = Ref(true)
 
 """
     disable_encoding()
@@ -62,7 +63,7 @@ end
 # colorant arrays
 function Base.show(io::IO, mime::MIME"text/plain", img::AbstractArray{<:Colorant})
     if should_render_image[]
-        println(io, summary(img), ":")
+        print_summary[] && println(io, summary(img), ":")
         imshow(io, img)
     else
         invoke(Base.show, Tuple{typeof(io),typeof(mime),AbstractArray}, io, mime, img)

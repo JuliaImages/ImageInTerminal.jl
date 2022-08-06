@@ -18,5 +18,5 @@ function Base.display(
 )
     println(d.summary_stream, summary(img), ":")
     ImageInTerminal.imshow(d.content_stream, img, colormode[1])
-    return nothing
+    nothing
 end
