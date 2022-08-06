@@ -75,9 +75,9 @@ otherwise it will use 256 colors (8-bit) as a fallback option.
 To manually switch between 24-bit colors and 256 colors, you can use the internal helpers:
 
 ```julia
-using AsciiPixel
-AsciiPixel.set_colormode(8)
-AsciiPixel.set_colormode(24)
+using XTermColors
+XTermColors.set_colormode(8)
+XTermColors.set_colormode(24)
 ```
 
 Note that 24 bits format only works as expected if your terminal supports it,

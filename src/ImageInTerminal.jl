@@ -1,6 +1,6 @@
 module ImageInTerminal
 
-using AsciiPixel
+using XTermColors
 using ImageCore
 using ColorTypes
 using Crayons
@@ -31,7 +31,7 @@ disable_encoding() = (should_render_image[] = false)
 Enable the image encoding feature and show images in terminal.
 
 This can be disabled by calling `ImageInTerminal.disable_encoding()`. To choose between
-different encoding method, call `AsciiPixel.set_colormode(8)` or `AsciiPixel.set_colormode(24)`.
+different encoding method, call `XTermColors.set_colormode(8)` or `XTermColors.set_colormode(24)`.
 """
 enable_encoding() = (should_render_image[] = true)
 
@@ -72,8 +72,8 @@ end
 # colorant
 function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     if should_render_image[]
-        fgcol = AsciiPixel._colorant2ansi(color, AsciiPixel.colormode[])
-        chr = AsciiPixel._charof(alpha(color))
+        fgcol = XTermColors._colorant2ansi(color, XTermColors.colormode[])
+        chr = XTermColors._charof(alpha(color))
         print(io, Crayon(; foreground=fgcol), chr, chr, " ")
         print(io, Crayon(; foreground=:white), color)
         print(io, Crayon(; reset=true))
@@ -97,14 +97,14 @@ downsampled to fit into the display.
 
 Supported encoding:
     - sixel (`Sixel` backend)
-    - ascii (`AsciiPixel` backend)
+    - ascii (`XTermColors` backend)
 """
 
 function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io))
     if choose_sixel(img)
         sixel_encode(io, img)
     else
-        colormode = AsciiPixel.colormode[]
+        colormode = XTermColors.colormode[]
         if ndims(img) > 2
             Base.show_nd(io, img, (io, x) -> ascii_display(io, x, colormode, maxsize), true)
         else
