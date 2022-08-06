@@ -1,5 +1,6 @@
 style = "blue"
 short_to_long_function_def = false
+trailing_comma = "nothing"
 always_use_return = false
 import_to_using = false
 align_struct_field = true

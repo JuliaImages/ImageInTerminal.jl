@@ -16,7 +16,7 @@ end
 function Base.display(
     d::TerminalGraphicDisplay, ::MIME"image/png", img::AbstractArray{<:Colorant}
 )
-    println(d.summary_stream, summary(img), ":")
+    SUMMARY[] && println(d.summary_stream, summary(img), ":")
     ImageInTerminal.imshow(d.content_stream, img, colormode[1])
     return nothing
 end

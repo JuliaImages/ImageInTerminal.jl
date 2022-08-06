@@ -9,7 +9,7 @@ import ImageInTerminal: imshow
 
 include(joinpath(dirname(pathof(XTermColors)), "..", "test", "common.jl"))
 
-ImageInTerminal.encoder_backend[] = :ImageInTerminal  # manually disable Sixel
+ImageInTerminal.ENCODER_BACKEND[] = :ImageInTerminal  # manually disable Sixel
 for t in ("tst_baseshow.jl", "tst_imshow.jl", "tst_sixel.jl")
     @testset "$t" begin
         include(t)

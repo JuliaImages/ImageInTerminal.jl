@@ -6,19 +6,19 @@ function _tostring(io; strip_summary=false)
 end
 
 @testset "enable/disable encoding" begin
-    old_should_render_image = ImageInTerminal.should_render_image[]
-    old_colormode = XTermColors.colormode[]
+    old_should_render_image = ImageInTerminal.SHOULD_RENDER_IMAGE[]
+    old_colormode = XTermColors.COLORMODE[]
 
     ImageInTerminal.enable_encoding()
-    @test ImageInTerminal.should_render_image[] == true
-    @test XTermColors.colormode[] == old_colormode
+    @test ImageInTerminal.SHOULD_RENDER_IMAGE[] == true
+    @test XTermColors.COLORMODE[] == old_colormode
 
     ImageInTerminal.disable_encoding()
-    @test ImageInTerminal.should_render_image[] == false
-    @test XTermColors.colormode[] == old_colormode
+    @test ImageInTerminal.SHOULD_RENDER_IMAGE[] == false
+    @test XTermColors.COLORMODE[] == old_colormode
 
-    ImageInTerminal.should_render_image[] = old_should_render_image
-    XTermColors.colormode[] = old_colormode
+    ImageInTerminal.SHOULD_RENDER_IMAGE[] = old_should_render_image
+    XTermColors.COLORMODE[] = old_colormode
 end
 
 @testset "no encoding" begin

@@ -12,9 +12,11 @@ import Sixel
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
 
-const encoder_backend = Ref(:ImageInTerminal)
-const should_render_image = Ref(true)
-const small_imgs_sixel = Ref(false)
+const ENCODER_BACKEND = Ref(:ImageInTerminal)
+const SHOULD_RENDER_IMAGE = Ref(true)
+const SMALL_IMGS_SIXEL = Ref(false)
+const RESET = Crayon(; reset=true)
+const SUMMARY = Ref(false)
 
 """
     disable_encoding()
@@ -23,7 +25,7 @@ Disable the image encoding feature and show images as if they are normal arrays.
 
 This can be restored by calling `ImageInTerminal.enable_encoding()`.
 """
-disable_encoding() = (should_render_image[] = false)
+disable_encoding() = SHOULD_RENDER_IMAGE[] = false
 
 """
     enable_encoding()
@@ -33,7 +35,7 @@ Enable the image encoding feature and show images in terminal.
 This can be disabled by calling `ImageInTerminal.disable_encoding()`. To choose between
 different encoding method, call `XTermColors.set_colormode(8)` or `XTermColors.set_colormode(24)`.
 """
-enable_encoding() = (should_render_image[] = true)
+enable_encoding() = SHOULD_RENDER_IMAGE[] = true
 
 """
     choose_sixel(img::AbstractArray)
@@ -41,13 +43,13 @@ enable_encoding() = (should_render_image[] = true)
 Choose to encode the image using sixels based on the size of the encoded image.
 """
 function choose_sixel(img::AbstractArray)
-    encoder_backend[] == :Sixel || return false
+    ENCODER_BACKEND[] == :Sixel || return false
 
     # Sixel requires at least 6 pixels in row direction and thus doesn't perform very well for vectors.
     # ImageInTerminal encoder is good enough for vector case.
     ndims(img) == 1 && return false
 
-    if small_imgs_sixel[]
+    if SMALL_IMGS_SIXEL[]
         return true
     else
         # Small images really do not need sixel encoding.
@@ -61,8 +63,8 @@ end
 
 # colorant arrays
 function Base.show(io::IO, mime::MIME"text/plain", img::AbstractArray{<:Colorant})
-    if should_render_image[]
-        println(io, summary(img), ":")
+    if SHOULD_RENDER_IMAGE[]
+        SUMMARY[] && println(io, summary(img), ":")
         imshow(io, img)
     else
         invoke(Base.show, Tuple{typeof(io),typeof(mime),AbstractArray}, io, mime, img)
@@ -71,12 +73,19 @@ end
 
 # colorant
 function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
-    if should_render_image[]
-        fgcol = XTermColors._colorant2ansi(color, XTermColors.colormode[])
+    if SHOULD_RENDER_IMAGE[]
+        fgcol = XTermColors._colorant2ansi(color, XTermColors.COLORMODE[])
         chr = XTermColors._charof(alpha(color))
-        print(io, Crayon(; foreground=fgcol), chr, chr, " ")
-        print(io, Crayon(; foreground=:white), color)
-        print(io, Crayon(; reset=true))
+        print(
+            io,
+            Crayon(; foreground=fgcol),
+            chr,
+            chr,
+            " ",
+            Crayon(; foreground=:white),
+            color,
+            RESET
+        )
     else
         invoke(Base.show, Tuple{typeof(io),typeof(mime),Any}, io, mime, color)
     end
@@ -101,16 +110,22 @@ Supported encoding:
 """
 
 function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io))
+    buf = PipeBuffer()
+    io_color = get(io, :color, false)
+    iobuf = IOContext(buf, :color => io_color)
     if choose_sixel(img)
-        sixel_encode(io, img)
+        sixel_encode(iobuf, img)
     else
-        colormode = XTermColors.colormode[]
+        colormode = XTermColors.COLORMODE[]
         if ndims(img) > 2
-            Base.show_nd(io, img, (io, x) -> ascii_display(io, x, colormode, maxsize), true)
+            Base.show_nd(
+                iobuf, img, (iobuf, x) -> ascii_display(iobuf, x, colormode, maxsize), true
+            )
         else
-            ascii_display(io, img, colormode, maxsize)
+            ascii_display(iobuf, img, colormode, maxsize)
         end
     end
+    write(io, read(iobuf, String))
 end
 
 imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
@@ -122,9 +137,9 @@ sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
 function __init__()
     enable_encoding()
 
-    Sixel.is_sixel_supported() && (encoder_backend[] = :Sixel)
+    Sixel.is_sixel_supported() && (ENCODER_BACKEND[] = :Sixel)
 
-    pushdisplay(TerminalGraphicDisplay(stdout, devnull))
+    pushdisplay(TerminalGraphicDisplay(stdout))
 end
 
 end
