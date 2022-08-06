@@ -1,12 +1,12 @@
 abstract type ImageEncoder end
 struct BigBlocks <: ImageEncoder
-    size::NTuple{2, Int}
+    size::NTuple{2,Int}
 end
 struct SmallBlocks <: ImageEncoder
-    size::NTuple{2, Int}
+    size::NTuple{2,Int}
 end
 
-const RESET = Crayon(reset = true)
+const RESET = Crayon(; reset=true)
 const alpha_chars = ('⋅', '░', '▒', '▓', '█')
 
 function _charof(alpha)
@@ -91,22 +91,22 @@ function ascii_encode(
     ::SmallBlocks,
     colordepth::TermColorDepth,
     img::AbstractMatrix{<:Colorant};
-    trail_nl::Bool = false,
-    ret::Bool = false
+    trail_nl::Bool=false,
+    ret::Bool=false,
 )
     yinds, xinds = axes(img)
     for y in first(yinds):2:last(yinds)
         _printc(io, RESET)
         for x in xinds
             fgcol = _colorant2ansi(img[y, x], colordepth)
-            bgcol = if y+1 <= last(yinds)
-                _colorant2ansi(img[y+1, x], colordepth)
+            bgcol = if y + 1 <= last(yinds)
+                _colorant2ansi(img[y + 1, x], colordepth)
             else
                 # if reached it means that the last character row
                 # has only the upper pixel defined.
                 nothing
             end
-            _printc(io, Crayon(foreground=fgcol, background=bgcol), "▀")
+            _printc(io, Crayon(; foreground=fgcol, background=bgcol), "▀")
         end
         _printc(io, RESET)
         (trail_nl || y < last(yinds)) && println(io)
@@ -119,8 +119,8 @@ function ascii_encode(
     ::BigBlocks,
     colordepth::TermColorDepth,
     img::AbstractMatrix{<:Colorant};
-    trail_nl::Bool = false,
-    ret::Bool = false,
+    trail_nl::Bool=false,
+    ret::Bool=false,
 )
     yinds, xinds = axes(img)
     for y in yinds
@@ -129,7 +129,7 @@ function ascii_encode(
             color = img[y, x]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
-            _printc(io, Crayon(foreground = fgcol), chr, chr)
+            _printc(io, Crayon(; foreground=fgcol), chr, chr)
         end
         _printc(io, RESET)
         (trail_nl || y < last(yinds)) && println(io)
@@ -142,15 +142,15 @@ function ascii_encode(
     ::SmallBlocks,
     colordepth::TermColorDepth,
     img::AbstractVector{<:Colorant};
-    trail_nl::Bool = false,
-    ret::Bool = false
+    trail_nl::Bool=false,
+    ret::Bool=false,
 )
     _printc(io, RESET)
     for i in axes(img, 1)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
-        _printc(io, Crayon(foreground = fgcol), chr)
+        _printc(io, Crayon(; foreground=fgcol), chr)
     end
     _printc(io, RESET)
     trail_nl && println(io)
@@ -162,26 +162,26 @@ function ascii_encode(
     enc::BigBlocks,
     colordepth::TermColorDepth,
     img::AbstractVector{<:Colorant};
-    trail_nl::Bool = false,
-    ret::Bool = false
+    trail_nl::Bool=false,
+    ret::Bool=false,
 )
     w = length(img)
     n = enc.size[2] ÷ 3 == w ? w : enc.size[2] ÷ 6
     # left or full
     _printc(io, RESET)
-    for i in (0:n-1) .+ firstindex(img)
+    for i in (0:(n - 1)) .+ firstindex(img)
         color = img[i]
         fgcol = _colorant2ansi(color, colordepth)
         chr = _charof(alpha(color))
-        _printc(io, Crayon(foreground = fgcol), chr, chr, " ")
+        _printc(io, Crayon(; foreground=fgcol), chr, chr, " ")
     end
     if n < w  # right part
         _printc(io, RESET, " … ")
-        for i in (-n+1:0) .+ lastindex(img)
+        for i in ((-n + 1):0) .+ lastindex(img)
             color = img[i]
             fgcol = _colorant2ansi(color, colordepth)
             chr = _charof(alpha(color))
-            _printc(io, Crayon(foreground = fgcol), chr, chr, " ")
+            _printc(io, Crayon(; foreground=fgcol), chr, chr, " ")
         end
     end
     _printc(io, RESET)
@@ -190,11 +190,9 @@ function ascii_encode(
 end
 
 # use a `PipeBuffer` as io and returns encoded data reading lines of this buffer (using `readlines(io)`)
-ascii_encode(enc::SmallBlocks, args...) =
-    ascii_encode(PipeBuffer(), enc, args...; ret=true)
+ascii_encode(enc::SmallBlocks, args...) = ascii_encode(PipeBuffer(), enc, args...; ret=true)
 
-ascii_encode(enc::BigBlocks, args...) =
-    ascii_encode(PipeBuffer(), enc, args...; ret=true)
+ascii_encode(enc::BigBlocks, args...) = ascii_encode(PipeBuffer(), enc, args...; ret=true)
 
 """
     ascii_display([stream], img, [depth::TermColorDepth], [maxsize])
@@ -214,8 +212,8 @@ function ascii_display(
     io::IO,
     img::AbstractMatrix{<:Colorant},
     colordepth::TermColorDepth,
-    maxsize::Tuple = displaysize(io);
-    kwargs...
+    maxsize::Tuple=displaysize(io);
+    kwargs...,
 )
     io_h, io_w = maxsize
     img_h, img_w = map(length, axes(img))
@@ -229,8 +227,8 @@ function ascii_display(
     io::IO,
     img::AbstractVector{<:Colorant},
     colordepth::TermColorDepth,
-    maxsize::Tuple = displaysize(io);
-    kwargs...
+    maxsize::Tuple=displaysize(io);
+    kwargs...,
 )
     io_h, io_w = maxsize
     img_w = length(img)

@@ -1,6 +1,6 @@
 function _tostring(io; strip_summary=false)
     contents = map(readlines(io)) do line
-        replace(strip(line), "$Int"=>"Int64")
+        replace(strip(line), "$Int" => "Int64")
     end
     strip_summary ? contents[2:end] : contents  # ignore summary
 end
@@ -24,14 +24,14 @@ end
 @testset "no encoding" begin
     ImageInTerminal.disable_encoding()
     io = PipeBuffer()
-    img = fill(RGB(1., 1., 1.), 4, 4)
+    img = fill(RGB(1.0, 1.0, 1.0), 4, 4)
     show(io, MIME"text/plain"(), img)
     @test_reference "reference/2d_show_raw.txt" _tostring(io; strip_summary=true)
     io = PipeBuffer()
     show(io, MIME"text/plain"(), collect(rgb_line))
     @test_reference "reference/rgbline_show_raw.txt" _tostring(io; strip_summary=true)
     io = PipeBuffer()
-    show(io, MIME"text/plain"(), RGB(.5, .1, .9))
+    show(io, MIME"text/plain"(), RGB(0.5, 0.1, 0.9))
     @test_reference "reference/colorant_show_raw.txt" _tostring(io)
 end
 
@@ -41,12 +41,16 @@ for depth in (24, 8)
         AsciiPixel.set_colormode(depth)
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), mandril)
-        @test_reference "reference/mandril_show_$(depth)bit.txt" _tostring(io; strip_summary=true)
+        @test_reference "reference/mandril_show_$(depth)bit.txt" _tostring(
+            io; strip_summary=true
+        )
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), rgb_line)
-        @test_reference "reference/rgbline_show_$(depth)bit.txt" _tostring(io; strip_summary=true)
+        @test_reference "reference/rgbline_show_$(depth)bit.txt" _tostring(
+            io; strip_summary=true
+        )
         io = PipeBuffer()
-        @ensurecolor show(io, MIME"text/plain"(), RGB(.5, .1, .9))
+        @ensurecolor show(io, MIME"text/plain"(), RGB(0.5, 0.1, 0.9))
         @test_reference "reference/colorant_show_$(depth)bit.txt" _tostring(io)
     end
 end

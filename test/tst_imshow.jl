@@ -1,12 +1,19 @@
+import OffsetArrays: OffsetArray
+import SparseArrays: sprand
+import Rotations: RotMatrix
+
 @testset "STDOUT" begin
     # make sure it compiles and executes
     for mode in (8, 24)
         AsciiPixel.set_colormode(mode)
         # 2D - Matrix
-        imshow(colorview(RGB, rand(3, 2, 3))); println()
-        imshow(colorview(RGB, rand(3, 2, 3)), (2, 3)); println()
+        imshow(colorview(RGB, rand(3, 2, 3)))
+        println()
+        imshow(colorview(RGB, rand(3, 2, 3)), (2, 3))
+        println()
         # 3D
-        imshow(colorview(RGB, rand(3, 3, 4, 2))); println()
+        imshow(colorview(RGB, rand(3, 3, 4, 2)))
+        println()
     end
 end
 
@@ -16,7 +23,7 @@ for mode in (8, 24)
     @testset "$name" begin
         @testset "non colorant" begin
             @test_throws ArgumentError imshow(rand(5, 5))
-            @test_throws ArgumentError imshow(sprand(5, 5, .5))
+            @test_throws ArgumentError imshow(sprand(5, 5, 0.5))
         end
         @testset "rgb line" begin
             io = PipeBuffer()

@@ -1,5 +1,5 @@
 abstract type TermColorDepth end
-struct TermColor8bit  <: TermColorDepth end
+struct TermColor8bit <: TermColorDepth end
 struct TermColor24bit <: TermColorDepth end
 
 """
@@ -36,23 +36,24 @@ _colorant2ansi(gr::TransparentColor, colordepth::TermColorDepth) =
 # 8bit (256) colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor8bit)
     r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
-    r24, g24, b24 = map(c->round(Int, 23c), (r, g, b))
+    r24, g24, b24 = map(c -> round(Int, 23c), (r, g, b))
     if r24 == g24 == b24
         # Use grayscales because of higher resolution
         # This way even grayscale RGB images look good.
         232 + r24
     else
-        r6, g6, b6 = map(c->round(Int, 5c), (r, g, b))
+        r6, g6, b6 = map(c -> round(Int, 5c), (r, g, b))
         16 + 36r6 + 6g6 + b6
     end
 end
 
-_colorant2ansi(gr::Color{<:Any,1}, ::TermColor8bit) = round(Int, 232 + 23clamp01nan(real(gr)))
+_colorant2ansi(gr::Color{<:Any,1}, ::TermColor8bit) =
+    round(Int, 232 + 23clamp01nan(real(gr)))
 
 # 24 bit colors
 function _colorant2ansi(col::AbstractRGB, ::TermColor24bit)
     r, g, b = clamp01nan(red(col)), clamp01nan(green(col)), clamp01nan(blue(col))
-    map(c->round(Int, 255c), (r, g, b))
+    map(c -> round(Int, 255c), (r, g, b))
 end
 
 function _colorant2ansi(gr::Color{<:Any,1}, ::TermColor24bit)

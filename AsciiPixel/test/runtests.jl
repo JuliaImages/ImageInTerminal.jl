@@ -15,10 +15,7 @@ function check_encoded(res::Vector{String}, expected::Vector{String})
     @test all(res .== expected)
 end
 
-for t in (
-    "tst_colorant2ansi.jl",
-    "tst_ascii.jl",
-)
+for t in ("tst_colorant2ansi.jl", "tst_ascii.jl")
     @testset "$t" begin
         include(t)
     end

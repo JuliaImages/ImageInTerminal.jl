@@ -1,12 +1,12 @@
-@test supertype(AsciiPixel.BigBlocks)   <: AsciiPixel.ImageEncoder
+@test supertype(AsciiPixel.BigBlocks) <: AsciiPixel.ImageEncoder
 @test supertype(AsciiPixel.SmallBlocks) <: AsciiPixel.ImageEncoder
 
 @testset "_charof" begin
-    @test @inferred(AsciiPixel._charof(0.)) === '⋅'
-    @test @inferred(AsciiPixel._charof(.2)) === '░'
-    @test @inferred(AsciiPixel._charof(.5)) === '▒'
-    @test @inferred(AsciiPixel._charof(.8)) === '▓'
-    @test @inferred(AsciiPixel._charof(1.)) === '█'
+    @test @inferred(AsciiPixel._charof(0.0)) === '⋅'
+    @test @inferred(AsciiPixel._charof(0.2)) === '░'
+    @test @inferred(AsciiPixel._charof(0.5)) === '▒'
+    @test @inferred(AsciiPixel._charof(0.8)) === '▓'
+    @test @inferred(AsciiPixel._charof(1.0)) === '█'
 end
 
 @testset "ascii_encode 8bit small" begin
@@ -15,7 +15,7 @@ end
         @test enc.size === (1, 2)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232;48;5;248m▀\e[38;5;239;48;5;255m▀\e[0m"]
+            ["\e[0m\e[38;5;232;48;5;248m▀\e[38;5;239;48;5;255m▀\e[0m"],
         )
     end
     @testset "transparent gray square" begin
@@ -25,8 +25,8 @@ end
         @test enc.size === (1, 2)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232;48;5;248m▀\e[38;5;239;48;5;255m▀\e[0m"]
-        ) 
+            ["\e[0m\e[38;5;232;48;5;248m▀\e[38;5;239;48;5;255m▀\e[0m"],
+        )
     end
     # the following tests checks the correct use of restrict
     # we compare against a hand checked reference output
@@ -70,7 +70,10 @@ end
         @test enc.size === (2, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m██\e[38;5;239m██\e[0m", "\e[0m\e[38;5;248m██\e[38;5;255m██\e[0m"]
+            [
+                "\e[0m\e[38;5;232m██\e[38;5;239m██\e[0m",
+                "\e[0m\e[38;5;248m██\e[38;5;255m██\e[0m",
+            ],
         )
     end
     @testset "transparent gray square" begin
@@ -78,7 +81,10 @@ end
         @test enc.size === (2, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m██\e[38;5;239m▓▓\e[0m", "\e[0m\e[38;5;248m░░\e[38;5;255m⋅⋅\e[0m"]
+            [
+                "\e[0m\e[38;5;232m██\e[38;5;239m▓▓\e[0m",
+                "\e[0m\e[38;5;248m░░\e[38;5;255m⋅⋅\e[0m",
+            ],
         )
     end
     # the following tests checks the correct use of restrict
@@ -111,7 +117,9 @@ end
         @test enc.size === (1, 2)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0;48;2;178;178;178m▀\e[38;2;76;76;76;48;2;255;255;255m▀\e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0;48;2;178;178;178m▀\e[38;2;76;76;76;48;2;255;255;255m▀\e[0m",
+            ],
         )
     end
     @testset "transparent gray square" begin
@@ -121,7 +129,9 @@ end
         @test enc.size === (1, 2)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0;48;2;178;178;178m▀\e[38;2;76;76;76;48;2;255;255;255m▀\e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0;48;2;178;178;178m▀\e[38;2;76;76;76;48;2;255;255;255m▀\e[0m",
+            ],
         )
     end
     # the following tests checks the correct use of restrict
@@ -161,7 +171,10 @@ end
         @test enc.size === (2, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m██\e[38;2;76;76;76m██\e[0m", "\e[0m\e[38;2;178;178;178m██\e[38;2;255;255;255m██\e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0m██\e[38;2;76;76;76m██\e[0m",
+                "\e[0m\e[38;2;178;178;178m██\e[38;2;255;255;255m██\e[0m",
+            ],
         )
     end
     @testset "transparent gray square" begin
@@ -169,7 +182,10 @@ end
         @test enc.size === (2, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m██\e[38;2;76;76;76m▓▓\e[0m", "\e[0m\e[38;2;178;178;178m░░\e[38;2;255;255;255m⋅⋅\e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0m██\e[38;2;76;76;76m▓▓\e[0m",
+                "\e[0m\e[38;2;178;178;178m░░\e[38;2;255;255;255m⋅⋅\e[0m",
+            ],
         )
     end
     # the following tests checks the correct use of restrict
@@ -202,7 +218,7 @@ end
         @test enc.size === (1, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m█\e[38;5;239m█\e[38;5;248m█\e[38;5;255m█\e[0m"]
+            ["\e[0m\e[38;5;232m█\e[38;5;239m█\e[38;5;248m█\e[38;5;255m█\e[0m"],
         )
     end
     @testset "transparent gray line" begin
@@ -210,7 +226,7 @@ end
         @test enc.size === (1, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m█\e[38;5;239m▓\e[38;5;248m░\e[38;5;255m⋅\e[0m"]
+            ["\e[0m\e[38;5;232m█\e[38;5;239m▓\e[38;5;248m░\e[38;5;255m⋅\e[0m"],
         )
     end
     @testset "rgb line" begin
@@ -218,7 +234,9 @@ end
         @test enc.size === (1, 6)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;18m█\e[38;5;56m█\e[38;5;91m█\e[38;5;126m█\e[38;5;161m█\e[38;5;88m█\e[0m"]
+            [
+                "\e[0m\e[38;5;18m█\e[38;5;56m█\e[38;5;91m█\e[38;5;126m█\e[38;5;161m█\e[38;5;88m█\e[0m",
+            ],
         )
     end
 end
@@ -231,13 +249,13 @@ end
         @test enc.size === (1, 9)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m██ \e[0m … \e[38;5;255m██ \e[0m"]
+            ["\e[0m\e[38;5;232m██ \e[0m … \e[38;5;255m██ \e[0m"],
         )
         img, enc = _downscale_big(gray_line, 12)
         @test enc.size === (1, 12)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m██ \e[38;5;239m██ \e[38;5;248m██ \e[38;5;255m██ \e[0m"]
+            ["\e[0m\e[38;5;232m██ \e[38;5;239m██ \e[38;5;248m██ \e[38;5;255m██ \e[0m"],
         )
     end
     @testset "transparent gray line" begin
@@ -245,13 +263,13 @@ end
         @test enc.size === (1, 9)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m██ \e[0m … \e[38;5;255m⋅⋅ \e[0m"]
+            ["\e[0m\e[38;5;232m██ \e[0m … \e[38;5;255m⋅⋅ \e[0m"],
         )
         img, enc = _downscale_big(gray_line_alpha, 12)
         @test enc.size === (1, 12)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;232m██ \e[38;5;239m▓▓ \e[38;5;248m░░ \e[38;5;255m⋅⋅ \e[0m"]
+            ["\e[0m\e[38;5;232m██ \e[38;5;239m▓▓ \e[38;5;248m░░ \e[38;5;255m⋅⋅ \e[0m"],
         )
     end
     @testset "rgb line" begin
@@ -259,13 +277,15 @@ end
         @test enc.size === (1, 9)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;21m██ \e[0m … \e[38;5;196m██ \e[0m"]
+            ["\e[0m\e[38;5;21m██ \e[0m … \e[38;5;196m██ \e[0m"],
         )
         img, enc = _downscale_big(rgb_line, 22)
         @test enc.size === (1, 21)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;21m██ \e[38;5;21m██ \e[38;5;56m██ \e[0m … \e[38;5;161m██ \e[38;5;196m██ \e[38;5;196m██ \e[0m"]
+            [
+                "\e[0m\e[38;5;21m██ \e[38;5;21m██ \e[38;5;56m██ \e[0m … \e[38;5;161m██ \e[38;5;196m██ \e[38;5;196m██ \e[0m",
+            ],
         )
     end
 end
@@ -278,7 +298,9 @@ end
         @test enc.size === (1, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m█\e[38;2;76;76;76m█\e[38;2;178;178;178m█\e[38;2;255;255;255m█\e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0m█\e[38;2;76;76;76m█\e[38;2;178;178;178m█\e[38;2;255;255;255m█\e[0m",
+            ],
         )
     end
     @testset "transparent gray line" begin
@@ -286,7 +308,9 @@ end
         @test enc.size === (1, 4)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m█\e[38;2;76;76;76m▓\e[38;2;178;178;178m░\e[38;2;255;255;255m⋅\e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0m█\e[38;2;76;76;76m▓\e[38;2;178;178;178m░\e[38;2;255;255;255m⋅\e[0m",
+            ],
         )
     end
     @testset "rgb line" begin
@@ -294,7 +318,9 @@ end
         @test enc.size === (1, 6)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;6;0;122m█\e[38;2;47;0;208m█\e[38;2;101;0;154m█\e[38;2;154;0;101m█\e[38;2;208;0;47m█\e[38;2;122;0;6m█\e[0m"]
+            [
+                "\e[0m\e[38;2;6;0;122m█\e[38;2;47;0;208m█\e[38;2;101;0;154m█\e[38;2;154;0;101m█\e[38;2;208;0;47m█\e[38;2;122;0;6m█\e[0m",
+            ],
         )
     end
 end
@@ -307,13 +333,15 @@ end
         @test enc.size === (1, 9)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m██ \e[0m … \e[38;2;255;255;255m██ \e[0m"]
+            ["\e[0m\e[38;2;0;0;0m██ \e[0m … \e[38;2;255;255;255m██ \e[0m"],
         )
         img, enc = _downscale_big(gray_line, 12)
         @test enc.size === (1, 12)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m██ \e[38;2;76;76;76m██ \e[38;2;178;178;178m██ \e[38;2;255;255;255m██ \e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0m██ \e[38;2;76;76;76m██ \e[38;2;178;178;178m██ \e[38;2;255;255;255m██ \e[0m",
+            ],
         )
     end
     @testset "transparent gray line" begin
@@ -321,13 +349,15 @@ end
         @test enc.size === (1, 9)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m██ \e[0m … \e[38;2;255;255;255m⋅⋅ \e[0m"]
+            ["\e[0m\e[38;2;0;0;0m██ \e[0m … \e[38;2;255;255;255m⋅⋅ \e[0m"],
         )
         img, enc = _downscale_big(gray_line_alpha, 12)
         @test enc.size === (1, 12)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;0m██ \e[38;2;76;76;76m▓▓ \e[38;2;178;178;178m░░ \e[38;2;255;255;255m⋅⋅ \e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;0m██ \e[38;2;76;76;76m▓▓ \e[38;2;178;178;178m░░ \e[38;2;255;255;255m⋅⋅ \e[0m",
+            ],
         )
     end
     @testset "rgb line" begin
@@ -335,13 +365,15 @@ end
         @test enc.size === (1, 9)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;255m██ \e[0m … \e[38;2;255;0;0m██ \e[0m"]
+            ["\e[0m\e[38;2;0;0;255m██ \e[0m … \e[38;2;255;0;0m██ \e[0m"],
         )
         img, enc = _downscale_big(rgb_line, 22)
         @test enc.size === (1, 21)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor24bit(), img)),
-            ["\e[0m\e[38;2;0;0;255m██ \e[38;2;13;0;242m██ \e[38;2;27;0;228m██ \e[0m … \e[38;2;228;0;27m██ \e[38;2;242;0;13m██ \e[38;2;255;0;0m██ \e[0m"]
+            [
+                "\e[0m\e[38;2;0;0;255m██ \e[38;2;13;0;242m██ \e[38;2;27;0;228m██ \e[0m … \e[38;2;228;0;27m██ \e[38;2;242;0;13m██ \e[38;2;255;0;0m██ \e[0m",
+            ],
         )
     end
 end
@@ -352,7 +384,9 @@ end
         @test enc.size === (1, 6)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;18m█\e[38;5;56m█\e[38;5;91m█\e[38;5;126m█\e[38;5;161m█\e[38;5;88m█\e[0m"]
+            [
+                "\e[0m\e[38;5;18m█\e[38;5;56m█\e[38;5;91m█\e[38;5;126m█\e[38;5;161m█\e[38;5;88m█\e[0m",
+            ],
         )
     end
     @testset "rgb line2" begin
@@ -360,13 +394,15 @@ end
         @test enc.size === (1, 9)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;21m██ \e[0m … \e[38;5;196m██ \e[0m"]
+            ["\e[0m\e[38;5;21m██ \e[0m … \e[38;5;196m██ \e[0m"],
         )
         img, enc = _downscale_big(OffsetArray(rgb_line, (-2,)), 22)
         @test enc.size === (1, 21)
         check_encoded(
             @ensurecolor(ascii_encode(enc, TermColor8bit(), img)),
-            ["\e[0m\e[38;5;21m██ \e[38;5;21m██ \e[38;5;56m██ \e[0m … \e[38;5;161m██ \e[38;5;196m██ \e[38;5;196m██ \e[0m"]
+            [
+                "\e[0m\e[38;5;21m██ \e[38;5;21m██ \e[38;5;56m██ \e[0m … \e[38;5;161m██ \e[38;5;196m██ \e[38;5;196m██ \e[0m",
+            ],
         )
     end
     @testset "lighthouse" begin

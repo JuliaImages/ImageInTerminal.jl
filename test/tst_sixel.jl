@@ -1,3 +1,5 @@
+import ImageQualityIndexes, Sixel
+
 @testset "encoder/sixel" begin
     # Force sixel encoding
     old_encoder = ImageInTerminal.encoder_backend[]
@@ -9,7 +11,7 @@
         imshow(io, img)
         # we can't reference test it right now, because ReferenceTests calls
         # FileIO.load, which returns an array for sixel file.
-        @test assess_psnr(sixel_decode(seek(io, 0)), img) > 30
+        @test ImageQualityIndexes.assess_psnr(Sixel.sixel_decode(seek(io, 0)), img) > 30
     end
     @testset "small images" begin
         # small images still use ImageInTerminal's fallback encoding

@@ -2,11 +2,12 @@ module ImageInTerminal
 
 using AsciiPixel
 using ImageCore
-using ImageBase: restrict
 using ColorTypes
-using Requires
 using Crayons
 using FileIO
+
+import ImageBase: restrict
+import Sixel
 
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
@@ -30,7 +31,7 @@ disable_encoding() = (should_render_image[] = false)
 Enable the image encoding feature and show images in terminal.
 
 This can be disabled by calling `ImageInTerminal.disable_encoding()`. To choose between
-different encoding method, call `AsciiPixel.use_256()` or `AsciiPixel.use_24bit()`.
+different encoding method, call `AsciiPixel.set_colormode(8)` or `AsciiPixel.set_colormode(24)`.
 """
 enable_encoding() = (should_render_image[] = true)
 
@@ -59,15 +60,12 @@ function choose_sixel(img::AbstractArray)
 end
 
 # colorant arrays
-function Base.show(
-    io::IO, mime::MIME"text/plain",
-    img::AbstractArray{<:Colorant}
-)
+function Base.show(io::IO, mime::MIME"text/plain", img::AbstractArray{<:Colorant})
     if should_render_image[]
         println(io, summary(img), ":")
         imshow(io, img)
     else
-        invoke(Base.show, Tuple{typeof(io), typeof(mime), AbstractArray}, io, mime, img)
+        invoke(Base.show, Tuple{typeof(io),typeof(mime),AbstractArray}, io, mime, img)
     end
 end
 
@@ -76,11 +74,11 @@ function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     if should_render_image[]
         fgcol = AsciiPixel._colorant2ansi(color, AsciiPixel.colormode[])
         chr = AsciiPixel._charof(alpha(color))
-        print(io, Crayon(foreground = fgcol), chr, chr, " ")
-        print(io, Crayon(foreground = :white), color)
-        print(io, Crayon(reset = true))
+        print(io, Crayon(; foreground=fgcol), chr, chr, " ")
+        print(io, Crayon(; foreground=:white), color)
+        print(io, Crayon(; reset=true))
     else
-        invoke(Base.show, Tuple{typeof(io), typeof(mime), Any}, io, mime, color)
+        invoke(Base.show, Tuple{typeof(io),typeof(mime),Any}, io, mime, color)
     end
 end
 
@@ -102,11 +100,7 @@ Supported encoding:
     - ascii (`AsciiPixel` backend)
 """
 
-function imshow(
-    io::IO,
-    img::AbstractArray{<:Colorant},
-    maxsize::Tuple = displaysize(io)
-)
+function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io))
     if choose_sixel(img)
         sixel_encode(io, img)
     else
@@ -120,31 +114,17 @@ function imshow(
 end
 
 imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
-imshow(img, args...) = throw(
-    ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions")
-)
+imshow(img, args...) =
+    throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
+
+sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
 
 function __init__()
     enable_encoding()
-    
-    if VERSION < v"1.6.0-DEV.888" && Sys.iswindows()
-        # https://discourse.julialang.org/t/image-in-repl-does-not-correct/46359
-        @warn "ImageInTerminal is not supported for Windows platform: Julia at least v1.6.0 is required."
-        disable_encoding()
-    end
 
-    # Sixel requires Julia at least v1.6. We don't want to maintain an ImageInTerminal branch
-    # for old Julia versions so here we use Requires to conditionally load Sixel as an advanced
-    # image encoding choice. All ImageInTerminal functionality is still there even without Sixel
-    # -- well, basically.
-    @require Sixel="45858cf5-a6b0-47a3-bbea-62219f50df47" begin
-        if Sixel.is_sixel_supported()
-            encoder_backend[1] = :Sixel
-        end
-        sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
-    end
+    Sixel.is_sixel_supported() && (encoder_backend[] = :Sixel)
 
     pushdisplay(TerminalGraphicDisplay(stdout, devnull))
 end
 
-end # module
+end

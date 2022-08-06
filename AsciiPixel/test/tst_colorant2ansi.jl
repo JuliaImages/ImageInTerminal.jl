@@ -7,7 +7,7 @@
     @testset "8bit colors" begin
         # reference functions to compare against
         function _ref_col2ansi(r, g, b)
-            r6, g6, b6 = map(c ->round(Int, 5c), (r, g, b))
+            r6, g6, b6 = map(c -> round(Int, 5c), (r, g, b))
             16 + 36r6 + 6g6 + b6
         end
         function _ref_col2ansi(gr)
@@ -16,7 +16,7 @@
         @testset "RGB" begin
             for col in rand(RGB, 10)
                 r, g, b = red(col), green(col), blue(col)
-                ri, gi, bi = map(c ->round(Int, 23c), (r, g, b))
+                ri, gi, bi = map(c -> round(Int, 23c), (r, g, b))
                 if ri == gi == bi
                     @test _colorant2ansi(col, TermColor8bit()) === _ref_col2ansi(r)
                 else
@@ -38,7 +38,7 @@
         @testset "RGB" begin
             for col in rand(RGB, 10)
                 r, g, b = red(col), green(col), blue(col)
-                ri, gi, bi = map(c ->round(Int, 255c), (r, g, b))
+                ri, gi, bi = map(c -> round(Int, 255c), (r, g, b))
                 @test _colorant2ansi(col, TermColor24bit()) === (ri, gi, bi)
             end
         end
@@ -55,7 +55,8 @@
     @testset "Non RGB" begin
         for col_rgb in rand(RGB, 10)
             col_other = convert(HSV, col_rgb)
-            @test _colorant2ansi(col_rgb, TermColor24bit()) === _colorant2ansi(col_other, TermColor24bit())
+            @test _colorant2ansi(col_rgb, TermColor24bit()) ===
+                _colorant2ansi(col_other, TermColor24bit())
         end
     end
 
@@ -64,7 +65,8 @@
     @testset "TransparentColor" begin
         for col in (rand(RGB, 10)..., rand(HSV, 10)...)
             acol = alphacolor(col, rand())
-            @test _colorant2ansi(col, TermColor24bit()) === _colorant2ansi(acol, TermColor24bit())
+            @test _colorant2ansi(col, TermColor24bit()) ===
+                _colorant2ansi(acol, TermColor24bit())
         end
     end
 end
@@ -74,8 +76,8 @@ end
 # Also compare functionality against the functions tested above
 @testset "Exported Interface" begin
     @testset "Validate exported interface boundaries" begin
-        @test_throws MethodError colorant2ansi(RGB(1., 1., 1.), TermColor8bit())
-        @test_throws MethodError colorant2ansi(RGB(1., 1., 1.), TermColor24bit())
+        @test_throws MethodError colorant2ansi(RGB(1.0, 1.0, 1.0), TermColor8bit())
+        @test_throws MethodError colorant2ansi(RGB(1.0, 1.0, 1.0), TermColor24bit())
     end
 
     @testset "8bit colors" begin
@@ -102,4 +104,3 @@ end
         end
     end
 end
-
