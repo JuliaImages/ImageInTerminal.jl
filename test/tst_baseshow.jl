@@ -1,77 +1,58 @@
 function _tostring(io; strip_summary=false)
-    contents = map(readlines(seek(io,0))) do line
+    contents = map(readlines(io)) do line
         replace(strip(line), "$Int" => "Int64")
     end
-
-    # ignore summary
-    strip_summary ? contents[2:end] : contents
+    strip_summary ? contents[2:end] : contents  # ignore summary
 end
 
 @testset "enable/disable encoding" begin
-    old_colormode = ImageInTerminal.colormode[1]
-    old_should_render_image = ImageInTerminal.should_render_image[1]
+    old_should_render_image = ImageInTerminal.should_render_image[]
+    old_colormode = AsciiPixel.colormode[]
 
     ImageInTerminal.enable_encoding()
-    @test ImageInTerminal.colormode[1] == old_colormode
-    @test ImageInTerminal.should_render_image[1] == true
-
-    ImageInTerminal.enable_encoding()
-    ImageInTerminal.disable_encoding()
-    @test ImageInTerminal.colormode[1] == old_colormode
-    @test ImageInTerminal.should_render_image[1] == false
+    @test ImageInTerminal.should_render_image[] == true
+    @test AsciiPixel.colormode[] == old_colormode
 
     ImageInTerminal.disable_encoding()
-    ImageInTerminal.use_256()
-    @test ImageInTerminal.colormode[1] == ImageInTerminal.TermColor256()
-    @test ImageInTerminal.should_render_image[1] == true
+    @test ImageInTerminal.should_render_image[] == false
+    @test AsciiPixel.colormode[] == old_colormode
 
-    ImageInTerminal.disable_encoding()
-    ImageInTerminal.use_24bit()
-    @test ImageInTerminal.colormode[1] == ImageInTerminal.TermColor24bit()
-    @test ImageInTerminal.should_render_image[1] == true
-
-    ImageInTerminal.colormode[1] = old_colormode
-    ImageInTerminal.should_render_image[1] = old_should_render_image
+    ImageInTerminal.should_render_image[] = old_should_render_image
+    AsciiPixel.colormode[] = old_colormode
 end
 
 @testset "no encoding" begin
     ImageInTerminal.disable_encoding()
-    io = IOBuffer()
+    io = PipeBuffer()
     img = fill(RGB(1.0, 1.0, 1.0), 4, 4)
     show(io, MIME"text/plain"(), img)
     @test_reference "reference/2d_show_raw.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
+    io = PipeBuffer()
     show(io, MIME"text/plain"(), collect(rgb_line))
     @test_reference "reference/rgbline_show_raw.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
-    show(io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
+    io = PipeBuffer()
+    show(io, MIME"text/plain"(), RGB(0.5, 0.1, 0.9))
     @test_reference "reference/colorant_show_raw.txt" _tostring(io)
 end
 
-@testset "256 colors" begin
-    ImageInTerminal.use_256()
-    io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), lena)
-    @test_reference "reference/lena_show_256.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), rgb_line)
-    @test_reference "reference/rgbline_show_256.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
-    @test_reference "reference/colorant_show_256.txt" _tostring(io)
+for depth in (24, 8)
+    @testset "$depth bit color" begin
+        ImageInTerminal.enable_encoding()
+        AsciiPixel.set_colormode(depth)
+        io = PipeBuffer()
+        @ensurecolor show(io, MIME"text/plain"(), mandril)
+        @test_reference "reference/mandril_show_$(depth)bit.txt" _tostring(
+            io; strip_summary=true
+        )
+        io = PipeBuffer()
+        @ensurecolor show(io, MIME"text/plain"(), rgb_line)
+        @test_reference "reference/rgbline_show_$(depth)bit.txt" _tostring(
+            io; strip_summary=true
+        )
+        io = PipeBuffer()
+        @ensurecolor show(io, MIME"text/plain"(), RGB(0.5, 0.1, 0.9))
+        @test_reference "reference/colorant_show_$(depth)bit.txt" _tostring(io)
+    end
 end
 
-@testset "24 bit" begin
-    ImageInTerminal.use_24bit()
-    io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), lena)
-    @test_reference "reference/lena_show_24bit.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), rgb_line)
-    @test_reference "reference/rgbline_show_24bit.txt" _tostring(io; strip_summary=true)
-    io = IOBuffer()
-    ensurecolor(show, io, MIME"text/plain"(), RGB(0.5,0.1,0.9))
-    @test_reference "reference/colorant_show_24bit.txt" _tostring(io)
-end
-
-ImageInTerminal.use_256()
+AsciiPixel.set_colormode(8)  # paranoid

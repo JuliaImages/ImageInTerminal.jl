@@ -1,0 +1,8 @@
+style = "blue"
+short_to_long_function_def = false
+always_use_return = false
+import_to_using = false
+align_struct_field = true
+align_conditional = true
+align_assignment = true
+align_pair_arrow = true

@@ -67,18 +67,17 @@ the content using `Sixel` encoder for large images, and thus bring much better i
 However, do notice that not all terminals support sixel format.
 See [Terminals that support sixel](https://github.com/johnnychen94/Sixel.jl#terminals-that-support-sixel) for more information.
 
-### 256 colors and 24-bit colors
+### 8-bit (256) colors and 24-bit colors
 
-By default this packages will detect if your running terminal supports
-24 bit colors, i.e., true color. If it does, then the image will be
-displayed in 24-bit colors, otherwise it will use 256 colors as a fallback
-option. To manually switch between 24-bit colors and 256 colors, you can
-use the internal helpers:
+By default this packages will detect if your running terminal supports 24 bit colors, i.e., true color.
+If it does, then the image will be displayed in 24-bit colors,
+otherwise it will use 256 colors (8-bit) as a fallback option.
+To manually switch between 24-bit colors and 256 colors, you can use the internal helpers:
 
 ```julia
-using ImageInTerminal
-ImageInTerminal.use_24bit()
-ImageInTerminal.use_256()
+using AsciiPixel
+AsciiPixel.set_colormode(8)
+AsciiPixel.set_colormode(24)
 ```
 
 Note that 24 bits format only works as expected if your terminal supports it,
@@ -93,8 +92,7 @@ Here's how images are displayed in 24-bit colors:
 ### Enable and disable
 
 If you want to temporarily disable this package, you can call `ImageInTerminal.disable_encoding()`. To
-restore the encoding functionality with `ImageInTerminal.enable_encoding()`. `ImageInTerminal.use_24bit()`
-and `ImageInTerminal.use_256()` will also enable encodings, too.
+restore the encoding functionality with `ImageInTerminal.enable_encoding()`.
 
 ## Troubleshooting
 

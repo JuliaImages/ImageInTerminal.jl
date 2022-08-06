@@ -1,4 +1,4 @@
-struct TerminalGraphicDisplay{TC<:IO, TS<:IO} <: AbstractDisplay
+struct TerminalGraphicDisplay{TC<:IO,TS<:IO} <: AbstractDisplay
     content_stream::TC
     summary_stream::TS
 end
@@ -13,9 +13,10 @@ function Base.display(d::TerminalGraphicDisplay, ::MIME"image/png", bytes::Vecto
     display(d, MIME("image/png"), img)
 end
 
-function Base.display(d::TerminalGraphicDisplay, ::MIME"image/png", img::AbstractArray{<:Colorant})
+function Base.display(
+    d::TerminalGraphicDisplay, ::MIME"image/png", img::AbstractArray{<:Colorant}
+)
     println(d.summary_stream, summary(img), ":")
     ImageInTerminal.imshow(d.content_stream, img, colormode[1])
     return nothing
 end
-
