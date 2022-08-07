@@ -55,17 +55,29 @@ julia> testimage("cameraman")
 julia> colorview(RGB, rand(3, 10, 10))
 ```
 
-<img src="https://cloud.githubusercontent.com/assets/10854026/22923639/92e3b164-f2a2-11e6-85ea-b92bdc4a63e0.png" alt="ImageInTerminal" width="500">
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/example.png" alt="Example" width="500">
 
 ### Sixel encoder (Julia 1.6+)
 
 If [`Sixel`](https://github.com/johnnychen94/Sixel.jl) (requires Julia 1.6+) is loaded, this package will try to encode
 the content using `Sixel` encoder for large images, and thus bring much better image visualization experience in terminal:
 
-<img src="https://user-images.githubusercontent.com/8684355/118361462-20954800-b5be-11eb-8505-9455a0b00ec0.png" alt="Sixel" width="500">
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/sixel.png" alt="Sixel" width="500">
 
 However, do notice that not all terminals support sixel format.
 See [Terminals that support sixel](https://github.com/johnnychen94/Sixel.jl#terminals-that-support-sixel) for more information.
+
+### Display equations
+
+`ImageInTerminal` can be used to display latex equations from [Latexify.jl](https://github.com/korsbo/Latexify.jl), here on `mlterm`:
+
+```julia
+using ImageInTerminal, Latexify
+
+render(latexify(:(x / y)), MIME("image/png"))
+```
+
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/latexify.png" alt="Latexify" width="300">
 
 ### 8-bit (256) colors and 24-bit colors
 
@@ -87,7 +99,7 @@ supports 24 bits color, you can check if the environment variable `COLORTERM` is
 
 Here's how images are displayed in 24-bit colors:
 
-<img src="https://user-images.githubusercontent.com/8684355/76688541-a17a4c00-6668-11ea-9fb9-41669fbec07e.png" alt="24bit color" width="500">
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/cameraman.png" alt="Cameraman" width="500">
 
 ### Enable and disable
 
@@ -101,7 +113,6 @@ that your font displays the utilized unicode block-characters
 in an unfortunate way. Try changing font or reducing your
 terminal's line-spacing. If your font is Source Code Pro, update to
 the latest version.
-
 
 <!-- URLS -->
 
