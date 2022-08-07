@@ -5,7 +5,7 @@ import Rotations: RotMatrix
 @testset "STDOUT" begin
     # make sure it compiles and executes
     for mode in (8, 24)
-        XTermColors.set_colormode(mode)
+        set_colormode(mode)
         # 2D - Matrix
         imshow(colorview(RGB, rand(3, 2, 3)))
         println()
@@ -18,7 +18,7 @@ import Rotations: RotMatrix
 end
 
 for mode in (8, 24)
-    XTermColors.set_colormode(mode)
+    set_colormode(mode)
     name = "$(mode)bit"
     @testset "$name" begin
         @testset "non colorant" begin
@@ -55,7 +55,7 @@ for mode in (8, 24)
 end
 
 @testset "imshow 8bit non 1 based indexing" begin
-    XTermColors.set_colormode(8)
+    set_colormode(8)
     @testset "mandril" begin
         img = OffsetArray(imresize(mandril, 10, 10), (-10, 5))
         io = PipeBuffer()
@@ -71,4 +71,4 @@ end
     end
 end
 
-XTermColors.set_colormode(8)
+set_colormode(8)

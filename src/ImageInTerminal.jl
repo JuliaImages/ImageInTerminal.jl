@@ -6,13 +6,15 @@ using ColorTypes
 using Crayons
 using FileIO
 
+import XTermColors: TermColorDepth, TermColor8bit, TermColor24bit
 import ImageBase: restrict
 import Sixel
 
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
 
-const ENCODER_BACKEND = Ref(:ImageInTerminal)
+const COLORMODE = Ref{TermColorDepth}(TermColor8bit())
+const ENCODER_BACKEND = Ref(:XTermColors)
 const SHOULD_RENDER_IMAGE = Ref(true)
 const SMALL_IMGS_SIXEL = Ref(false)
 const RESET = Crayon(; reset=true)
@@ -33,7 +35,7 @@ disable_encoding() = SHOULD_RENDER_IMAGE[] = false
 Enable the image encoding feature and show images in terminal.
 
 This can be disabled by calling `ImageInTerminal.disable_encoding()`. To choose between
-different encoding method, call `XTermColors.set_colormode(8)` or `XTermColors.set_colormode(24)`.
+different encoding method, call `ImageInTerminal.set_colormode(8)` or `ImageInTerminal.set_colormode(24)`.
 """
 enable_encoding() = SHOULD_RENDER_IMAGE[] = true
 
@@ -74,7 +76,7 @@ end
 # colorant
 function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     if SHOULD_RENDER_IMAGE[]
-        fgcol = XTermColors._colorant2ansi(color, XTermColors.COLORMODE[])
+        fgcol = XTermColors._colorant2ansi(color, COLORMODE[])
         chr = XTermColors._charof(alpha(color))
         XTermColors._printc(
             io,
@@ -116,13 +118,15 @@ function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysi
     if choose_sixel(img)
         sixel_encode(iobuf, img)
     else
-        colormode = XTermColors.COLORMODE[]
         if ndims(img) > 2
             Base.show_nd(
-                iobuf, img, (iobuf, x) -> ascii_display(iobuf, x, colormode, maxsize), true
+                iobuf,
+                img,
+                (iobuf, x) -> ascii_display(iobuf, x, COLORMODE[], maxsize),
+                true
             )
         else
-            ascii_display(iobuf, img, colormode, maxsize)
+            ascii_display(iobuf, img, COLORMODE[], maxsize)
         end
     end
     write(io, read(iobuf, String))
@@ -134,8 +138,31 @@ imshow(img, args...) =
 
 sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
 
+"""
+    set_colormode(bit::Int)
+
+Sets the terminal color depth to the given argument.
+"""
+function set_colormode(bit::Int)
+    if bit == 8
+        COLORMODE[] = TermColor8bit()
+    elseif bit == 24
+        COLORMODE[] = TermColor24bit()
+    else
+        error("Setting color depth to $bit-bit is not supported, valid modes are:
+          - 8bit (256 colors)
+          - 24bit")
+    end
+    COLORMODE[]
+end
+
+is_24bit_supported() = lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "truecolor")
+
 function __init__()
     enable_encoding()
+
+    # use 24bit if the terminal supports it
+    is_24bit_supported() && set_colormode(24)
 
     Sixel.is_sixel_supported() && (ENCODER_BACKEND[] = :Sixel)
 
