@@ -43,7 +43,7 @@ enable_encoding() = SHOULD_RENDER_IMAGE[] = true
 Choose to encode the image using sixels based on the size of the encoded image.
 """
 function choose_sixel(img::AbstractArray)
-    ENCODER_BACKEND[] == :Sixel || return false
+    ENCODER_BACKEND[] === :Sixel || return false
 
     # Sixel requires at least 6 pixels in row direction and thus doesn't perform very well for vectors.
     # ImageInTerminal encoder is good enough for vector case.
@@ -76,12 +76,12 @@ function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
     if SHOULD_RENDER_IMAGE[]
         fgcol = XTermColors._colorant2ansi(color, XTermColors.COLORMODE[])
         chr = XTermColors._charof(alpha(color))
-        print(
+        XTermColors._printc(
             io,
             Crayon(; foreground=fgcol),
             chr,
             chr,
-            " ",
+            ' ',
             Crayon(; foreground=:white),
             color,
             RESET
