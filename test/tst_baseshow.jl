@@ -55,4 +55,4 @@ for mode in (24, 8)
     end
 end
 
-set_colormode(8)  # paranoid
+set_colormode(8)  # reset to default state

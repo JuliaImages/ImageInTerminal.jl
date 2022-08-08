@@ -98,13 +98,11 @@ include("display.jl")
 """
     imshow([stream], img, [maxsize])
 
-Displays the given image `img` using unicode characters and
-terminal colors (defaults to 256 colors).
+Displays the given image `img` using unicode characters and terminal colors (defaults to 256 colors).
 `img` has to be an array of `Colorant`.
 
-If working in the REPL, the function tries to choose the encoding
-based on the current display size. The image will also be
-downsampled to fit into the display.
+If working in the REPL, the function tries to choose the encoding based on the current display size.
+The image will also be downsampled to fit into the display.
 
 Supported encoding:
     - sixel (`Sixel` backend)

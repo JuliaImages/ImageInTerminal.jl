@@ -8,7 +8,7 @@ Base.displayable(::TerminalGraphicDisplay, ::MIME"image/png") = true
 
 function Base.display(d::TerminalGraphicDisplay, ::MIME"image/png", bytes::Vector{UInt8})
     # In this case, assume it to be png byte sequences, use FileIO to find a decoder for it.
-    img = FileIO.load(FileIO.Stream{format"PNG"}(IOBuffer(bytes)))
+    img = FileIO.load(FileIO.Stream{format"PNG"}(PipeBuffer(bytes)))
     display(d, MIME("image/png"), img)
 end
 

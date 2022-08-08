@@ -2,18 +2,39 @@ import OffsetArrays: OffsetArray
 import SparseArrays: sprand
 import Rotations: RotMatrix
 
+# workaround for github.com/JuliaLang/julia/issues/12711
+function _redirect_stdout(f::Function, io::IO)
+    old_stdout = stdout
+    rd, = redirect_stdout()
+    task = @async write(io, rd)
+    try
+        ret = f()
+        Libc.flush_cstdio()
+        flush(stdout)
+        return ret
+    finally
+        close(rd)
+        redirect_stdout(old_stdout)
+        wait(task)
+    end
+end
+
 @testset "STDOUT" begin
     # make sure it compiles and executes
     for mode in (8, 24)
         set_colormode(mode)
-        # 2D - Matrix
-        imshow(colorview(RGB, rand(3, 2, 3)))
-        println()
-        imshow(colorview(RGB, rand(3, 2, 3)), (2, 3))
-        println()
-        # 3D
-        imshow(colorview(RGB, rand(3, 3, 4, 2)))
-        println()
+        io = PipeBuffer()
+        _redirect_stdout(io) do
+            # 2D - Matrix
+            @ensurecolor imshow(colorview(RGB, rand(3, 2, 3)))
+            println()
+            @ensurecolor imshow(colorview(RGB, rand(3, 2, 3)), (2, 3))
+            println()
+            # 3D
+            @ensurecolor imshow(colorview(RGB, rand(3, 3, 4, 2)))
+            println()
+        end
+        @test length(read(io, String)) > 500
     end
 end
 
@@ -71,4 +92,4 @@ end
     end
 end
 
-set_colormode(8)
+set_colormode(8)  # reset to default state
