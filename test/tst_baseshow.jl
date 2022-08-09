@@ -6,19 +6,19 @@ function _tostring(io; strip_summary=false)
 end
 
 @testset "enable/disable encoding" begin
-    old_should_render_image = ImageInTerminal.should_render_image[]
-    old_colormode = XTermColors.colormode[]
+    old_should_render_image = ImageInTerminal.SHOULD_RENDER_IMAGE[]
+    old_colormode = ImageInTerminal.COLORMODE[]
 
     ImageInTerminal.enable_encoding()
-    @test ImageInTerminal.should_render_image[] == true
-    @test XTermColors.colormode[] == old_colormode
+    @test ImageInTerminal.SHOULD_RENDER_IMAGE[] == true
+    @test ImageInTerminal.COLORMODE[] == old_colormode
 
     ImageInTerminal.disable_encoding()
-    @test ImageInTerminal.should_render_image[] == false
-    @test XTermColors.colormode[] == old_colormode
+    @test ImageInTerminal.SHOULD_RENDER_IMAGE[] == false
+    @test ImageInTerminal.COLORMODE[] == old_colormode
 
-    ImageInTerminal.should_render_image[] = old_should_render_image
-    XTermColors.colormode[] = old_colormode
+    ImageInTerminal.SHOULD_RENDER_IMAGE[] = old_should_render_image
+    ImageInTerminal.COLORMODE[] = old_colormode
 end
 
 @testset "no encoding" begin
@@ -35,24 +35,24 @@ end
     @test_reference "reference/colorant_show_raw.txt" _tostring(io)
 end
 
-for depth in (24, 8)
-    @testset "$depth bit color" begin
+for mode in (24, 8)
+    @testset "$mode bit color" begin
         ImageInTerminal.enable_encoding()
-        XTermColors.set_colormode(depth)
+        set_colormode(mode)
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), mandril)
-        @test_reference "reference/mandril_show_$(depth)bit.txt" _tostring(
+        @test_reference "reference/mandril_show_$(mode)bit.txt" _tostring(
             io; strip_summary=true
         )
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), rgb_line)
-        @test_reference "reference/rgbline_show_$(depth)bit.txt" _tostring(
+        @test_reference "reference/rgbline_show_$(mode)bit.txt" _tostring(
             io; strip_summary=true
         )
         io = PipeBuffer()
         @ensurecolor show(io, MIME"text/plain"(), RGB(0.5, 0.1, 0.9))
-        @test_reference "reference/colorant_show_$(depth)bit.txt" _tostring(io)
+        @test_reference "reference/colorant_show_$(mode)bit.txt" _tostring(io)
     end
 end
 
-XTermColors.set_colormode(8)  # paranoid
+set_colormode(8)  # reset to default state

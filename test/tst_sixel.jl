@@ -2,8 +2,8 @@ import ImageQualityIndexes, Sixel
 
 @testset "encoder/sixel" begin
     # Force sixel encoding
-    old_encoder = ImageInTerminal.encoder_backend[]
-    ImageInTerminal.encoder_backend[] = :Sixel
+    old_encoder = ImageInTerminal.ENCODER_BACKEND[]
+    ImageInTerminal.ENCODER_BACKEND[] = :Sixel
 
     @testset "mandril" begin
         img = imresize(mandril, 128, 128)
@@ -34,5 +34,5 @@ import ImageQualityIndexes, Sixel
     end
 
     # restore encoder to previous one
-    ImageInTerminal.encoder_backend[] = old_encoder
+    ImageInTerminal.ENCODER_BACKEND[] = old_encoder
 end

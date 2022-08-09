@@ -4,15 +4,15 @@
 [![][pkgeval-img]][pkgeval-url]
 [![][codecov-img]][codecov-url]
 
-ImageInTerminal.jl is a drop-in package that once imported
-changes a how a single `Colorant` and whole `Colorant` arrays (i.e.
-Images) are displayed in the interactive REPL.
+`ImageInTerminal` is a drop-in package that once imported changes
+how a single `Colorant` and whole `Colorant` arrays (regular images)
+are displayed in the interactive REPL.
 The displayed images will be downscaled to fit into the size of
 your active terminal session.
 
 To activate this package simply import it into your Julia session.
 
-### Without this package
+### Without ImageInTerminal
 
 ```julia
 julia> using Images, TestImages
@@ -45,7 +45,7 @@ julia> colorview(RGB, rand(3, 10, 10))
  RGB{Float64}(0.422224,0.914328,0.773111)      RGB{Float64}(0.448258,0.955572,0.0445449)
 ```
 
-### With this package
+### Using ImageInTerminal
 
 ```julia
 julia> using Images, TestImages, ImageInTerminal
@@ -55,53 +55,63 @@ julia> testimage("cameraman")
 julia> colorview(RGB, rand(3, 10, 10))
 ```
 
-<img src="https://cloud.githubusercontent.com/assets/10854026/22923639/92e3b164-f2a2-11e6-85ea-b92bdc4a63e0.png" alt="ImageInTerminal" width="500">
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/example.png" alt="Example" width="500">
 
 ### Sixel encoder (Julia 1.6+)
 
-If [`Sixel`](https://github.com/johnnychen94/Sixel.jl) (requires Julia 1.6+) is loaded, this package will try to encode
-the content using `Sixel` encoder for large images, and thus bring much better image visualization experience in terminal:
+If [`Sixel`](https://github.com/johnnychen94/Sixel.jl) is supported by the terminal, this package will encode
+the content using a `Sixel` encoder for large images, and thus bring much better image visualization experience in terminal:
 
-<img src="https://user-images.githubusercontent.com/8684355/118361462-20954800-b5be-11eb-8505-9455a0b00ec0.png" alt="Sixel" width="500">
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/sixel.png" alt="Sixel" width="500">
 
 However, do notice that not all terminals support sixel format.
 See [Terminals that support sixel](https://github.com/johnnychen94/Sixel.jl#terminals-that-support-sixel) for more information.
 
-### 8-bit (256) colors and 24-bit colors
+### Display equations
 
-By default this packages will detect if your running terminal supports 24 bit colors, i.e., true color.
-If it does, then the image will be displayed in 24-bit colors,
-otherwise it will use 256 colors (8-bit) as a fallback option.
-To manually switch between 24-bit colors and 256 colors, you can use the internal helpers:
+`ImageInTerminal` can be used to display latex equations from [Latexify.jl](https://github.com/korsbo/Latexify.jl), here on `mlterm`:
 
 ```julia
-using XTermColors
-XTermColors.set_colormode(8)
-XTermColors.set_colormode(24)
+using ImageInTerminal, Latexify
+
+render(latexify(:(iħ * (∂Ψ(𝐫, t) / ∂t) = -ħ^2 / 2m * ΔΨ(𝐫, t) + V * Ψ(𝐫, t))), MIME("image/png"))
+```
+
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/latexify.png" alt="Latexify" width="500">
+
+### 8-bit (256) colors and 24-bit colors
+
+By default this packages will detect if your running terminal supports 24-bit colors (true colors).
+If it does, the image will be displayed in 24-bit colors, otherwise it fallbacks to 8-bit (256 colors).
+To manually switch between 24-bit and 8-bit colors, you can use the internal helpers:
+
+```julia
+using ImageInTerminal
+ImageInTerminal.set_colormode(8)
+ImageInTerminal.set_colormode(24)
 ```
 
 Note that 24 bits format only works as expected if your terminal supports it,
-otherwise you are likely to get some random outputs. To check if your terminal
-supports 24 bits color, you can check if the environment variable `COLORTERM` is
-`24bit` (or `truecolor`).
+otherwise you are likely to get some random outputs.
+To check if your terminal supports 24 bits color, you can check if
+the environment variable `COLORTERM` is set to `24bit` (or `truecolor`).
 
 Here's how images are displayed in 24-bit colors:
 
-<img src="https://user-images.githubusercontent.com/8684355/76688541-a17a4c00-6668-11ea-9fb9-41669fbec07e.png" alt="24bit color" width="500">
+<img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/cameraman.png" alt="Cameraman" width="500">
 
 ### Enable and disable
 
-If you want to temporarily disable this package, you can call `ImageInTerminal.disable_encoding()`. To
-restore the encoding functionality with `ImageInTerminal.enable_encoding()`.
+If you want to temporarily disable this package, you can call `ImageInTerminal.disable_encoding()`.
+To restore the encoding functionality use `ImageInTerminal.enable_encoding()`.
 
 ## Troubleshooting
 
-If you see out of place horizontal lines in your Image it means
-that your font displays the utilized unicode block-characters
-in an unfortunate way. Try changing font or reducing your
-terminal's line-spacing. If your font is Source Code Pro, update to
-the latest version.
-
+If you see out of place horizontal lines in your Image it means that
+your font displays the unicode block-characters in an unfortunate way.
+Try changing font or reducing your terminal's line-spacing.
+If your font is Source Code Pro, update to the latest version.
+It is recommended to use the [JuliaMono](https://juliamono.netlify.app) font.
 
 <!-- URLS -->
 

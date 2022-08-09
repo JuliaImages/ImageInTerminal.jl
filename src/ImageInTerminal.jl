@@ -6,15 +6,19 @@ using ColorTypes
 using Crayons
 using FileIO
 
+import XTermColors: TermColorDepth, TermColor8bit, TermColor24bit
 import ImageBase: restrict
 import Sixel
 
 # -------------------------------------------------------------------
 # overload default show in the REPL for colorant (arrays)
 
-const encoder_backend = Ref(:ImageInTerminal)
-const should_render_image = Ref(true)
-const small_imgs_sixel = Ref(false)
+const COLORMODE = Ref{TermColorDepth}(TermColor8bit())
+const ENCODER_BACKEND = Ref(:XTermColors)
+const SHOULD_RENDER_IMAGE = Ref(true)
+const SMALL_IMGS_SIXEL = Ref(false)
+const RESET = Crayon(; reset=true)
+const SUMMARY = Ref(false)
 
 """
     disable_encoding()
@@ -23,7 +27,7 @@ Disable the image encoding feature and show images as if they are normal arrays.
 
 This can be restored by calling `ImageInTerminal.enable_encoding()`.
 """
-disable_encoding() = (should_render_image[] = false)
+disable_encoding() = SHOULD_RENDER_IMAGE[] = false
 
 """
     enable_encoding()
@@ -31,9 +35,9 @@ disable_encoding() = (should_render_image[] = false)
 Enable the image encoding feature and show images in terminal.
 
 This can be disabled by calling `ImageInTerminal.disable_encoding()`. To choose between
-different encoding method, call `XTermColors.set_colormode(8)` or `XTermColors.set_colormode(24)`.
+different encoding method, call `ImageInTerminal.set_colormode(8)` or `ImageInTerminal.set_colormode(24)`.
 """
-enable_encoding() = (should_render_image[] = true)
+enable_encoding() = SHOULD_RENDER_IMAGE[] = true
 
 """
     choose_sixel(img::AbstractArray)
@@ -41,13 +45,13 @@ enable_encoding() = (should_render_image[] = true)
 Choose to encode the image using sixels based on the size of the encoded image.
 """
 function choose_sixel(img::AbstractArray)
-    encoder_backend[] == :Sixel || return false
+    ENCODER_BACKEND[] === :Sixel || return false
 
     # Sixel requires at least 6 pixels in row direction and thus doesn't perform very well for vectors.
     # ImageInTerminal encoder is good enough for vector case.
     ndims(img) == 1 && return false
 
-    if small_imgs_sixel[]
+    if SMALL_IMGS_SIXEL[]
         return true
     else
         # Small images really do not need sixel encoding.
@@ -61,8 +65,8 @@ end
 
 # colorant arrays
 function Base.show(io::IO, mime::MIME"text/plain", img::AbstractArray{<:Colorant})
-    if should_render_image[]
-        println(io, summary(img), ":")
+    if SHOULD_RENDER_IMAGE[]
+        SUMMARY[] && println(io, summary(img), ":")
         imshow(io, img)
     else
         invoke(Base.show, Tuple{typeof(io),typeof(mime),AbstractArray}, io, mime, img)
@@ -71,12 +75,19 @@ end
 
 # colorant
 function Base.show(io::IO, mime::MIME"text/plain", color::Colorant)
-    if should_render_image[]
-        fgcol = XTermColors._colorant2ansi(color, XTermColors.colormode[])
+    if SHOULD_RENDER_IMAGE[]
+        fgcol = XTermColors._colorant2ansi(color, COLORMODE[])
         chr = XTermColors._charof(alpha(color))
-        print(io, Crayon(; foreground=fgcol), chr, chr, " ")
-        print(io, Crayon(; foreground=:white), color)
-        print(io, Crayon(; reset=true))
+        XTermColors._printc(
+            io,
+            Crayon(; foreground=fgcol),
+            chr,
+            chr,
+            ' ',
+            Crayon(; foreground=:white),
+            color,
+            RESET
+        )
     else
         invoke(Base.show, Tuple{typeof(io),typeof(mime),Any}, io, mime, color)
     end
@@ -87,13 +98,11 @@ include("display.jl")
 """
     imshow([stream], img, [maxsize])
 
-Displays the given image `img` using unicode characters and
-terminal colors (defaults to 256 colors).
+Displays the given image `img` using unicode characters and terminal colors (defaults to 256 colors).
 `img` has to be an array of `Colorant`.
 
-If working in the REPL, the function tries to choose the encoding
-based on the current display size. The image will also be
-downsampled to fit into the display.
+If working in the REPL, the function tries to choose the encoding based on the current display size.
+The image will also be downsampled to fit into the display.
 
 Supported encoding:
     - sixel (`Sixel` backend)
@@ -101,16 +110,24 @@ Supported encoding:
 """
 
 function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io))
+    buf = PipeBuffer()
+    io_color = get(io, :color, false)
+    iobuf = IOContext(buf, :color => io_color)
     if choose_sixel(img)
-        sixel_encode(io, img)
+        sixel_encode(iobuf, img)
     else
-        colormode = XTermColors.colormode[]
         if ndims(img) > 2
-            Base.show_nd(io, img, (io, x) -> ascii_display(io, x, colormode, maxsize), true)
+            Base.show_nd(
+                iobuf,
+                img,
+                (iobuf, x) -> ascii_display(iobuf, x, COLORMODE[], maxsize),
+                true
+            )
         else
-            ascii_display(io, img, colormode, maxsize)
+            ascii_display(iobuf, img, COLORMODE[], maxsize)
         end
     end
+    write(io, read(iobuf, String))
 end
 
 imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
@@ -119,12 +136,35 @@ imshow(img, args...) =
 
 sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)
 
+"""
+    set_colormode(bit::Int)
+
+Sets the terminal color depth to the given argument.
+"""
+function set_colormode(bit::Int)
+    if bit == 8
+        COLORMODE[] = TermColor8bit()
+    elseif bit == 24
+        COLORMODE[] = TermColor24bit()
+    else
+        error("Setting color depth to $bit-bit is not supported, valid modes are:
+          - 8bit (256 colors)
+          - 24bit")
+    end
+    COLORMODE[]
+end
+
+is_24bit_supported() = lowercase(get(ENV, "COLORTERM", "")) in ("24bit", "truecolor")
+
 function __init__()
     enable_encoding()
 
-    Sixel.is_sixel_supported() && (encoder_backend[] = :Sixel)
+    # use 24bit if the terminal supports it
+    is_24bit_supported() && set_colormode(24)
 
-    pushdisplay(TerminalGraphicDisplay(stdout, devnull))
+    Sixel.is_sixel_supported() && (ENCODER_BACKEND[] = :Sixel)
+
+    pushdisplay(TerminalGraphicDisplay(stdout))
 end
 
 end
