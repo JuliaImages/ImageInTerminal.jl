@@ -1,13 +1,11 @@
 module ImageInTerminal
 
 using XTermColors
-using ImageCore
 using ColorTypes
 using Crayons
 using FileIO
 
 import XTermColors: TermColorDepth, TermColor8bit, TermColor24bit
-import ImageBase: restrict
 import Sixel
 
 # -------------------------------------------------------------------
@@ -57,8 +55,8 @@ function choose_sixel(img::AbstractArray)
         # Small images really do not need sixel encoding.
         # `60` is a randomly chosen value (10 sixel); it's not the best because
         # 60x60 image will be very small in terminal after sixel encoding.
-        any(size(img) .<= 12) && return false
-        all(size(img) .<= 60) && return false
+        any(size(img) .≤ 12) && return false
+        all(size(img) .≤ 60) && return false
         return true
     end
 end
@@ -110,24 +108,19 @@ Supported encoding:
 """
 
 function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io))
-    buf = PipeBuffer()
-    io_color = get(io, :color, false)
-    iobuf = IOContext(buf, :color => io_color)
+    buf = IOContext(PipeBuffer(), :color => get(io, :color, false))
     if choose_sixel(img)
-        sixel_encode(iobuf, img)
+        sixel_encode(buf, img)
     else
         if ndims(img) > 2
             Base.show_nd(
-                iobuf,
-                img,
-                (iobuf, x) -> ascii_display(iobuf, x, COLORMODE[], maxsize),
-                true
+                buf, img, (buf, x) -> ascii_show(buf, x, COLORMODE[], :auto, maxsize), true
             )
         else
-            ascii_display(iobuf, img, COLORMODE[], maxsize)
+            ascii_show(buf, img, COLORMODE[], :auto, maxsize)
         end
     end
-    write(io, read(iobuf, String))
+    write(io, read(buf, String))
 end
 
 imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)

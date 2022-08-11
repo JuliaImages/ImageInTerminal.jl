@@ -6,8 +6,6 @@ version = "0.5.0"
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-ImageBase = "c817782e-172a-44cc-b673-b171935fbb9e"
-ImageCore = "a09fc81d-aa75-5fe9-8630-4744c3626534"
 Sixel = "45858cf5-a6b0-47a3-bbea-62219f50df47"
 XTermColors = "c8c2cc18-de81-4e68-b407-38a3a0c0491f"
 
@@ -15,14 +13,13 @@ XTermColors = "c8c2cc18-de81-4e68-b407-38a3a0c0491f"
 ColorTypes = "0.9 - 0.11"
 Crayons = "^4.1"
 FileIO = "^1.6"
-ImageBase = "0.1"
-ImageCore = "0.9"
 Sixel = "0.1"
-XTermColors = "0.1"
+XTermColors = "0.2"
 julia = "1.6"
 
 [extras]
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
+ImageBase = "c817782e-172a-44cc-b673-b171935fbb9e"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageQualityIndexes = "2996bd0c-7a13-11e9-2da2-2f5ce47296a9"
 ImageTransformations = "02fcd773-0e25-5acc-982a-7f6622650795"
@@ -34,4 +31,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 
 [targets]
-test = ["CoordinateTransformations", "ImageIO", "ImageQualityIndexes", "ImageTransformations", "OffsetArrays", "ReferenceTests", "Rotations", "SparseArrays", "Test", "TestImages"]
+test = ["CoordinateTransformations", "ImageBase", "ImageIO", "ImageQualityIndexes", "ImageTransformations", "OffsetArrays", "ReferenceTests", "Rotations", "SparseArrays", "Test", "TestImages"]
