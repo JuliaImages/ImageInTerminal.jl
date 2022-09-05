@@ -74,7 +74,7 @@ See [Terminals that support sixel](https://github.com/johnnychen94/Sixel.jl#term
 ```julia
 using ImageInTerminal, Latexify
 
-render(latexify(:(iħ * (∂Ψ(𝐫, t) / ∂t) = -ħ^2 / 2m * ΔΨ(𝐫, t) + V * Ψ(𝐫, t))), MIME("image/png"))
+render(latexify(:(iħ * (∂Ψ(𝐫, t) / ∂t) = -ħ^2 / 2m * ΔΨ(𝐫, t) + V * Ψ(𝐫, t))), dpi=200)
 ```
 
 <img src="https://github.com/JuliaImages/ImageInTerminal.jl/raw/imgs/latexify.png" alt="Latexify" width="500">
