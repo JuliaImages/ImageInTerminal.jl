@@ -107,17 +107,18 @@ Supported encoding:
     - ascii (`XTermColors` backend)
 """
 
-function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io); callback = nothing)
+function imshow(
+    io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io); kw...
+)
     buf = IOContext(PipeBuffer(), :color => get(io, :color, false))
     if choose_sixel(img)
         sixel_encode(buf, img)
     else
+        print_func = (io, x) -> ascii_show(io, x, COLORMODE[], :auto, maxsize; kw...)
         if ndims(img) > 2
-            Base.show_nd(
-                buf, img, (buf, x) -> ascii_show(buf, x, COLORMODE[], :auto, maxsize; callback = callback), true
-            )
+            Base.show_nd(buf, img, print_func, true)
         else
-            ascii_show(buf, img, COLORMODE[], :auto, maxsize; callback = callback)
+            print_func(buf, img)
         end
     end
     write(io, read(buf, String))
