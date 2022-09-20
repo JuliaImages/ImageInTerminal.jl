@@ -107,24 +107,25 @@ Supported encoding:
     - ascii (`XTermColors` backend)
 """
 
-function imshow(io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io))
+function imshow(
+    io::IO, img::AbstractArray{<:Colorant}, maxsize::Tuple=displaysize(io); kw...
+)
     buf = IOContext(PipeBuffer(), :color => get(io, :color, false))
     if choose_sixel(img)
         sixel_encode(buf, img)
     else
+        print_func = (io, x) -> ascii_show(io, x, COLORMODE[], :auto, maxsize; kw...)
         if ndims(img) > 2
-            Base.show_nd(
-                buf, img, (buf, x) -> ascii_show(buf, x, COLORMODE[], :auto, maxsize), true
-            )
+            Base.show_nd(buf, img, print_func, true)
         else
-            ascii_show(buf, img, COLORMODE[], :auto, maxsize)
+            print_func(buf, img)
         end
     end
     write(io, read(buf, String))
 end
 
-imshow(img::AbstractArray{<:Colorant}, args...) = imshow(stdout, img, args...)
-imshow(img, args...) =
+imshow(img::AbstractArray{<:Colorant}, args...; kw...) = imshow(stdout, img, args...; kw...)
+imshow(img, args...; kw...) =
     throw(ArgumentError("imshow only supports colorant arrays with 1 or 2 dimensions"))
 
 sixel_encode(args...; kwargs...) = Sixel.sixel_encode(args...; kwargs...)

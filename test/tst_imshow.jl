@@ -92,4 +92,17 @@ end
     end
 end
 
+@testset "callback" begin
+    img = imresize(mandril, 10, 10)
+    io = PipeBuffer()
+    fgcols, bgcols = [], []
+    callback(I, fgcol, bgcol, chars...) = begin
+        push!(fgcols, fgcol)
+        push!(bgcols, bgcol)
+    end
+    @ensurecolor imshow(io, img; callback=callback)
+    @test length(fgcols) == prod(size(img))
+    @test all(ismissing.(bgcols))
+end
+
 set_colormode(8)  # reset to default state
