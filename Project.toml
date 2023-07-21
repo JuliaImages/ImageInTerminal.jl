@@ -1,6 +1,6 @@
 name = "ImageInTerminal"
 uuid = "d8c32880-2388-543b-8c61-d9f865259254"
-version = "0.4.8"
+version = "0.4.9"
 
 [deps]
 Crayons = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
@@ -11,7 +11,7 @@ Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 [compat]
 Crayons = "4.1"
 ImageBase = "0.1"
-ImageCore = "0.9"
+ImageCore = "0.9, 0.10"
 Requires = "1"
 julia = "1"
 
