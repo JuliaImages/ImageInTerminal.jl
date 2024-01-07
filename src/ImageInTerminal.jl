@@ -55,8 +55,8 @@ function choose_sixel(img::AbstractArray)
         # Small images really do not need sixel encoding.
         # `60` is a randomly chosen value (10 sixel); it's not the best because
         # 60x60 image will be very small in terminal after sixel encoding.
-        any(size(img) .≤ 12) && return false
-        all(size(img) .≤ 60) && return false
+        any(size(img)[1:2] .≤ 12) && return false
+        all(size(img)[1:2] .≤ 60) && return false
         return true
     end
 end
