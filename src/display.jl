@@ -4,9 +4,11 @@ struct TerminalGraphicDisplay{TC<:IO,TS<:IO} <: AbstractDisplay
 end
 TerminalGraphicDisplay(io::IO) = TerminalGraphicDisplay(io, io)
 
-Base.displayable(::TerminalGraphicDisplay, ::MIME"image/png", x::Any) = showable("image/png", x)
+Base.displayable(::TerminalGraphicDisplay, ::MIME"image/png", x::Any) =
+    showable("image/png", x)
 Base.displayable(::TerminalGraphicDisplay, ::MIME"image/png", ::Vector{UInt8}) = true
-Base.displayable(::TerminalGraphicDisplay, ::MIME"image/png", ::AbstractArray{<:Colorant}) = true
+Base.displayable(::TerminalGraphicDisplay, ::MIME"image/png", ::AbstractArray{<:Colorant}) =
+    true
 
 function Base.display(d::TerminalGraphicDisplay, ::MIME"image/png", x::Any)
     io = IOBuffer()

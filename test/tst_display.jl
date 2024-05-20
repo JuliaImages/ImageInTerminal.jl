@@ -17,7 +17,8 @@
     @test length(read(io, String)) > 5_000
 
     struct Foo end
-    Base.show(io::IO, ::MIME"image/png", ::Foo) = FileIO.save(Stream{format"PNG"}(io), FileIO.load(fn))
+    Base.show(io::IO, ::MIME"image/png", ::Foo) =
+        FileIO.save(Stream{format"PNG"}(io), FileIO.load(fn))
     dsp = ImageInTerminal.TerminalGraphicDisplay(io)
     display(dsp, MIME("image/png"), Foo())
     @test length(read(io, String)) > 5_000
