@@ -10,7 +10,7 @@ Sixel = "45858cf5-a6b0-47a3-bbea-62219f50df47"
 XTermColors = "c8c2cc18-de81-4e68-b407-38a3a0c0491f"
 
 [compat]
-ColorTypes = "0.9 - 0.11"
+ColorTypes = "0.9 - 0.12"
 Crayons = "^4.1"
 FileIO = "^1.6"
 Sixel = "0.1"
